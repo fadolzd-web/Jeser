@@ -3,18 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>تقويم الصائغ - جسر أصلي v2 - ID حقيقي من السيرفر</title>
+<title>تقويم الصائغ - جسر v5 - من ملفك، بدون تخمين</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#d6ece6;font-family:system-ui,Tahoma,Arial,sans-serif;color:#0f2e2a;padding:12px 12px 90px}
 .top{background:#eef7f4;border-radius:22px;padding:14px}
-.top h1{font-size:22px}.top .sub{font-size:13px;color:#0e7a6e;font-weight:800;line-height:1.6}
+.top h1{font-size:21px}.top .sub{font-size:13px;color:#0e7a6e;font-weight:800;line-height:1.7}
 input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #bcd;font-size:16px;margin-top:8px;background:#fff}
-.tabs{display:flex;gap:8px;margin-top:10px}
-.tabs button{flex:1;padding:12px;border-radius:12px;border:2px solid #0e7a6e;background:#fff;color:#0e7a6e;font-weight:900}
-.tabs button.on{background:#0e7a6e;color:#fff}
 .bridge{margin:12px 0;background:#0f2e2a;color:#d6ece6;border-radius:16px;padding:12px}
-.log{font-size:12.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,monospace;max-height:300px;overflow:auto;background:#1a3d38;padding:8px;border-radius:10px;margin-top:8px}
+.log{font-size:12.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,monospace;max-height:420px;overflow:auto;background:#1a3d38;padding:8px;border-radius:10px;margin-top:8px}
 .fail{background:#ffeded;color:#a00;border:2px solid #ff9a9a;border-radius:16px;padding:14px;margin:12px 0;font-weight:800;text-align:center;display:none}
 .fail.show{display:block}
 .ok{background:#e6ffef;color:#0a6a2e;border:2px solid #7ef0c1;border-radius:16px;padding:12px;margin:12px 0;font-weight:800;text-align:center;display:none}
@@ -24,156 +21,194 @@ input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #bcd;fo
 .card{background:linear-gradient(135deg,#0e8a7a,#0a6a5e);color:#fff;border-radius:22px;padding:14px;margin:12px 0}
 .card .t{font-size:19px;font-weight:800}.card .main{font-size:52px;font-weight:900;line-height:1.1}
 .card .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:14px;font-weight:700;margin-top:8px}
-table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;font-size:13px}
-th,td{padding:8px 6px;border-bottom:1px solid #eee;text-align:center}
-th{background:#0e7a6e;color:#fff}
-.sec{background:#22302e;color:#7ef0c1;border-radius:18px;padding:14px;margin:12px 0}
 .btn{width:100%;background:#0e7a6e;color:#fff;border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px}
 .btnY{width:100%;background:#ffd166;color:#0f2e2a;border:0;border-radius:14px;padding:13px;font-weight:900;font-size:16px;margin-top:8px}
+.btnB{width:100%;background:#fff;color:#0f2e2a;border:2px solid #0e7a6e;border-radius:14px;padding:13px;font-weight:900;font-size:16px;margin-top:8px}
 .diag{background:#fff;border-radius:14px;padding:12px;margin:12px 0;font-size:12.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,monospace}
-.small{font-size:12px;opacity:.85;line-height:1.6}
+.src{background:#fff;border:1px solid #0e7a6e;border-radius:14px;padding:12px;margin:12px 0;font-size:13px;line-height:1.7}
+.src b{color:#0e7a6e}
 </style>
 </head>
 <body>
 <div class="top">
-<h1>تقويم الصائغ - جسر أصلي v2</h1>
-<div class="sub">تصليح: الـ ID تبع الـ DB المحلي (107) مش هو ID السيرفر. السيرفر بيعطي ID نصي متل 698b1dd2... لازم نجيبه من /cities أول، وبعدين نجرب المواقيت فيه.<br>وما عاد نقول "وصلت داتا" بس لأن /cities نجح - لازم توصل مواقيت فعلا.</div>
-<div style="margin-top:8px;background:#fff;border-radius:10px;padding:8px;font-size:13px">نوع الجسر: <b id="bridgeType">جارٍ الفحص...</b><br>Server ID للمدينة المختارة: <b id="serverId">— لم نجيبه بعد —</b><br>عدد مدن السيرفر: <b id="serverCitiesCount">—</b></div>
-<label style="font-weight:800">المدينة - 2439 مدينة من الـ DB المحلي</label>
-<input id="search" placeholder="دوّر: النجف، بيروت، طهران...">
-<select id="citySelect"><option>جارٍ تحميل المدن...</option></select>
+<h1>تقويم الصائغ - جسر v5 - من ملفك</h1>
+<div class="sub">ما فيه تخمين بعد. المصدر منسوخ من ملفك حرف حرف:<br>الرابط: <b>https://taqwimalsayegh.com/city/{code}</b><br>الكود: <b>107 = النجف الأشرف</b> - نفس <b>_selectedSayeghCode</b> بملفك<br>التحليل: <b>parseHijriMiladi + parsePrayerTimesReal</b> - منسوخين من ملفك، ما تغيروا<br>التغيير الوحيد الجراحي: <b>النقل</b> - بدل <b>fetchWith7ProxiesParallel</b> (7 بروكسيات) صار <b>CapacitorHttp.get</b> مباشرة - نفس الصفحة، نفس الـ HTML، من دون بروكسي ومن دون CORS.</div>
+<div style="margin-top:8px;background:#fff;border-radius:10px;padding:8px;font-size:13px">نوع الجسر: <b id="bridgeType">جارٍ الفحص...</b><br>الرابط الحالي: <b id="goodUrl">—</b><br>طول الـ HTML: <b id="htmlLen">—</b></div>
+<label style="font-weight:800">المدينة - كود الصائغ (مش ID قاعدة بيانات)</label>
+<select id="citySelect"></select>
+<div style="display:flex;gap:8px;margin-top:8px">
+<input id="newName" placeholder="اسم مدينة جديدة - مثال: بيروت">
+<input id="newCode" placeholder="كود الصائغ - أرقام فقط - مثال: 236">
+</div>
+<button class="btnB" id="addCityBtn">➕ إضافة مدينة بنفس منطق ملفك</button>
 <div id="cityInfo" style="font-size:13px;margin-top:8px;line-height:1.7;background:#fff;border-radius:10px;padding:8px">—</div>
-<label style="font-weight:800;display:block;margin-top:10px">التاريخ (ميلادي)</label>
-<input type="date" id="dateInput" value="2026-11-19">
-<div class="tabs"><button id="tabDay" class="on">اليوم</button><button id="tabMonth">الشهر + إمساكية</button><button id="tabYear">السنة</button></div>
 </div>
-<div class="bridge"><div><b>الجسر:</b> <span id="bridge-status">جاهز</span></div><div class="log" id="bridge-log">ما صار أي طلب بعد.</div><button class="btn" id="runBtn">1. جيب ID السيرفر + جرّب جسر اليوم</button><button class="btnY" id="runMonthBtn">جرّب رزنامة الشهر + إمساكية</button><button class="btnY" id="runYearBtn">جرّب رزنامة السنة</button></div>
-<div class="fail" id="failBox">❌ فشل الجسر - ما وصلت مواقيت من السيرفر - البطاقات ضلّت فاضية عمدا.</div>
-<div class="warn" id="warnBox">⚠️ وصلت قائمة المدن من السيرفر بس، بعد ما وصلت مواقيت. شوف التشخيص: أي مسار رجّع 404 وأي مسار رجّع 200.</div>
-<div class="ok" id="okBox">✅ وصلت مواقيت حقيقية من السيرفر - مش حساب محلي.</div>
+<div class="src"><b>مصدر v5 - من ملفك:</b><br>• <b>window._sayeghProxies</b> = 7 بروكسيات: corsproxy.io / proxy.cors.sh / allorigins / corsproxy.org / hoppscotch<br>• <b>window.fetchWith7ProxiesParallel(url)</b> = بيجرب الـ 7 بالتوازي، بيرجع أول وحدة طولها &gt; 500<br>• <b>window.fetchPrayers(code)</b> = url = <b>https://taqwimalsayegh.com/city/ + code</b> ثم <b>parseHijriMiladi(html)</b> + <b>parsePrayerTimesReal(html)</b><br>• <b>api.sayeghcalendar.com</b> مش موجود أبداً بملفك - لهيك كل تخمينات v1-v3 رجعت 404. هيدا كان الخطأ، وتصلّح هون.</div>
+<div class="bridge"><div><b>الجسر:</b> <span id="bridge-status">جاهز</span></div><div class="log" id="bridge-log">ما صار أي طلب بعد.</div>
+<button class="btn" id="runBtn">جيب اليوم من الصائغ بالجسر - من دون بروكسي</button>
+</div>
+<div class="fail" id="failBox">❌ فشل الجسر - ما وصلت صفحة HTML من الصائغ - البطاقات ضلّت فاضية عمدا.</div>
+<div class="warn" id="warnBox">⚠️ وصلت صفحة HTML بس التحليل ما لقى هجري / مواقيت. شوف التشخيص والـ HTML الخام.</div>
+<div class="ok" id="okBox">✅ وصلت داتا حقيقية من صفحة الصائغ - نفس الصفحة يللي كان يجيبها البروكسي - مش حساب محلي.</div>
 <div id="dayView">
-<div class="card"><div class="t">صلاة الصبح <span style="color:#ffd166" id="cd">—</span></div><div class="main" id="v-subh">—</div><div class="meta"><span>إمساك: <b id="v-imsak">—</b></span><span>أذان الفجر: <b id="v-fajr">—</b></span><span>الشروق: <b id="v-sunrise">—</b></span><span>آخر الفضيلة: <b id="v-subhF">—</b></span></div></div>
-<div class="card"><div class="t">أذان الظهر</div><div class="main" id="v-dhuhr">—</div><div class="meta"><span>الزوال: <b id="v-zawal">—</b></span><span>أول فضيلة العصر: <b id="v-asr1">—</b></span><span>آخر فضيلة العصر: <b id="v-asrEnd">—</b></span><span>العصر: <b id="v-asr">—</b></span><span>الشمس باتجاه القبلة: <b id="v-qiblaT">—</b></span></div></div>
+<div class="card"><div class="t">صلاة الصبح <span style="color:#ffd166" id="cd">—</span></div><div class="main" id="v-subh">—</div><div class="meta"><span>الإمساك: <b id="v-imsak">—</b></span><span>أذان الفجر: <b id="v-fajr">—</b></span><span>الشروق: <b id="v-sunrise">—</b></span><span>آخر فضيلة الصبح: <b id="v-subhF">—</b></span></div></div>
+<div class="card"><div class="t">أذان الظهر</div><div class="main" id="v-dhuhr">—</div><div class="meta"><span>الزوال: <b id="v-zawal">—</b></span><span>أول فضيلة العصر: <b id="v-asr1">—</b></span><span>آخر فضيلة الظهر: <b id="v-dhuhrF">—</b></span><span>العصر: <b id="v-asr">—</b></span></div></div>
 <div class="card"><div class="t">أذان المغرب</div><div class="main" id="v-maghrib">—</div><div class="meta"><span>الغروب: <b id="v-sunset">—</b></span><span>أول فضيلة العشاء: <b id="v-ishaF">—</b></span><span>منتصف الليل: <b id="v-mid">—</b></span><span>السحر: <b id="v-sahar">—</b></span></div></div>
-<div class="card" style="background:#fff;color:#0f2e2a"><div class="t">التواريخ - من الجسر فقط</div><div class="meta" style="font-size:15px"><span>هجري: <b id="v-hijri">—</b></span><span>ميلادي: <b id="v-mil">—</b></span><span>فارسي: <b id="v-farsi">—</b></span></div><div id="v-events" style="margin-top:10px;font-weight:800">المناسبات: — بانتظار الجسر —</div></div>
+<div class="card" style="background:#fff;color:#0f2e2a"><div class="t">التواريخ - من صفحة الصائغ فقط</div><div class="meta" style="font-size:15px"><span>هجري: <b id="v-hijri">—</b></span><span>ميلادي: <b id="v-mil">—</b></span></div><div id="v-datesRaw" style="margin-top:8px;font-size:13px;line-height:1.7">هجري خام: —<br>ميلادي خام: —</div><div style="margin-top:8px;font-size:12px">المصدر: <a id="srcLink" href="#" target="_blank" style="color:#0e7a6e;font-weight:800">—</a></div></div>
 </div>
-<div id="monthView" style="display:none"><h3 style="margin:12px 0">رزنامة الشهر + إمساكية - من الجسر فقط</h3><div style="overflow:auto"><table><thead><tr><th>ميلادي</th><th>هجري</th><th>إمساك</th><th>فجر</th><th>صبح</th><th>شروق</th><th>ظهر</th><th>عصر</th><th>مغرب</th><th>عشاء</th><th>منتصف</th><th>سحر</th></tr></thead><tbody id="monthBody"><tr><td colspan="12">— بانتظار الجسر —</td></tr></tbody></table></div><div id="monthRaw" class="diag">الجواب الخام بيظهر هون.</div></div>
-<div id="yearView" style="display:none"><h3 style="margin:12px 0">رزنامة السنة - من الجسر فقط</h3><div id="yearBody"></div><div id="yearRaw" class="diag">الجواب الخام بيظهر هون.</div></div>
-<div class="sec"><h3 style="text-align:center">جغرافيا البلد - من قاعدة المدن فقط</h3><div id="geo2">—</div><div>القبلة المخزنة: <b id="qiblaDB">—</b> (مش محسوبة)</div></div>
-<div class="diag" id="diag">تشخيص v2:
-- الـ ID المحلي 107 مش هو ID السيرفر. السيرفر بيعطي ID نصي.
-- أول خطوة: GET /cities، نلاقي النجف بالاسم، ناخد ID السيرفر.
-- تاني خطوة: نجرب المواقيت بكل الـ IDات: السيرفر + المحلي + الاسم، وبكل المسارات المحتملة.
-- النجاح = وصلت مواقيت فعلا (imsak/fajr/subh...)، مش بس /cities.
+<div class="diag" id="diag">تشخيص v5 - من ملفك:
+- الرابط = https://taqwimalsayegh.com/city/{code}
+- النقل = CapacitorHttp.get مباشرة (OkHttp) - ما بيخضع لـ CORS، لهيك ما بدو بروكسي.
+- التحليل = نفس دوال ملفك، منسوخة حرف حرف.
+- إذا وصلت HTML بس التحليل فشل، بيظهر أول 3000 حرف من الـ HTML هون لتقارنها مع ملفك.
 </div>
+<div class="diag" id="htmlRaw">الـ HTML الخام بيظهر هون - أول 3000 حرف.</div>
 <script>
-const API="https://api.sayeghcalendar.com/";
-let CITIES=[], sel=null, serverCities=[], serverId=null;
-const selEl=document.getElementById('citySelect');
+// ===== من ملفك - حرف حرف =====
+function toLat(s){return (s||'').toString().replace(/[٠-٩]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-0x0660+48);}).replace(/[۰-۹]/g,function(d){return String.fromCharCode(d.charCodeAt(0)-0x06F0+48);});}
+window.parseHijriMiladi=function(html){
+ try{
+ var txt=toLat(html);
+ var hijri=null, miladi=null;
+ var hijriMonths='(محرم|المحرم|Muharram|Moharram|صفر|الصفر|صفر المظفر|صفرالمظفر|صفر مظفر|صفر الخير|Safar|Safar al-Muzaffar|Safar al-Mudhaffar|ربيع الأول|ربيع الاول|ربيع أول|ربيع اول|الربيع الأول|ربيع 1|Rabi al-Awwal|Rabi al-Awal|Rabi I|Rabi 1|Rabi al Awwal|ربيع الثاني|ربيع ثاني|ربيع الآخر|ربيع الاخر|ربيع 2|Rabi al-Thani|Rabi al-Sani|Rabi II|Rabi 2|جمادى الأولى|جمادى الاولى|جمادي الأولى|جمادي الاولى|جمادى أولى|جمادى 1|Jumada al-Ula|Jumada al-Oula|Jumada I|جمادى الآخرة|جمادى الاخرة|جمادي الآخرة|جمادي الاخرة|جمادى الثانية|جمادى 2|Jumada al-Akhirah|Jumada al-Akhira|Jumada II|رجب|الرجب|Rajab|شعبان|الشعبان|Shaban|Shaaban|رمضان|شهر رمضان|Ramadan|Ramadhan|شوال|Shawwal|ذو القعدة|ذو القعده|ذي القعدة|Dhu al-Qadah|Dhul Qadah|ذو الحجة|ذو الحجه|ذي الحجة|Dhu al-Hijjah|Dhul Hijjah|Zul Hijjah|1|2|3|4|5|6|7|8|9|10|11|12|01|02|03|04|05|06|07|08|09)';
+ var hijriPatterns=[new RegExp('(\\d{1,2})\\s+'+hijriMonths+'\\s+(14\\d{2})','gi'),new RegExp(hijriMonths+'\\s+(\\d{1,2})[,،]?\\s+(14\\d{2})','gi')];
+ for(var pi=0; pi<hijriPatterns.length; pi++){var mm=txt.match(hijriPatterns[pi]); if(mm&&mm[0]){ hijri=mm[0].trim(); break; } }
+ var miladiMonthsAr='(يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر|كانون الثاني|كانون الأول|كانون الاول|شباط|آذار|نيسان|أيار|حزيران|تموز|آب|أيلول|تشرين الأول|تشرين الاول|تشرين الثاني|كانون الأول|جانفي|فيفري|مارس|أفريل|ماي|جوان|جويلية|أوت|سبتمبر|أكتوبر|نوفمبر|ديسمبر|January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)';
+ var miladiPatterns=[new RegExp('(\\d{1,2})\\s+'+miladiMonthsAr+'\\s+(\\d{4})','gi'),new RegExp(miladiMonthsAr+'\\s+(\\d{1,2})[,،]?\\s+(\\d{4})','gi'),new RegExp('(\\d{4})[-/](\\d{1,2})[-/](\\d{1,2})','g'),new RegExp('(\\d{1,2})[-/](\\d{1,2})[-/](\\d{4})','g')];
+ for(var pj=0; pj<miladiPatterns.length; pj++){var m2=txt.match(miladiPatterns[pj]); if(m2&&m2[0]){ miladi=m2[0].trim(); break; } }
+ return {hijri:hijri, miladi:miladi};
+ }catch(e){return {hijri:null,miladi:null};}
+};
+window.parsePrayerTimesReal=function(html){
+  try{
+   let txt=toLat(html).replace(/<[^>]+>/g,'\n');let lines=txt.split('\n').map(s=>s.trim()).filter(s=>s.length>0);
+   function find(label){
+    function valid(l,lb){if(lb==='العصر'){if(l.includes('فضيلة'))return false;if(l.includes('أول')||l.includes('آخر'))return false;}if(lb==='الزوال'&&l.includes('فضيلة'))return false;if(lb==='غروب'&&l.includes('فضيلة'))return false;return true;}
+    for(let i=0;i<lines.length;i++){let ln=lines[i];if(!ln.includes(label))continue;if(!valid(ln,label))continue;let m=ln.match(/([0-2]?\d:[0-5]\d)/);if(m)return m[1];}
+    for(let i=0;i<lines.length;i++){let ln=lines[i];if(!ln.includes(label))continue;if(!valid(ln,label))continue;if(i>0){let m=lines[i-1].match(/^([0-2]?\d:[0-5]\d)$/);if(m)return m[1];}}
+    return null;
+   }
+   function findBig(h){for(let i=0;i<lines.length;i++){if(lines[i].includes(h)){for(let j=i+1;j<Math.min(i+3,lines.length);j++){let m=lines[j].match(/^([0-2]?\d:[0-5]\d)$/);if(m)return m[1];}}}return null;}
+   let d={bigMaghrib:findBig('أذان المغرب'),ghurub:find('غروب'),fadilaIshaStart:find('أول فضيلة العشاء'),midnight:find('منتصف الليل'),sahar:find('السحر'),bigDhuhr:findBig('أذان الظهر'),zawal:find('الزوال'),fadilaAsrStart:find('أول فضيلة العصر'),fadilaDhuhrEnd:find('آخر فضيلة الظهر'),asr:find('العصر'),bigFajr:findBig('صلاة الصبح'),imsak:find('الإمساك'),fajr:find('أذان الفجر'),fadilaFajr:find('آخر فضيلة الصبح'),shuruq:find('شروق')};
+   if(!d.bigMaghrib)d.bigMaghrib=d.ghurub;if(!d.bigDhuhr)d.bigDhuhr=d.zawal;if(!d.bigFajr)d.bigFajr=d.fajr;return d;
+  }catch(e){return null;}
+};
+// ===== البروكسي الأصلي - للتصفح فقط كـ fallback، مش للـ APK =====
+window._sayeghProxies=[
+function(url){return 'https://corsproxy.io/?'+encodeURIComponent(url);},
+function(url){return 'https://proxy.cors.sh/'+url;},
+function(url){return 'https://api.allorigins.win/raw?url='+encodeURIComponent(url);},
+function(url){return 'https://api.allorigins.win/get?url='+encodeURIComponent(url);},
+function(url){return 'https://corsproxy.org/?'+encodeURIComponent(url);},
+function(url){return 'https://proxy.hoppscotch.io/'+encodeURIComponent(url);},
+function(url){return 'https://api.allorigins.win/raw?url='+encodeURIComponent(url)+'&cb='+Date.now();}
+];
+window.fetchWith7ProxiesParallel=async function(originalUrl){
+ var proxies=window._sayeghProxies;
+ var tasks=proxies.map(function(makeUrl){return (async function(){try{var pUrl=makeUrl(originalUrl);var res=await fetch(pUrl,{method:'GET'});if(!res.ok) return null;var text=await res.text();if(pUrl.includes('/get?url=')){try{var j=JSON.parse(text);if(j.contents) text=j.contents;}catch(e){}}if(text&&text.length>500) return text;return null;}catch(e){return null;}})();});
+ var results=await Promise.all(tasks);
+ for(var i=0;i<results.length;i++){if(results[i]) return results[i];}
+ return null;
+};
+// ===== الجسر الجديد - التغيير الجراحي الوحيد =====
 function isNative(){ return !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp); }
-document.getElementById('bridgeType').textContent = isNative() ? "✅ CapacitorHttp أصلي (OkHttp)" : "⚠️ fetch متصفح";
-async function nativeGet(path){
-  const url=API+path; log("GET "+url);
-  if(isNative()){
-    try{ const r=await window.Capacitor.Plugins.CapacitorHttp.get({url, headers:{Accept:'application/json'}, connectTimeout:12000, readTimeout:12000}); log("HTTP "+r.status+" من "+path); if(r.status>=200 && r.status<300){ const txt=typeof r.data==='string'?r.data:JSON.stringify(r.data); log("وصل "+txt.length+" حرف - أول 600: "+txt.slice(0,600)); try{return JSON.parse(txt);}catch(e){return {__raw:txt};} } else { log("الجواب مش OK"); return null; } }catch(e){ log("❌ فشل أصلي "+path+" : "+(e.message||e)); return {__error:String(e.message||e)}; }
-  } else {
-    try{ const r=await fetch(url,{headers:{Accept:'application/json'},mode:'cors'}); log("HTTP "+r.status+" من "+path+" (متصفح)"); if(!r.ok) return null; const txt=await r.text(); log("وصل "+txt.length+" حرف - أول 600: "+txt.slice(0,600)); try{return JSON.parse(txt);}catch(e){return {__raw:txt};} }catch(e){ log("❌ فشل متصفح "+path+" : "+e.name+" - "+e.message); return {__error:e.name+": "+e.message}; }
-  }
-}
-async function loadCities(){ try{ const r=await fetch('sayegh-cities.json'); CITIES=await r.json(); log("تحمّلت قاعدة المدن المحلية: "+CITIES.length); }catch(e){ CITIES=[{id:107,city_name_ar:"النجف",city_name_en:"Najaf",country_ar:"العراق",country_en:"Iraq",country_code:"IQ",latitude:32.026,longitude:44.346,timezone:3,dls_rule:0,qibla:"201:58"}]; } renderCities(""); const n=CITIES.find(c=>c.city_name_en==="Najaf"); if(n) selectCity(n.id); }
-function renderCities(f){ const ff=(f||"").trim(); const list=CITIES.filter(c=>!ff||(c.city_name_ar||"").includes(ff)||(c.city_name_en||"").toLowerCase().includes(ff.toLowerCase())).slice(0,300); selEl.innerHTML=list.map(c=>`<option value="${c.id}">${c.city_name_ar} - ${c.city_name_en} (${c.country_ar})</option>`).join(""); if(list.length) selectCity(list[0].id); }
-function selectCity(id){ sel=CITIES.find(c=>String(c.id)===String(id)); if(!sel) return; selEl.value=String(sel.id); document.getElementById('cityInfo').innerHTML=`المدينة: <b>${sel.city_name_ar} / ${sel.city_name_en}</b><br>البلد: ${sel.country_ar} - ${sel.country_code}<br>الإحداثيات من الـ DB: ${sel.latitude} , ${sel.longitude}<br>المنطقة: GMT${sel.timezone>=0?'+':''}${sel.timezone} - dls: ${sel.dls_rule}<br>القبلة المخزنة: ${sel.qibla}`; document.getElementById('geo2').textContent=`${sel.city_name_ar} - ${sel.latitude} , ${sel.longitude}`; document.getElementById('qiblaDB').textContent=sel.qibla; serverId=null; document.getElementById('serverId').textContent="— لم نجيبه بعد —"; clearValues(); }
-function clearValues(){ ['v-subh','v-imsak','v-fajr','v-sunrise','v-subhF','v-dhuhr','v-zawal','v-asr1','v-asrEnd','v-asr','v-qiblaT','v-maghrib','v-sunset','v-ishaF','v-mid','v-sahar','cd','v-hijri','v-mil','v-farsi'].forEach(id=>{const e=document.getElementById(id); if(e) e.textContent="—";}); document.getElementById('v-events').textContent="المناسبات: — بانتظار الجسر —"; document.getElementById('failBox').classList.remove('show'); document.getElementById('okBox').classList.remove('show'); document.getElementById('warnBox').classList.remove('show'); }
-selEl.addEventListener('change',()=>selectCity(selEl.value)); document.getElementById('search').addEventListener('input',e=>renderCities(e.target.value));
+document.getElementById('bridgeType').textContent = isNative() ? "✅ CapacitorHttp أصلي (OkHttp) - مباشر من دون بروكسي" : "⚠️ متصفح - رح يستعمل البروكسي الأصلي كـ fallback للتجربة فقط";
 function log(s){ document.getElementById('bridge-log').textContent+="\n"+s; document.getElementById('diag').textContent+="\n"+s; }
-function hasPrayer(obj){ if(!obj || typeof obj!=='object') return false; const txt=JSON.stringify(obj).toLowerCase(); return (txt.includes('imsak')||txt.includes('fajr')||txt.includes('sobh')||txt.includes('subh')||txt.includes('maghrib')||txt.includes('dhuhr')) && txt.length>200; }
-async function fetchServerCities(){
-  log("=== الخطوة 1: جيب /cities من السيرفر ===");
-  const res = await nativeGet("cities");
-  if(!res || res.__error || !Array.isArray(res)){ log("❌ /cities ما رجّع لائحة."); return null; }
-  serverCities=res; document.getElementById('serverCitiesCount').textContent=res.length+" مدينة من السيرفر";
-  log("✅ /cities رجّع "+res.length+" مدينة. أول مدينة: "+JSON.stringify(res[0]).slice(0,400));
-  // لاقي المدينة المختارة بالاسم
-  const want = (sel.city_name_en||"").toLowerCase();
-  const wantAr = sel.city_name_ar||"";
-  let found = res.find(c=> (c.city_en||"").toLowerCase()===want || (c.city_ar||"")===wantAr || (c.city||"").toLowerCase()===want || (c.city_ar_||"")===wantAr || (c.name||"").toLowerCase()===want);
-  if(!found){ // جرّب contains
-    found = res.find(c=> JSON.stringify(c).includes(wantAr) || JSON.stringify(c).toLowerCase().includes(want));
-  }
-  if(found){
-    serverId = found.id || found._id || found.city_id || null;
-    document.getElementById('serverId').textContent = serverId + " (من السيرفر)";
-    log("✅ لقينا "+sel.city_name_ar+" بالسيرفر: serverId="+serverId);
-    log("كامل سطر المدينة من السيرفر: "+JSON.stringify(found).slice(0,800));
+async function fetchSayeghBridge(code){
+  const url='https://taqwimalsayegh.com/city/'+String(code).trim();
+  document.getElementById('goodUrl').textContent=url;
+  document.getElementById('srcLink').textContent=url; document.getElementById('srcLink').href=url;
+  log("الرابط من ملفك: "+url);
+  if(isNative()){
+    log("النقل: CapacitorHttp.get مباشرة - من دون بروكسي");
+    try{
+      const r=await window.Capacitor.Plugins.CapacitorHttp.get({url, headers:{Accept:'text/html,application/xhtml+xml,*/*'}, connectTimeout:20000, readTimeout:20000, responseType:'text'});
+      const txt = typeof r.data==='string' ? r.data : (typeof r.data==='object' ? JSON.stringify(r.data) : String(r.data||''));
+      log("HTTP "+r.status+" - وصل "+txt.length+" حرف");
+      document.getElementById('htmlLen').textContent=txt.length;
+      if(r.status>=200 && r.status<300 && txt.length>500) return txt;
+      log("الجواب مش OK أو قصير");
+      return null;
+    }catch(e){ log("❌ فشل CapacitorHttp: "+(e.message||e)); return null; }
   } else {
-    log("⚠️ ما لقينا "+sel.city_name_ar+" بالسيرفر بالاسم. جرّبنا contains وما لقينا. رح نجرب بالـ ID المحلي وبالاسم كمان.");
+    log("النقل: متصفح - fallback للبروكسي الأصلي من ملفك (للتجربة فقط)");
+    const html=await window.fetchWith7ProxiesParallel(url);
+    if(html) { log("وصل من البروكسي: "+html.length+" حرف"); document.getElementById('htmlLen').textContent=html.length; }
+    else log("❌ فشل البروكسي");
+    return html;
   }
-  return res;
 }
+let cities=[];
+function loadCities(){
+  try{
+    const raw=localStorage.getItem('sayegh_dynamic_cities_v3');
+    if(raw){ cities=JSON.parse(raw); } else { cities=[{name:'النجف الأشرف',code:'107'}]; localStorage.setItem('sayegh_dynamic_cities_v3', JSON.stringify(cities)); }
+  }catch(e){ cities=[{name:'النجف الأشرف',code:'107'}]; }
+  if(!cities.some(c=>String(c.code)==='107')) cities.unshift({name:'النجف الأشرف',code:'107'});
+  renderCities();
+}
+function renderCities(){
+  const sel=document.getElementById('citySelect');
+  sel.innerHTML=cities.map(c=>`<option value="${c.code}">${c.name} - ${c.code}</option>`).join('');
+  const saved=localStorage.getItem('_selectedSayeghCode')||'107';
+  if(cities.some(c=>String(c.code)===String(saved))) sel.value=String(saved);
+  updateCityInfo();
+}
+function updateCityInfo(){
+  const sel=document.getElementById('citySelect');
+  const c=cities.find(x=>String(x.code)===String(sel.value))||cities[0];
+  if(!c) return;
+  document.getElementById('cityInfo').innerHTML=`المدينة: <b>${c.name}</b><br>كود الصائغ: <b>${c.code}</b><br>الرابط: <b>https://taqwimalsayegh.com/city/${c.code}</b>`;
+  localStorage.setItem('_selectedSayeghCode', String(c.code));
+}
+document.getElementById('citySelect').addEventListener('change',()=>{ updateCityInfo(); clearValues(); });
+document.getElementById('addCityBtn').addEventListener('click',()=>{
+  const name=(document.getElementById('newName').value||'').trim();
+  let code=(document.getElementById('newCode').value||'').trim().replace(/[٠-٩]/g,d=>String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/[۰-۹]/g,d=>String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)));
+  if(!name||!code){ alert('اكتب الاسم والكود'); return; }
+  if(!/^\d+$/.test(code)){ alert('الكود أرقام فقط'); return; }
+  if(cities.find(c=>String(c.code)===code)){ alert('الكود موجود'); return; }
+  cities.push({name:name,code:code});
+  localStorage.setItem('sayegh_dynamic_cities_v3', JSON.stringify(cities));
+  renderCities(); document.getElementById('citySelect').value=code; updateCityInfo();
+  document.getElementById('newName').value=''; document.getElementById('newCode').value='';
+});
+function clearValues(){ ['v-subh','v-imsak','v-fajr','v-sunrise','v-subhF','v-dhuhr','v-zawal','v-asr1','v-dhuhrF','v-asr','v-maghrib','v-sunset','v-ishaF','v-mid','v-sahar','cd','v-hijri','v-mil'].forEach(id=>{const e=document.getElementById(id); if(e) e.textContent="—";}); document.getElementById('failBox').classList.remove('show'); document.getElementById('okBox').classList.remove('show'); document.getElementById('warnBox').classList.remove('show'); }
 async function runDay(){
-  if(!sel) return; document.getElementById('bridge-log').textContent=""; document.getElementById('diag').textContent="تشخيص v2 - يوم - "+sel.city_name_ar+"\n"; document.getElementById('bridge-status').textContent="عم يحاول..."; clearValues();
-  const d=document.getElementById('dateInput').value||"2026-11-19"; log("التاريخ: "+d+" - المدينة المحلية id="+sel.id+" - الاسم: "+sel.city_name_en);
-  await fetchServerCities();
-  const idsToTry = [];
-  if(serverId) idsToTry.push(serverId);
-  idsToTry.push(String(sel.id));
-  idsToTry.push(sel.city_name_en);
-  idsToTry.push(encodeURIComponent(sel.city_name_ar));
-  log("IDs يللي رح نجربهن: "+idsToTry.join(" , "));
-  let prayerFound=false, citiesOnly=false;
-  for(const cid of idsToTry){
-    const tries=[
-      "cities/"+cid,
-      "cities/"+cid+"/calendar?date="+d,
-      "cities/"+cid+"/days?date="+d,
-      "cities/"+cid+"/day?date="+d,
-      "calendar?cityId="+cid+"&date="+d,
-      "calendar?city="+cid+"&date="+d,
-      "days?cityId="+cid+"&date="+d,
-      "days?city="+cid+"&date="+d,
-      "day?cityId="+cid+"&date="+d,
-      "prayer-times?cityId="+cid+"&date="+d,
-      "prayer?cityId="+cid+"&date="+d,
-      "hijri-calendar/crescent/city?id="+cid+"&date="+d,
-      "calendar-tidewave?city="+cid+"&date="+d,
-    ];
-    for(const p of tries){
-      const r=await nativeGet(p);
-      if(r && !r.__error){
-        if(hasPrayer(r)){ prayerFound=true; document.getElementById('monthRaw').textContent=JSON.stringify(r,null,2).slice(0,8000); log("🎉 هيدا المسار رجّع مواقيت! "+p); break; }
-        else { citiesOnly=true; log("هيدا المسار رجّع جواب بس مش مواقيت: "+p); }
-      }
-    }
-    if(prayerFound) break;
+  const code=document.getElementById('citySelect').value||'107';
+  document.getElementById('bridge-log').textContent=""; document.getElementById('diag').textContent="تشخيص v5 - من ملفك - كود "+code+"\n"; document.getElementById('bridge-status').textContent="عم يجيب من الصائغ..."; clearValues();
+  const html=await fetchSayeghBridge(code);
+  if(!html){
+    document.getElementById('bridge-status').textContent="❌ فشل الجسر";
+    document.getElementById('failBox').classList.add('show');
+    log("❌ ما وصلت صفحة HTML.");
+    return;
   }
-  if(prayerFound){ document.getElementById('bridge-status').textContent="✅ وصلت مواقيت"; document.getElementById('okBox').classList.add('show'); log("✅ النتيجة: وصلت مواقيت حقيقية. بنربط حقولها بالبطاقات بس لما نشوف شكل الـ JSON."); }
-  else if(citiesOnly){ document.getElementById('bridge-status').textContent="⚠️ وصلت مدن بس، ما وصلت مواقيت"; document.getElementById('warnBox').classList.add('show'); log("⚠️ النتيجة: /cities شغال، بس ولا مسار مواقيت رجّع 200 مع مواقيت. كلن 404 أو جواب مش مواقيت. لازم نلاقي المسار الصح من الـ bundle تبع التطبيق الأصلي."); }
-  else { document.getElementById('bridge-status').textContent="❌ فشل الجسر"; document.getElementById('failBox').classList.add('show'); log("❌ النتيجة: فشل الجسر."); }
-}
-async function runMonth(){
-  if(!sel) return; setMode('month'); document.getElementById('bridge-log').textContent=""; document.getElementById('diag').textContent="تشخيص v2 - شهر - "+sel.city_name_ar+"\n"; document.getElementById('bridge-status').textContent="عم يحاول شهر..."; document.getElementById('monthBody').innerHTML='<tr><td colspan="12">— بانتظار الجسر —</td></tr>';
-  await fetchServerCities();
-  const d=document.getElementById('dateInput').value||"2026-11-19"; const y=d.slice(0,4), m=d.slice(5,7); log("الشهر: "+y+"-"+m);
-  const ids=[serverId, String(sel.id), sel.city_name_en].filter(Boolean);
-  let ok=false;
-  for(const cid of ids){
-    const tries=["cities/"+cid+"/calendar?year="+y+"&month="+m, "cities/"+cid+"/days?year="+y+"&month="+m, "calendar?cityId="+cid+"&year="+y+"&month="+m, "days?cityId="+cid+"&year="+y+"&month="+m, "month?cityId="+cid+"&year="+y+"&month="+m, "imsakiya?cityId="+cid+"&year="+y+"&month="+m];
-    for(const p of tries){ const r=await nativeGet(p); if(r && !r.__error){ document.getElementById('monthRaw').textContent=JSON.stringify(r,null,2).slice(0,8000); if(hasPrayer(r)){ ok=true; log("🎉 شهر: هيدا المسار رجّع مواقيت! "+p); break; } } }
-    if(ok) break;
+  document.getElementById('htmlRaw').textContent="الرابط: https://taqwimalsayegh.com/city/"+code+"\nالطول: "+html.length+" حرف\n\nأول 3000 حرف:\n"+html.slice(0,3000);
+  const parsed=window.parseHijriMiladi(html);
+  const pr=window.parsePrayerTimesReal(html);
+  log("parseHijriMiladi: "+JSON.stringify(parsed));
+  log("parsePrayerTimesReal: "+JSON.stringify(pr));
+  if(parsed.hijri) { document.getElementById('v-hijri').textContent=parsed.hijri; document.getElementById('cd').textContent=parsed.hijri; }
+  if(parsed.miladi) document.getElementById('v-mil').textContent=parsed.miladi;
+  document.getElementById('v-datesRaw').innerHTML=`هجري خام: ${parsed.hijri||"—"}<br>ميلادي خام: ${parsed.miladi||"—"}`;
+  if(pr){
+    const m={bigFajr:'v-subh',imsak:'v-imsak',fajr:'v-fajr',shuruq:'v-sunrise',fadilaFajr:'v-subhF',bigDhuhr:'v-dhuhr',zawal:'v-zawal',fadilaAsrStart:'v-asr1',fadilaDhuhrEnd:'v-dhuhrF',asr:'v-asr',bigMaghrib:'v-maghrib',ghurub:'v-sunset',fadilaIshaStart:'v-ishaF',midnight:'v-mid',sahar:'v-sahar'};
+    for(const k in m){ if(pr[k]) document.getElementById(m[k]).textContent=pr[k]; }
   }
-  if(ok){ document.getElementById('bridge-status').textContent="✅ وصلت داتا شهر"; document.getElementById('okBox').classList.add('show'); } else { document.getElementById('bridge-status').textContent="⚠️ ما وصلت مواقيت شهر"; document.getElementById('warnBox').classList.add('show'); }
+  const hasDates=!!(parsed.hijri||parsed.miladi);
+  const hasPray=pr && Object.values(pr).filter(Boolean).length>=3;
+  if(hasDates||hasPray){
+    document.getElementById('bridge-status').textContent="✅ وصلت داتا من الصائغ";
+    document.getElementById('okBox').classList.add('show');
+    log("✅ النتيجة: وصلت صفحة الصائغ وانقرت بنفس دوال ملفك. ما فيه حساب محلي.");
+  } else {
+    document.getElementById('bridge-status').textContent="⚠️ وصلت HTML بس التحليل ما لقى شي";
+    document.getElementById('warnBox').classList.add('show');
+    log("⚠️ وصلت HTML بس التحليل رجّع فاضي. قارن أول 3000 حرف فوق مع صفحة الصائغ.");
+  }
 }
-async function runYear(){
-  if(!sel) return; setMode('year'); document.getElementById('bridge-log').textContent=""; document.getElementById('diag').textContent="تشخيص v2 - سنة - "+sel.city_name_ar+"\n"; document.getElementById('bridge-status').textContent="عم يحاول سنة...";
-  await fetchServerCities();
-  const d=document.getElementById('dateInput').value||"2026-11-19"; const y=d.slice(0,4); log("السنة: "+y);
-  const ids=[serverId, String(sel.id)].filter(Boolean); let ok=false;
-  for(const cid of ids){ const tries=["cities/"+cid+"/calendar?year="+y, "calendar?cityId="+cid+"&year="+y, "days?cityId="+cid+"&year="+y]; for(const p of tries){ const r=await nativeGet(p); if(r && !r.__error){ document.getElementById('yearRaw').textContent=JSON.stringify(r,null,2).slice(0,8000); if(hasPrayer(r)){ ok=true; break; } } } if(ok) break; }
-  if(ok){ document.getElementById('bridge-status').textContent="✅ وصلت داتا سنة"; document.getElementById('okBox').classList.add('show'); } else { document.getElementById('bridge-status').textContent="⚠️ ما وصلت مواقيت سنة"; document.getElementById('warnBox').classList.add('show'); }
-}
-function setMode(m){ document.getElementById('tabDay').classList.toggle('on',m==='day'); document.getElementById('tabMonth').classList.toggle('on',m==='month'); document.getElementById('tabYear').classList.toggle('on',m==='year'); document.getElementById('dayView').style.display=m==='day'?'block':'none'; document.getElementById('monthView').style.display=m==='month'?'block':'none'; document.getElementById('yearView').style.display=m==='year'?'block':'none'; }
-document.getElementById('tabDay').addEventListener('click',()=>setMode('day')); document.getElementById('tabMonth').addEventListener('click',()=>setMode('month')); document.getElementById('tabYear').addEventListener('click',()=>setMode('year'));
-document.getElementById('runBtn').addEventListener('click',()=>{setMode('day'); runDay();}); document.getElementById('runMonthBtn').addEventListener('click',runMonth); document.getElementById('runYearBtn').addEventListener('click',runYear);
+document.getElementById('runBtn').addEventListener('click',runDay);
 loadCities();
 </script>
 </body>
