@@ -17,6 +17,10 @@ jobs:
           java-version: 17
       - name: Install
         run: npm install
+      - name: Use JS config - remove TS config if exists
+        run: |
+          rm -f capacitor.config.ts
+          ls -la
       - name: Add Android if missing
         run: |
           if [ ! -d android ]; then npx cap add android; fi
