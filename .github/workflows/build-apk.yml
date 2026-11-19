@@ -16,7 +16,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Install
-        run: npm ci
+        run: npm install
       - name: Add Android if missing
         run: |
           if [ ! -d android ]; then npx cap add android; fi
@@ -29,3 +29,4 @@ jobs:
           name: sayegh-bridge-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
+          
