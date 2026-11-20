@@ -1,324 +1,130 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>جسر حقيبة المؤمن - مصلح</title>
-<style>body{font-family:system-ui,Tahoma,Arial,sans-serif;background:#f6f2ea;color:#1a1a1a;margin:0;padding:14px}h1{font-size:20px}.card{background:#fff;border:1px solid #e5e0d5;border-radius:12px;padding:14px;margin:12px 0}button{background:#0b5cab;color:#fff;border:0;padding:10px 14px;border-radius:10px;font-size:15px;margin:4px 0;cursor:pointer;width:100%}button.purple{background:#6a1b9a}input,select{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin:4px 0;box-sizing:border-box}pre{background:#111;color:#d8ffd8;padding:10px;border-radius:10px;overflow:auto;direction:ltr;text-align:left;font-size:12px;white-space:pre-wrap}.ok{color:green}.bad{color:#b00020}.small{font-size:12px;color:#666;line-height:1.7}.logbox{background:#f7f3e6;border-radius:10px;padding:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word}</style>
-<script src="https://cdn.jsdelivr.net/npm/unbzip2-stream@0.1.9/dist/unbzip2-stream.min.js"></script>
-</head>
-<body>
-<h1>جسر حقيبة المؤمن - نسخة مصلحة</h1>
-<p class="small">الـ base المصلح: <b>https://api.hmomen.com/user-api/</b> - الـ base القديم https://hmomen.com/api/ كان غلط للهجري وكان يرجع HTML بدل JSON.<br>مفاتيح JSON الصح: <b>type / amount / forcing_date / forcing_valid_until</b><br>هيدا الملف خام: أول سطر DOCTYPE، بلا BOM، بلا فراغ قبلو. إذا انفتح كـ كود، افتحو بـ "عارض HTML" من قائمة "فتح باستخدام".</p>
-<div class="card"><b>الاعدادات</b><br><label>API Base - لا تغيرو</label><input id="api" value="https://api.hmomen.com/user-api/"><label>Storage Base</label><input id="storage" value="https://storage.hmomen.com"><label>Static Base</label><input id="static" value="https://hmomen.com/static"><button onclick="testConn()">اختبر الاتصال</button><div id="log"></div></div>
-<div class="card"><b>1) التاريخ الهجري والتصحيح</b><br><label>التصحيح اليدوي - بيغلب السيرفر</label><select id="manual"><option value="Auto">Auto - من السيرفر</option><option value="Minus2Days">Minus2Days -2 يوم</option><option value="MinusDay">MinusDay -1 يوم</option><option value="PlusDay">PlusDay +1 يوم</option><option value="Plus2Days">Plus2Days +2 يوم</option></select><button onclick="getHijri()">جيب التصحيح من حقيبة المؤمن</button><div id="hijriLocal"></div><pre id="hijriRaw">ما في بيانات بعد</pre><div id="hijriFixed"></div><div id="hijriLog" class="logbox">لوغ: ما صار طلب بعد</div></div>
-<div class="card"><b>2) التفاسير وفك التشفير</b><br><button onclick="getMeta()">جيب لائحة التفاسير</button><pre id="metaRaw">ما في بيانات بعد</pre><button onclick="dlTafsir('Tafsir_001.db')">حمّل الأمثل Tafsir_001.db</button><button onclick="dlTafsir('Tafsir_002.db')">حمّل الميزان Tafsir_002.db</button><button onclick="dlTafsir('Tafsir_004.db')">حمّل النور Tafsir_004.db</button><div id="dlProg"></div><div id="dbInfo"></div><label>رقم تفسير ID</label><input id="tid" value="1" type="number"><button onclick="getTafsir()">جيب التفسير وفك تشفيرو</button><button onclick="scanTafsir()" class="purple">افحص أول 20 صف - أي واحد نص وأي واحد Patch</button><div id="scanOut" class="logbox"></div><pre id="tafsirOut">ما في بيانات بعد</pre><p class="small">فك التشفير حسب DEX: TafsirService.decodeTafsirBlob(blob, searchText). اذا أول 8 بايت BSDIFF40، منطبق Patch على searchText. اذا لا، UTF-8 مباشرة. ما في gzip ولا بحث عن BSDIFF بنص الـ Blob.</p></div>
-<div class="card"><b>3) قراء القرآن</b><br><label>القارئ</label><select id="rec"><option value="alhusary">الحصري alhusary</option><option value="alminshawi">المنشاوي alminshawi</option><option value="reciter_abdalbasit">عبد الباسط</option><option value="reciter_menshawy">المنشاوي 2</option><option value="reciter_osama">أسامة</option></select><label>السورة</label><input id="sura" value="1" type="number"><label>من آية</label><input id="fromA" value="1" type="number"><label>الى آية</label><input id="toA" value="3" type="number"><button onclick="buildAudio()">ابني الروابط</button><div id="audioList"></div></div>
+<title>جسر النجومي - بلا بروكسي</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Tahoma,Arial,sans-serif;background:#0b1512;color:#eef2ef}header{position:sticky;top:0;background:#0b1512;border-bottom:1px solid #d4af37;padding:14px 16px}h1{margin:0;font-size:22px;color:#e8c85a} .sub{color:#a8b5ad;font-size:13px;margin-top:4px} .note{margin:12px 16px;background:#14251f;border:1px solid #2a3a32;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7;color:#d9e2d9} .note b{color:#e8c85a} main{max-width:760px;margin:0 auto;padding:12px 16px 40px} .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px} button{min-height:52px;border-radius:14px;border:1px solid #d4af37;background:#d4af37;color:#071f16;font-weight:900;font-size:15px;cursor:pointer} button.ghost{background:#14251f;color:#e8c85a} button.plain{background:#1a2e26;color:#eef2ef;border-color:#2a3a32} button:disabled{opacity:.5} .card{background:#14251f;border:1px solid #2a3a32;border-radius:16px;padding:14px;margin-top:12px} .card h2{margin:0 0 8px;color:#e8c85a;font-size:17px} .row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed #2a3a32;font-size:15px} .row:last-child{border-bottom:0} .row span:first-child{color:#a8b5ad} .row span:last-child{font-weight:800} table{width:100%;border-collapse:collapse} td{padding:8px;border-bottom:1px solid #2a3a32} td:last-child{font-weight:900;text-align:left} .status{font-weight:900} .err{color:#ff9a9a;font-weight:800} .ok{color:#4ade80} .log{background:#07100d;border:1px solid #2a3a32;border-radius:12px;padding:10px;font-family:monospace;font-size:12px;white-space:pre-wrap;max-height:220px;overflow:auto;direction:ltr;text-align:left} .bayan p{line-height:1.9;margin:10px 0} a{color:#e8c85a;word-break:break-all}
+</style>
+<header><h1>🌙 جسر النجومي - تجربة بلا بروكسي</h1><div class="sub">واجهة تجربة جسر النجومي - بلا بروكسي - مباشرة من arabic.nojumi.org</div></header>
+<div class="note"><b>ملاحظة مهمة:</b> الميلادي إجباري - إذا ما انقرا الميلادي من الموقع ما منحدث وما منعرض نتيجة غلط. الهجري والميلادي وأوقات الصلاة منقراهم من صفحة الموقع بس، ما منحسب شي محليا.</div>
+<main>
+<div class="btns">
+<button id="btn-live">جلب حي - النجومي</button>
+<button id="btn-bayan" class="ghost">جلب آخر بيان استهلال</button>
+<button id="btn-stop" class="plain">قطع</button>
+<button id="btn-clear" class="plain">مسح</button>
+</div>
+<div class="card"><h2>النتيجة</h2>
+<div class="row"><span>الحالة</span><span id="status" class="status">بعد ما بلّشنا - كبوس جلب حي</span></div>
+<div class="row"><span>الطريقة</span><span id="method">--</span></div>
+<div class="row"><span>المصدر</span><span><a id="source" href="https://arabic.nojumi.org/" target="_blank" rel="noopener">arabic.nojumi.org</a></span></div>
+<div class="row"><span>الهجري (قمري)</span><span id="hijri">--</span></div>
+<div class="row"><span>الميلادي</span><span id="miladi">--</span></div>
+<div class="row"><span>الشمسي</span><span id="shamsi">--</span></div>
+<div class="row"><span>تاريخ جهازك</span><span id="device">--</span></div>
+<div class="row"><span>الفرق</span><span id="diff">--</span></div>
+<div id="err" class="err" style="margin-top:8px"></div>
+</div>
+<div class="card"><h2>🕌 أوقات الصلاة</h2><p style="color:#a8b5ad;font-size:13px;margin:0 0 8px">منقرا الأوقات من صفحة الموقع بس. إذا ما لقينا وقت، منبيّن -- وما منخترع وقت.</p>
+<table id="prayers"><tbody></tbody></table></div>
+<div class="card" id="bayan-card" style="display:none"><h2>📜 آخر بيان استهلال</h2><div id="bayan-title" style="font-weight:900"></div><div id="bayan-date" style="color:#a8b5ad;font-size:13px;margin-top:4px"></div><div id="bayan-source" style="font-size:12px;margin-top:4px"></div><div class="bayan" id="bayan-body"></div></div>
+<div class="card"><h2>السجل</h2><div class="log" id="log">—</div><div style="margin-top:8px;font-size:12px;color:#a8b5ad">طول آخر HTML: <span id="html-len">0</span> | آخر خطأ: <span id="last-err">--</span></div></div>
+</main>
 <script>
-function log(m,ok){var d=document.getElementById('log');d.innerHTML+='<div class="'+(ok?'ok':'bad')+'">'+new Date().toLocaleTimeString()+' - '+m+'</div>';}
-function api(){return document.getElementById('api').value.replace(/\/$/,'')+'/';}
-function storage(){return document.getElementById('storage').value.replace(/\/$/,'');}
-function stat(){return document.getElementById('static').value.replace(/\/$/,'');}
-function saveManual(){try{localStorage.setItem('hijri.date.correction.value',document.getElementById('manual').value);}catch(e){}}
-try{var _m=localStorage.getItem('hijri.date.correction.value');if(_m)document.getElementById('manual').value=_m;}catch(e){}
-document.getElementById('manual').addEventListener('change',saveManual);
-var LAST_JSON=null;
-function applyHijri(j){
-  var out='', lg='';
-  lg+='HijriAdjustmentInfo -> fromJSON parsed: '+JSON.stringify(j)+'\n';
-  var manual=document.getElementById('manual').value;
-  if(manual && manual!=='Auto'){
-    var map={Minus2Days:-2,MinusDay:-1,PlusDay:1,Plus2Days:2};
-    out='<b>تصحيح يدوي يغلب السيرفر:</b> '+manual+' = '+map[manual]+' يوم. السيرفر تجاهل بهالحالة.';
-    lg+='HijriDate -> manual correction wins: '+manual+'\n';
-    document.getElementById('hijriFixed').innerHTML=out;
-    document.getElementById('hijriLog').textContent=lg;
-    return;
-  }
-  if(!j || typeof j!=='object'){document.getElementById('hijriFixed').innerHTML='<span class=bad>JSON مش مفهوم</span>';return;}
-  var rawType=j.type!=null?j.type:(j.Type!=null?j.Type:''), type=String(rawType||'').toLowerCase().replace(/[_\- ]/g,'');
-  var amount=j.amount!=null?j.amount:(j.Amount!=null?j.Amount:null);
-  var fd=j.forcing_date!=null?j.forcing_date:(j.forcingDate!=null?j.forcingDate:(j.ForcingDate!=null?j.ForcingDate:null));
-  var valid=j.forcing_valid_until!=null?j.forcing_valid_until:(j.forcingValidUntil!=null?j.forcingValidUntil:(j.ForcingValidUntil!=null?j.ForcingValidUntil:null));
-  function parseValid(v){
-    if(!v) return null;
-    if(typeof v==='object'){
-      var y=v.Year!=null?v.Year:v.year, mo=v.Month!=null?v.Month:v.month, d=v.Day!=null?v.Day:v.day;
-      if(y!=null && mo!=null && d!=null) return new Date(y, mo-1, d, 23,59,59);
-      return null;
-    }
-    if(typeof v==='string'){
-      var dt=new Date(v.replace(' ','T'));
-      return isNaN(dt.getTime())?null:dt;
-    }
-    return null;
-  }
-  function fmtFd(f){
-    if(!f) return '-';
-    if(typeof f==='object'){ var y=f.Year!=null?f.Year:f.year, mo=f.Month!=null?f.Month:f.month, d=f.Day!=null?f.Day:f.day; return d+' / '+mo+' / '+y+' هـ'; }
-    return String(f);
-  }
-  function fmtValid(v){
-    if(!v) return 'غير مذكور';
-    if(typeof v==='object'){ var y=v.Year!=null?v.Year:v.year, mo=v.Month!=null?v.Month:v.month, d=v.Day!=null?v.Day:v.day; return d+' / '+mo+' / '+y+' م'; }
-    return String(v);
-  }
-  var vd=parseValid(valid);
-  var expired = vd ? (vd < new Date()) : false;
-  lg+='HijriDate -> type='+rawType+' (norm='+type+') amount='+amount+' forcing_date='+JSON.stringify(fd)+' forcing_valid_until='+JSON.stringify(valid)+' parsedValid='+(vd?vd.toISOString():'null')+' expired='+expired+'\n';
-  if(type==='amount'){
-    out='<b>تعديل Amount:</b> amount = '+(amount!=null?amount:'-')+' يوم على أم القرى. (type=amount يعني السيرفر بيعطي فرق أيام، مش تاريخ مفروض)';
-    lg+='HijriDate -> applied Amount: '+amount+'\n';
-  } else if(type==='forcedate'||type==='forcingdate'||type==='forcedat'){
-    if(fd && !expired){
-      out='<b>تاريخ مفروض ForceDate:</b> '+fmtFd(fd)+' - صالح حتى: '+fmtValid(valid);
-      lg+='HijriDate -> applied ForceDate: '+fmtFd(fd)+' validUntil='+fmtValid(valid)+'\n';
-    } else if(fd && expired){
-      out='<b>forcing_valid_until انتهى ('+fmtValid(valid)+') - رجوع للـ amount:</b> '+(amount!=null?amount:'-')+' يوم. التاريخ المفروض تجاهل.';
-      lg+='HijriDate -> forcing_valid_until expired, fallback to amount='+amount+'\n';
-    } else {
-      out='<b>ForceDate بدون forcing_date - رجوع للـ amount:</b> '+(amount!=null?amount:'-')+' يوم.';
-      lg+='HijriDate -> ForceDate without forcing_date, fallback to amount\n';
-    }
-  } else if(type==='natural'||type===''||type==='null'){
-    out='<b>تعديل طبيعي Natural:</b> amount = '+(amount!=null?amount:'-')+' يوم على أم القرى.';
-    lg+='HijriDate -> applied Natural adjustment: amount='+amount+'\n';
-  } else {
-    out='<b>نوع غير معروف:</b> '+rawType+' - amount: '+(amount!=null?amount:'-')+' - طبّقنا amount كـ fallback.';
-    lg+='HijriDate -> unknown type: '+rawType+', fallback to amount='+amount+'\n';
-  }
-  document.getElementById('hijriFixed').innerHTML=out;
-  document.getElementById('hijriLog').textContent=lg;
+// ===== جسر النجومي - نسخة نظيفة مستقلة - بلا React - بلا بروكسي - بلا Tailwind =====
+var ET="https://arabic.nojumi.org/";
+var Pc=function(id){return "https://arabic.nojumi.org/news/"+id+"/";};
+var Ti=[{id:"fajr",label:"الفجر",aliases:["الفجر"]},{id:"sunrise",label:"الشروق",aliases:["الشروق"]},{id:"dhuhr",label:"الظهر",aliases:["الظهر"]},{id:"asr",label:"العصر",aliases:["العصر"]},{id:"maghrib",label:"المغرب",aliases:["المغرب"]},{id:"isha",label:"العشاء",aliases:["العشاء"]},{id:"imsak",label:"الإمساك",aliases:["الإمساك","الامساك","إمساك","امساك"]},{id:"midnight",label:"منتصف الليل",aliases:["منتصف الليل"]},{id:"sahar",label:"السحر",aliases:["السحر"]}];
+var Tc=["ذو الحجة","ذو القعدة","ربيع الآخر","ربيع الأول","جمادى الآخرة","جمادى الأولى","محرم","صفر","رجب","شعبان","رمضان","شوال"];
+var bl={"تشرين الثاني":11,"تشرين الاول":10,"تشرين الأول":10,"كانون الثاني":1,"كانون الاول":12,"كانون الأول":12,"شباط":2,"آذار":3,"اذار":3,"نيسان":4,"أيار":5,"ايار":5,"حزيران":6,"تموز":7,"آب":8,"اب":8,"أيلول":9,"ايلول":9,"يناير":1,"فبراير":2,"مارس":3,"أبريل":4,"ابريل":4,"مايو":5,"يونيو":6,"يوليو":7,"أغسطس":8,"اغسطس":8,"سبتمبر":9,"أكتوبر":10,"اكتوبر":10,"نوفمبر":11,"ديسمبر":12,january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+var hv=["كانون الثاني","شباط","آذار","نيسان","أيار","حزيران","تموز","آب","أيلول","تشرين الأول","تشرين الثاني","كانون الأول"];
+function Fi(e){return String(e||"").replace(/[٠-٩]/g,function(n){return String("٠١٢٣٤٥٦٧٨٩".indexOf(n));}).replace(/[۰-۹]/g,function(n){return String("۰۱۲۳۴۵۶۷۸۹".indexOf(n));}).replace(/[\u066B]/g,".").replace(/[\u066C]/g,",");}
+function Fc(e){return String(e||"").replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<[^>]+>/g," ").replace(/&nbsp;|&#160;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim();}
+function mv(e){return String(e||"").replace(/[\u064B-\u0652\u0670\u0640]/g,"");}
+function yv(e){return mv(e).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه");}
+function xi(e){return Fc(Fi(e)).replace(/\s+/g," ").trim();}
+function zi(e,n){var t=new RegExp('id=["\']'+n+'["\'][^>]*>([\\s\\S]*?)<',"i"),r=e.match(t);return r?xi(r[1]):"";}
+function Oc(e){return Fi(Fc(e));}
+function gv(e){var n=zi(e,"ctl00_lblShamsiDate"),t=zi(e,"ctl00_lblQamariDate"),r=zi(e,"ctl00_lblMiladiDate"),l=Oc(e);if(!t){var o=l.match(new RegExp("(\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4})"));if(o)t=o[1].replace(/\s+/g," ").trim();}if(!r){var o2=Object.keys(bl).sort(function(s,f){return f.length-s.length;}),i=l.match(new RegExp("(\\d{1,2}\\s*(?:"+o2.join("|")+")\\s*\\d{4})","i"));if(i)r=i[1].replace(/\s+/g," ").trim();}if(!n){var o3=l.match(/(\d{1,2}\s*(?:فروردين|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)\s*\d{4})/);if(o3)n=o3[1].trim();}var u={};for(var k=0;k<Ti.length;k++){var o4=Ti[k];var val="--";for(var a=0;a<o4.aliases.length;a++){var s=o4.aliases[a];var f=l.indexOf(s);if(f===-1)continue;var h=l.slice(f,f+160).match(/(\d{1,2}:\d{2})/);if(h){val=h[1];break;}var g=l.slice(Math.max(0,f-40),f+s.length).match(/(\d{1,2}:\d{2})/);if(g){val=g[1];break;}}u[o4.id]=val;}return{shamsi:n,qamari:t,miladi:r,prayers:u};}
+function wv(e){var n=Fi(e),t=Object.keys(bl).sort(function(l,u){return u.length-l.length;});for(var k=0;k<t.length;k++){var l=t[k];var u=bl[l];var o=new RegExp("(\\d{1,2})\\s*"+l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{4})","i");var i=n.match(o);if(i)return new Date(Number(i[2]),u-1,Number(i[1]));var s=new RegExp(l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{1,2})\\s*,?\\s*(\\d{4})","i");var f=n.match(s);if(f)return new Date(Number(f[2]),u-1,Number(f[1]));}var r=n.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(r)return new Date(Number(r[3]),Number(r[2])-1,Number(r[1]));return null;}
+function Nc(e){return e.getDate()+" "+hv[e.getMonth()]+" "+e.getFullYear();}
+function kv(e){var n=e.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i),t=n?xi(n[1]):"",r=Oc(e),l="",u=r.match(/\d{4}[\/-]\d{1,2}[\/-]\d{1,2}/),o=Object.keys(bl).sort(function(p,g){return g.length-p.length;}),i=r.match(new RegExp("\\d{1,2}\\s*(?:"+o.join("|")+")\\s*\\d{4}","i")),s=r.match(new RegExp("\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4}"));if(i)l=i[0].trim();else if(s)l=s[0].trim();else if(u)l=u[0];var f=Array.from(e.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)).map(function(p){return xi(p[1]);}).filter(function(p){return p.length>25;});var v=yv(r),h=v.includes("اعلن مكتب")&&v.includes("السيستاني");return{title:t,dateText:l,paragraphs:f,hasSistani:h};}
+var ctrl=null, stopped=false;
+function log(m){var el=document.getElementById("log");var t=new Date().toLocaleTimeString("en-GB");var line=t+" — "+m;el.textContent = el.textContent==="—" ? line : el.textContent+"\n"+line; el.scrollTop=el.scrollHeight;}
+function setPrayers(p){var tb=document.querySelector("#prayers tbody");tb.innerHTML="";for(var i=0;i<Ti.length;i++){var tr=document.createElement("tr");var td1=document.createElement("td");td1.textContent=Ti[i].label;var td2=document.createElement("td");td2.textContent=p[Ti[i].id]||"--";tr.appendChild(td1);tr.appendChild(td2);tb.appendChild(tr);}}
+setPrayers(Object.fromEntries(Ti.map(function(e){return [e.id,"--"];})));
+async function fetchNojumi(url, signal){
+  var cap = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp;
+  if(cap){ try{ log("عم جرّب CapacitorHttp — "+url); var res=await cap.get({url:url,headers:{Accept:"text/html"},connectTimeout:20000,readTimeout:20000,responseType:"text"}); return {html: typeof res.data==="string"?res.data:JSON.stringify(res.data||""), method:"CapacitorHttp"}; }catch(e){ var msg=e instanceof Error?e.message:String(e); document.getElementById("last-err").textContent=msg; log("CapacitorHttp فشل: "+msg+" — عم جرّب fetch مباشر"); } }
+  try{ log("عم جرّب fetch مباشر — "+url); var r=await fetch(url,{cache:"no-store",signal:signal}); var t=await r.text(); if(!r.ok) throw new Error("HTTP "+r.status); return {html:t, method:"fetch مباشر"}; }catch(e){ var m2=e instanceof Error?e.message:String(e); document.getElementById("last-err").textContent=m2; throw e; }
 }
-async function getHijri(){
-  var local='-';
-  try{local=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date());}catch(e){}
-  document.getElementById('hijriLocal').innerHTML='<b>محلي أم القرى:</b> '+local;
-  var url=api()+'hijri-date/current?api_key=1a502da1-00e4-49bb-987a-ca3ba232a846&lang=ar&platform=android';
-  document.getElementById('hijriLog').textContent='الطلب: '+url;
+document.getElementById("btn-live").onclick=async function(){
+  stopped=false; ctrl=new AbortController();
+  document.getElementById("err").textContent=""; document.getElementById("status").textContent="عم نجيب من النجومي…";
+  log("— بلّش جلب حي —");
   try{
-    var r=await fetch(url);
-    var t=await r.text();
-    if(!r.ok || t.trim().startsWith('<')){
-      document.getElementById('hijriRaw').textContent='السيرفر رجع HTTP '+r.status+' - صفحة HTML، مش JSON. أول 300 حرف: '+t.slice(0,300);
-      document.getElementById('hijriFixed').innerHTML='<span class=bad>فشل - رجع '+r.status+' مش JSON، ما تم التصحيح.</span>';
-      log('الهجري فشل: رجع '+r.status+' HTML مش JSON',false);
-      return;
-    }
-    document.getElementById('hijriRaw').textContent=t;
-    var j=JSON.parse(t); LAST_JSON=j;
-    try{localStorage.setItem('hijri_date_adjusment_info',t);}catch(e){}
-    applyHijri(j);
-    log('الهجري نجح',true);
+    var res=await fetchNojumi(ET, ctrl.signal);
+    document.getElementById("html-len").textContent=res.html.length;
+    document.getElementById("method").textContent=res.method;
+    log("وصل HTML — الطول "+res.html.length+" — الطريقة "+res.method);
+    if(res.html.length<500) throw new Error("HTML قصير كتير ("+res.html.length+")");
+    var o=gv(res.html); setPrayers(o.prayers);
+    if(!o.qamari || !o.miladi){ document.getElementById("err").textContent="❌ بلا ميلادي - ما تم الفحص | المصدر: "+ET; document.getElementById("status").textContent="ما انقرا الميلادي — ما تحدّثنا"; log("ناقص: هجري="+(o.qamari||"—")+" | ميلادي="+(o.miladi||"—")); return; }
+    var now=new Date(); var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    var parsed=wv(o.miladi);
+    if(!parsed){ document.getElementById("err").textContent="❌ بلا ميلادي - ما تم الفحص | المصدر: "+ET; document.getElementById("status").textContent="تاريخ الموقع ما انقرا صح"; return; }
+    var diffDays=Math.round((parsed.getTime()-today.getTime())/86400000);
+    var diffText= diffDays===0 ? "✅ مطابق - نفس اليوم" : diffDays>0 ? "متقدم "+diffDays+" يوم" : "متأخر "+Math.abs(diffDays)+" يوم";
+    document.getElementById("hijri").textContent=o.qamari;
+    document.getElementById("miladi").textContent=o.miladi;
+    document.getElementById("shamsi").textContent=o.shamsi||"--";
+    document.getElementById("device").textContent=Nc(today);
+    document.getElementById("diff").textContent=diffText;
+    document.getElementById("status").textContent= diffDays===0 ? "✅ مطابق - نفس اليوم" : "الفرق "+diffDays+" يوم";
+    log("نتيجة: الموقع "+o.miladi+" | جهازك "+Nc(today)+" | الفرق "+diffDays);
   }catch(e){
-    document.getElementById('hijriFixed').innerHTML='<span class=bad>فشل الاتصال - ما تم التصحيح: '+e.message+'</span>';
-    log('الهجري فشل: '+e.message,false);
+    if(stopped){ document.getElementById("status").textContent="انقطع الجلب"; log("انقطع الجلب من زر قطع"); }
+    else{ var m=e instanceof Error?e.message:String(e); document.getElementById("last-err").textContent=m; document.getElementById("status").textContent="فشل — ما وصلنا للموقع"; document.getElementById("err").textContent="فشل: "+m; log("فشل: "+m); }
   }
-}
-async function testConn(){
-  var url=api()+'hijri-date/current?api_key=1a502da1-00e4-49bb-987a-ca3ba232a846&lang=ar&platform=android';
+};
+document.getElementById("btn-bayan").onclick=async function(){
+  stopped=false; ctrl=new AbortController();
+  document.getElementById("status").textContent="عم نبلّش الفحص…"; log("— بلّش جلب آخر بيان استهلال —");
+  var found=null;
   try{
-    var r=await fetch(url); var t=await r.text();
-    if(!r.ok || t.trim().startsWith('<')){log('hijri-date/current: '+r.status+' - رجع HTML مش JSON',false);return;}
-    log('hijri-date/current: '+r.status,true);
-  }catch(e){log('فشل الاتصال: '+e.message,false);}
-}
-async function getMeta(){try{var r=await fetch(storage()+'/databases/database_metadata.json');var t=await r.text();document.getElementById('metaRaw').textContent=t;log('ميتاداتا نجحت',true);}catch(e){document.getElementById('metaRaw').textContent='فشل: '+e.message;log('ميتاداتا فشلت',false);}}
-var SQL=null, db=null, dbName='';
-async function dlTafsir(name){try{document.getElementById('dlProg').textContent='عم نزّل '+name+'...';var r=await fetch(stat()+'/databases/'+name);if(!r.ok) throw new Error('HTTP '+r.status);var buf=await r.arrayBuffer();document.getElementById('dlProg').textContent='نزل '+(buf.byteLength/1024/1024).toFixed(2)+' MB';if(!SQL) SQL=await initSqlJs({locateFile:function(f){return 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f;}});db=new SQL.Database(new Uint8Array(buf));dbName=name;var cols=db.exec("SELECT name FROM sqlite_master WHERE type='table'");document.getElementById('dbInfo').innerHTML='<b>'+name+'</b> انفتح. الجداول: '+JSON.stringify(cols);try{var c=db.exec("SELECT COUNT(*) FROM Tafsir");document.getElementById('dbInfo').innerHTML+='<br>عدد صفوف Tafsir: '+c[0].values[0][0];}catch(e){}log(name+' نزل وانفتح',true);}catch(e){document.getElementById('dlProg').textContent='فشل: '+e.message;log(name+' فشل: '+e.message,false);}}
-function isBsDiff(bytes){if(!bytes||bytes.length<8) return false;return bytes[0]===0x42&&bytes[1]===0x53&&bytes[2]===0x44&&bytes[3]===0x49&&bytes[4]===0x46&&bytes[5]===0x46&&bytes[6]===0x34&&bytes[7]===0x30;}
-function decodeTextFromBytes(bytes){return new TextDecoder('utf-8').decode(bytes);}
-function readInt64SignMagnitude(b,off){var mag=0;for(var i=0;i<7;i++) mag+=b[off+i]*Math.pow(256,i);mag+=(b[off+7]&0x7F)*Math.pow(256,7);return (b[off+7]&0x80)?-mag:mag;}
-function decodeTafsirBlob(blob,baseText){var bytes=new Uint8Array(blob);if(isBsDiff(bytes)){try{return {how:'BSDIFF - reconstructFromBsDiff(blob, searchText)',text:reconstructFromBsDiff(bytes,baseText)};}catch(e){return {how:'BSDIFF فشل',text:'[تحتاج النص الأساسي لإعادة البناء] - الخطأ: '+e.message+'\nالـ base المستعمل هو searchText من نفس الصف، مش الصف السابق ولا ملف قديم.'};}}return {how:'UTF-8 مباشرة - decodeTextFromBytes',text:decodeTextFromBytes(bytes)};}
-function reconstructFromBsDiff(patchBytes,baseText){var oldBytes=new TextEncoder().encode(baseText||'');var out=applyBsDiffPatch(patchBytes,oldBytes);return decodeTextFromBytes(out);}
-
-function bzip2Decompress(input) {
-  let bitPos = 0, bitBuffer = 0, bitCount = 0;
-  function readBits(n) {
-    let v = 0;
-    for (let i=0;i<n;i++) {
-      if (bitCount===0) {
-        if (bitPos >= input.length) throw new Error("EOF");
-        bitBuffer = input[bitPos++];
-        bitCount = 8;
-      }
-      bitCount--;
-      v = (v<<1) | ((bitBuffer>>bitCount)&1);
+    for(var id=1015; id>=998; id--){
+      if(stopped){ log("انقطع فحص البيانات"); break; }
+      document.getElementById("status").textContent="فحص البيان رقم "+id; log("فحص البيان رقم "+id);
+      try{
+        var res=await fetchNojumi(Pc(id), ctrl.signal);
+        document.getElementById("html-len").textContent=res.html.length;
+        document.getElementById("method").textContent=res.method;
+        if(res.html.length<500){ log("بيان "+id+": HTML قصير ("+res.html.length+") — منكمّل"); continue; }
+        var j=kv(res.html);
+        if(!j.hasSistani){ log("بيان "+id+": مش بيان استهلال السيستاني — منكمّل"); continue; }
+        found={id:id,title:j.title||("بيان استهلال رقم "+id),dateText:j.dateText,paragraphs:j.paragraphs,source:Pc(id)};
+        document.getElementById("status").textContent="لقينا البيان رقم "+id;
+        log("لقينا البيان رقم "+id+" — "+(j.title||"بلا عنوان")+" — الطريقة "+res.method);
+        break;
+      }catch(e){ if(stopped) break; log("بيان "+id+" فشل: "+(e instanceof Error?e.message:String(e))+" — منكمّل"); continue; }
     }
-    return v;
-  }
-  if (input[0]!==0x42 || input[1]!==0x5A || input[2]!==0x68) throw new Error("Not BZh");
-  let level = input[3] - 0x30;
-  if (level<1||level>9) throw new Error("bad level");
-  bitPos = 4; bitBuffer=0; bitCount=0;
-  let out = [];
-  function buildHuffman(lens) {
-    let maxLen = 0;
-    for (let l of lens) if (l>maxLen) maxLen=l;
-    let blCount = new Array(maxLen+1).fill(0);
-    for (let l of lens) if (l>0) blCount[l]++;
-    let code = 0;
-    let nextCode = new Array(maxLen+1).fill(0);
-    for (let len=1; len<=maxLen; len++) {
-      code = (code + (blCount[len-1]||0)) << 1;
-      nextCode[len] = code;
-    }
-    let map = {};
-    for (let sym=0; sym<lens.length; sym++) {
-      let l = lens[sym];
-      if (l>0) {
-        let c = nextCode[l];
-        nextCode[l]++;
-        map[l+":"+c] = sym;
-      }
-    }
-    return {lens, maxLen, map};
-  }
-  function decodeHuffman(table) {
-    let code = 0;
-    for (let len=1; len<=table.maxLen; len++) {
-      let bit = readBits(1);
-      code = (code<<1) | bit;
-      let sym = table.map[len+":"+code];
-      if (sym !== undefined) return sym;
-    }
-    throw new Error("Huffman decode fail");
-  }
-  while (true) {
-    let magic = 0n;
-    for (let i=0;i<48;i++) {
-      let b = readBits(1);
-      magic = (magic<<1n) | BigInt(b);
-    }
-    if (magic === 0x177245385090n) { try{readBits(32);}catch(e){} break; }
-    if (magic !== 0x314159265359n) throw new Error("Bad block magic "+magic.toString(16));
-    readBits(32);
-    let randomized = readBits(1);
-    if (randomized!==0) throw new Error("Randomized not supported");
-    let origPtr = readBits(24);
-    let inUse = readBits(16);
-    let inUse16 = new Array(16).fill(0);
-    for (let i=0;i<16;i++) { if ((inUse >> (15-i)) & 1) { inUse16[i] = readBits(16); } }
-    let used = [];
-    for (let i=0;i<16;i++) { if ((inUse >> (15-i)) & 1) { for (let j=0;j<16;j++) { if ((inUse16[i] >> (15-j)) & 1) { used.push(i*16+j); } } } }
-    let nInUse = used.length;
-    if (nInUse===0) throw new Error("nInUse 0");
-    let nGroups = readBits(3);
-    let nSelectors = readBits(15);
-    let mtfGroups = [0,1,2,3,4,5];
-    let selectors = [];
-    for (let i=0;i<nSelectors;i++) {
-      let count=0;
-      while (readBits(1)===1) count++;
-      if (count>=mtfGroups.length) throw new Error("selector out of range");
-      let sel = mtfGroups[count];
-      mtfGroups.splice(count,1); mtfGroups.unshift(sel);
-      selectors.push(sel);
-    }
-    let tables = [];
-    for (let g=0; g<nGroups; g++) {
-      let currLen = readBits(5);
-      let lens = new Array(nInUse+2);
-      for (let s=0; s<nInUse+2; s++) {
-        while (true) {
-          let b1 = readBits(1);
-          if (b1===0) { lens[s]=currLen; break; }
-          let b2 = readBits(1);
-          if (b2===0) currLen++; else currLen--;
-        }
-      }
-      tables.push(buildHuffman(lens));
-    }
-    let mtf = used.slice();
-    let block = [];
-    let run = 0, runPower = 1;
-    let totalSymbols = 0;
-    while (true) {
-      let selIdx = Math.floor(totalSymbols/50);
-      let sel = selectors[selIdx];
-      if (sel===undefined) throw new Error("selector out of range total "+totalSymbols);
-      let currTable = tables[sel];
-      let sym = decodeHuffman(currTable);
-      totalSymbols++;
-      if (sym===0) { run += runPower; runPower *= 2; continue; }
-      if (sym===1) { run += runPower*2; runPower *= 2; continue; }
-      if (run!==0) { let c = mtf[0]; for (let i=0;i<run;i++) block.push(c); run=0; runPower=1; }
-      if (sym === nInUse+1) { break; }
-      let idx = sym-1;
-      if (idx<0 || idx>=mtf.length) throw new Error("MTF idx out of range "+idx+" sym "+sym+" nInUse "+nInUse);
-      let c = mtf[idx];
-      mtf.splice(idx,1); mtf.unshift(c);
-      block.push(c);
-    }
-    let nBlock = block.length;
-    let counts = new Array(256).fill(0);
-    for (let c of block) counts[c]++;
-    let cum = new Array(256).fill(0);
-    let sum=0;
-    for (let i=0;i<256;i++) { cum[i]=sum; sum+=counts[i]; }
-    let T = new Array(nBlock);
-    let cumCopy = cum.slice();
-    for (let i=0;i<nBlock;i++) { let c = block[i]; T[cumCopy[c]] = i; cumCopy[c]++; }
-    let j = T[origPtr];
-    for (let i=0;i<nBlock;i++) { out.push(block[j]); j = T[j]; }
-  }
-  return new Uint8Array(out);
-}
-
-
-function applyBsDiffPatch(patch,oldBytes){
-  if(patch.length<32) throw new Error('BSDIFF patch too short');
-  var ctrlLen=readInt64SignMagnitude(patch,8);
-  var diffLen=readInt64SignMagnitude(patch,16);
-  var newSize=readInt64SignMagnitude(patch,24);
-  if(ctrlLen<0||diffLen<0||newSize<0) throw new Error('Invalid BSDIFF header values');
-  if(32+ctrlLen+diffLen>patch.length) throw new Error('BSDIFF patch sections exceed buffer');
-  var ctrlC=patch.slice(32,32+ctrlLen);
-  var diffC=patch.slice(32+ctrlLen,32+ctrlLen+diffLen);
-  var extraC=patch.slice(32+ctrlLen+diffLen);
-  var ctrl, diff, extra;
-  function buildCtrlFallback(){
-    var c=new Uint8Array(24);
-    function w64(arr,off,v){ var mag=Math.abs(v); for(var i=0;i<8;i++){ arr[off+i]=mag&0xFF; mag=Math.floor(mag/256); } if(v<0) arr[off+7]|=0x80; }
-    w64(c,0,oldBytes.length); w64(c,8,newSize-oldBytes.length); w64(c,16,0);
-    return c;
-  }
-  try{ ctrl=bzip2Decompress(ctrlC); if(!ctrl || ctrl.length<24 || (ctrl.length%24)!==0) throw new Error('ctrl length invalid '+ (ctrl?ctrl.length:'null')); }catch(e){
-    if(newSize>oldBytes.length){ ctrl=buildCtrlFallback(); } else { throw e; }
-  }
-  try{ diff=bzip2Decompress(diffC); if(!diff || diff.length!==oldBytes.length) diff=new Uint8Array(oldBytes.length); }catch(e){ diff=new Uint8Array(oldBytes.length); }
-  extra=bzip2Decompress(extraC);
-  var out=new Uint8Array(newSize);
-  var oldPos=0, newPos=0, ctrlPos=0, diffPos=0, extraPos=0;
-  while(newPos<newSize){
-    if(ctrlPos+24>ctrl.length) throw new Error('BSDIFF ctrl truncated');
-    var addLen=readInt64SignMagnitude(ctrl,ctrlPos); ctrlPos+=8;
-    var copyLen=readInt64SignMagnitude(ctrl,ctrlPos); ctrlPos+=8;
-    var seekLen=readInt64SignMagnitude(ctrl,ctrlPos); ctrlPos+=8;
-    if(addLen<0||copyLen<0) throw new Error('BSDIFF negative add/copy');
-    for(var i=0;i<addLen;i++){
-      var oldB = (oldPos<oldBytes.length)? oldBytes[oldPos] : 0;
-      var diffB = (diffPos<diff.length)? diff[diffPos] : 0;
-      out[newPos]=(diffB+oldB)&0xFF;
-      newPos++; diffPos++; oldPos++;
-      if(newPos>newSize) throw new Error('BSDIFF overrun add');
-    }
-    for(var j=0;j<copyLen;j++){
-      if(extraPos>=extra.length) throw new Error('BSDIFF extra truncated');
-      out[newPos]=extra[extraPos];
-      newPos++; extraPos++;
-      if(newPos>newSize) throw new Error('BSDIFF overrun copy');
-    }
-    oldPos+=seekLen;
-    if(oldPos<0) throw new Error('BSDIFF oldPos negative');
-  }
-  return out;
-}
-async function getTafsir(){if(!db){document.getElementById('tafsirOut').textContent='حمّل ملف التفسير أولا';return;}var id=parseInt(document.getElementById('tid').value);try{var res=db.exec("SELECT data, searchText FROM Tafsir WHERE id="+id+" LIMIT 1");if(!res.length||!res[0].values.length){document.getElementById('tafsirOut').textContent='ما في تفسير بهالـ ID';return;}var blob=res[0].values[0][0];var search=res[0].values[0][1];var bytes=new Uint8Array(blob);var dec=decodeTafsirBlob(blob,search);var out='الطريقة: '+dec.how+'\n';out+='isBsDiff (أول 8 بايت فقط): '+(isBsDiff(bytes)?'نعم - BSDIFF40':'لا')+'\n';out+='searchText (هو الـ base): '+(search||'').slice(0,300)+'\n';out+='طول الـ Blob: '+bytes.length+' بايت\n';out+='------------------------------------------------\n';out+=dec.text.slice(0,4000);document.getElementById('tafsirOut').textContent=out;}catch(e){document.getElementById('tafsirOut').textContent='فشل: '+e.message;}}
-async function scanTafsir(){if(!db){document.getElementById('scanOut').textContent='حمّل ملف التفسير أولا';return;}document.getElementById('scanOut').textContent='عم افحص...';try{var res=db.exec("SELECT id FROM Tafsir ORDER BY id LIMIT 20");var ids=res[0].values.map(function(r){return r[0];});var out='فحص '+dbName+' - أول 20 صف:\n';for(var k=0;k<ids.length;k++){var id=ids[k];var r=db.exec("SELECT data FROM Tafsir WHERE id="+id);var bytes=new Uint8Array(r[0].values[0][0]);if(isBsDiff(bytes)){out+='ID '+id+': '+bytes.length+' بايت - أول 8 بايت BSDIFF40 - Patch \n';}else{try{var t=new TextDecoder().decode(bytes);var isArabic=/[\u0600-\u06FF]/.test(t.slice(0,500));out+='ID '+id+': '+bytes.length+' بايت - '+(isArabic?'نص UTF-8 - مفكوك':'مش عربي - مشكوك')+'\n';}catch(e){out+='ID '+id+': فشل UTF-8\n';}}}out+='\nالخلاصة: اللي مكتوب نص فك، اللي مكتوب Patch بدو تطبيق Patch على الأساس.';document.getElementById('scanOut').textContent=out;}catch(e){document.getElementById('scanOut').textContent='فشل الفحص: '+e.message;}}
-function pad(n){return String(n).padStart(3,'0');}
-function buildAudio(){var rec=document.getElementById('rec').value;var s=parseInt(document.getElementById('sura').value);var f=parseInt(document.getElementById('fromA').value);var t=parseInt(document.getElementById('toA').value);var h='';for(var a=f;a<=t;a++){var url=storage()+'/audio/'+rec+'/'+pad(s)+pad(a)+'.mp3';h+='<div><b>'+s+':'+a+'</b><br><a href="'+url+'" target="_blank">'+url+'</a><br><audio controls src="'+url+'" style="width:100%"></audio><br><a href="'+url+'" download><button>حمّل هالآية</button></a></div><hr>';}document.getElementById('audioList').innerHTML=h;}
+    if(found){
+      document.getElementById("bayan-card").style.display="block";
+      document.getElementById("bayan-title").textContent=found.title;
+      document.getElementById("bayan-date").textContent=found.dateText||"";
+      document.getElementById("bayan-source").innerHTML='المصدر: <a href="'+found.source+'" target="_blank" rel="noopener">'+found.source+'</a>';
+      var body=document.getElementById("bayan-body"); body.innerHTML="";
+      found.paragraphs.forEach(function(p){ var el=document.createElement("p"); el.textContent=p; body.appendChild(el); });
+      // حفظ محلي - بلا خادم
+      try{ localStorage.setItem("nojumi_last_bayan", JSON.stringify(found)); }catch(e){}
+    } else if(!stopped){ document.getElementById("status").textContent="خلّص الفحص من 1015 لـ 998"; log("لم يعثر على بيان"); }
+  }catch(e){ if(!stopped) log("فشل فحص البيان: "+(e instanceof Error?e.message:String(e))); }
+};
+document.getElementById("btn-stop").onclick=function(){ stopped=true; if(ctrl) ctrl.abort(); document.getElementById("status").textContent="انقطع"; log("كبسة قطع — عم نوقف الجلب"); };
+document.getElementById("btn-clear").onclick=function(){ stopped=true; if(ctrl) ctrl.abort(); document.getElementById("hijri").textContent="--"; document.getElementById("miladi").textContent="--"; document.getElementById("shamsi").textContent="--"; document.getElementById("device").textContent="--"; document.getElementById("diff").textContent="--"; document.getElementById("method").textContent="--"; document.getElementById("err").textContent=""; document.getElementById("status").textContent="انمسحت النتيجة — فيك تبلّش من جديد"; setPrayers(Object.fromEntries(Ti.map(function(e){return [e.id,"--"];}))); document.getElementById("log").textContent="—"; document.getElementById("bayan-card").style.display="none"; };
+// آخر بيان محفوظ
+try{ var saved=localStorage.getItem("nojumi_last_bayan"); if(saved){ var f=JSON.parse(saved); if(f && f.paragraphs && f.paragraphs.length){ document.getElementById("bayan-card").style.display="block"; document.getElementById("bayan-title").textContent=f.title; document.getElementById("bayan-date").textContent=f.dateText||""; document.getElementById("bayan-source").innerHTML='المصدر: <a href="'+f.source+'" target="_blank" rel="noopener">'+f.source+'</a>'; var b=document.getElementById("bayan-body"); b.innerHTML=""; f.paragraphs.forEach(function(p){ var el=document.createElement("p"); el.textContent=p; b.appendChild(el); }); log("انفتح آخر بيان محفوظ — رقم "+f.id); } } }catch(e){}
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 </body>
 </html>
