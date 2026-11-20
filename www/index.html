@@ -19,11 +19,39 @@ function log(m,ok){var d=document.getElementById('log');d.innerHTML+='<div class
 function api(){return document.getElementById('api').value.replace(/\/$/,'')+'/';}
 function storage(){return document.getElementById('storage').value.replace(/\/$/,'');}
 function stat(){return document.getElementById('static').value.replace(/\/$/,'');}
-async function testConn(){try{let r=await fetch(api()+'hijri-date/current');log('hijri-date/current: '+r.status, r.ok);}catch(e){log('فشل الاتصال: '+e.message,false);}}
+
 async function getHijri(){
   let local=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date());
   document.getElementById('hijriLocal').innerHTML='<b>محلي أم القرى:</b> '+local;
-  try{let r=await fetch(api()+'hijri-date/current');let t=await r.text();document.getElementById('hijriRaw').textContent=t;let j=JSON.parse(t);let fixed='ما في تصحيح من السيرفر';if(j.forcingDate) fixed='تصحيح مفروض: '+j.forcingDate;else if(j.adjustment!=null) fixed='تعديل: '+j.adjustment+' يوم';document.getElementById('hijriFixed').innerHTML='<b>بعد التصحيح:</b> '+fixed;log('الهجري نجح',true);}catch(e){document.getElementById('hijriFixed').innerHTML='<span class=bad>فشل الاتصال - ما تم التصحيح: '+e.message+'</span>';log('الهجري فشل: '+e.message,false);}
+  try{
+    let r=await fetch(api()+'hijri-date/current');
+    let t=await r.text();
+    // اذا السيرفر رجع صفحة HTML تبع خطأ، مش JSON، ما تعرضها كلها ككود
+    if(!r.ok || t.trim().startsWith('<')){
+      document.getElementById('hijriRaw').textContent='السيرفر رجع خطأ HTTP '+r.status+' - صفحة HTML تبع Cloudflare، مش JSON. يعني الرابط واصل للسيرفر بس السيرفر رافض / واقع هلأ. أول 300 حرف من الرد: '+t.slice(0,300);
+      document.getElementById('hijriFixed').innerHTML='<span class=bad>فشل - السيرفر رجع '+r.status+' مش JSON، ما تم التصحيح. التاريخ المحلي هو اللي ضل.</span>';
+      log('الهجري فشل: السيرفر رجع '+r.status+' HTML مش JSON',false);
+      return;
+    }
+    document.getElementById('hijriRaw').textContent=t;
+    let j=JSON.parse(t);
+    let fixed='ما في تصحيح من السيرفر';
+    if(j.forcingDate) fixed='تصحيح مفروض: '+j.forcingDate;
+    else if(j.adjustment!=null) fixed='تعديل: '+j.adjustment+' يوم';
+    document.getElementById('hijriFixed').innerHTML='<b>بعد التصحيح:</b> '+fixed;
+    log('الهجري نجح',true);
+  }catch(e){
+    document.getElementById('hijriFixed').innerHTML='<span class=bad>فشل الاتصال - ما تم التصحيح: '+e.message+'</span>';
+    log('الهجري فشل: '+e.message,false);
+  }
+}
+async function testConn(){
+  try{
+    let r=await fetch(api()+'hijri-date/current');
+    let t=await r.text();
+    if(!r.ok || t.trim().startsWith('<')){ log('hijri-date/current: '+r.status+' - السيرفر رجع صفحة خطأ HTML، مش JSON', false); return; }
+    log('hijri-date/current: '+r.status, r.ok);
+  }catch(e){ log('فشل الاتصال: '+e.message,false); }
 }
 async function getMeta(){try{let r=await fetch(storage()+'/databases/database_metadata.json');let t=await r.text();document.getElementById('metaRaw').textContent=t;log('ميتاداتا نجحت',true);}catch(e){document.getElementById('metaRaw').textContent='فشل: '+e.message;log('ميتاداتا فشلت',false);}}
 let SQL=null, db=null, dbName='';
