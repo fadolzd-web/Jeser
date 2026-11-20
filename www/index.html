@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -35,6 +35,7 @@
 <button id="btn-diag" class="ghost" style="width:100%">تشخيص أوقات الصلاة - فحص عميق من الجسر</button>
 <button id="btn-js" class="ghost" style="width:100%;margin-top:8px">فحص ملفات JS - وين مخباية الأوقات؟</button>
 <button id="btn-api" style="width:100%;margin-top:8px;background:#1a5c2e;color:#fff;border-color:#1a5c2e">جلب أوقات الصلاة من API الموقع - prayertimes</button>
+<button id="btn-api-key" style="width:100%;margin-top:8px;background:#d4af37;color:#071f16;border-color:#d4af37">جلب الأوقات مع المفتاح - API + apiKey</button>
 <div id="diag" style="margin-top:10px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-all"></div>
 <div style="margin-top:8px"><b>المدينة للصلاة:</b> <span style="font-size:12px;color:#a8b5ad">الموقع بيعرض النجف افتراضيا. اختار مدينتك هون، والجسر رح يجرب يجيب أوقاتها:</span></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
@@ -129,12 +130,11 @@ var ctrl=null, stopped=false;
 function log(m){var el=document.getElementById("log");var t=new Date().toLocaleTimeString("en-GB");var line=t+" — "+m;el.textContent = el.textContent==="—" ? line : el.textContent+"\n"+line; el.scrollTop=el.scrollHeight;}
 function setPrayers(p){var tb=document.querySelector("#prayers tbody");tb.innerHTML="";for(var i=0;i<Ti.length;i++){var tr=document.createElement("tr");var td1=document.createElement("td");td1.textContent=Ti[i].label;var td2=document.createElement("td");td2.textContent=p[Ti[i].id]||"--";tr.appendChild(td1);tr.appendChild(td2);tb.appendChild(tr);}}
 setPrayers(Object.fromEntries(Ti.map(function(e){return [e.id,"--"];})));
-async function fetchBridge(url, signal){
-  // جسر مباشر فقط: CapacitorHttp هو اتصال التطبيق نفسه، مش سيرفر وسيط
+async function fetchBridge(url, signal, extraHeaders){
+  var headers = Object.assign({Accept:"text/html,application/json"}, extraHeaders||{});
   var cap = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp;
-  if(cap){ try{ log("جسر مباشر - CapacitorHttp - "+url); var res=await cap.get({url:url,headers:{Accept:"text/html"},connectTimeout:20000,readTimeout:20000,responseType:"text"}); return {html: typeof res.data==="string"?res.data:JSON.stringify(res.data||""), method:"جسر مباشر - CapacitorHttp"}; }catch(e){ var msg=e instanceof Error?e.message:String(e); log("CapacitorHttp فشل: "+msg+" - عم جرّب جسر مباشر fetch"); } }
-  // جسر مباشر فقط: fetch من المتصفح دغري على الموقع
-  log("جسر مباشر - fetch - "+url); var r=await fetch(url,{cache:"no-store",signal:signal}); var t=await r.text(); if(!r.ok) throw new Error("HTTP "+r.status); return {html:t, method:"جسر مباشر - fetch"}; 
+  if(cap){ try{ log("جسر مباشر - CapacitorHttp - "+url+" - هيدرز: "+JSON.stringify(headers)); var res=await cap.get({url:url,headers:headers,connectTimeout:20000,readTimeout:20000,responseType:"text"}); return {html: typeof res.data==="string"?res.data:JSON.stringify(res.data||""), method:"جسر مباشر - CapacitorHttp"}; }catch(e){ var msg=e instanceof Error?e.message:String(e); log("CapacitorHttp فشل: "+msg+" - عم جرّب جسر مباشر fetch"); } }
+  log("جسر مباشر - fetch - "+url); var r=await fetch(url,{cache:"no-store",signal:signal,headers:headers}); var t=await r.text(); if(!r.ok) throw new Error("HTTP "+r.status); return {html:t, method:"جسر مباشر - fetch"}; 
 }
 document.getElementById("btn-live").onclick=async function(){
   stopped=false; ctrl=new AbortController();
@@ -402,6 +402,93 @@ document.getElementById("btn-api").onclick = async function(){
     log("خلص جلب API prayertimes");
   }catch(e){
     diag.textContent += "\nفشل: " + (e instanceof Error?e.message:String(e));
+  }
+};
+
+
+document.getElementById("btn-api-key").onclick = async function(){
+  var diag = document.getElementById("diag");
+  diag.textContent = "عم نجيب الأوقات مع المفتاح...\n";
+  stopped = false; ctrl = new AbortController();
+  try{
+    var out = "";
+    // 1. جيب المفتاح من الرئيسية دغري
+    var home = await fetchBridge(ET, ctrl.signal);
+    var mKey = home.html.match(/apiKey\s*:\s*['"]([^'"]+)['"]/);
+    var apiKey = mKey ? mKey[1] : "NJ5M14WSIA8PI";
+    out += "المفتاح من الموقع: " + apiKey + "\n\n";
+    var city = cityLatLon[currentCity];
+    var lat = city.lat, lon = city.lon;
+    out += "المدينة: " + city.name + " - lat " + lat + " - lon " + lon + "\n\n";
+    // 2. جيب صفحة prayertimes نفسها ودور فيها على الأوقات
+    out += "=== صفحة prayertimes نفسها ===\n";
+    var ptPage = await fetchBridge("https://arabic.nojumi.org/prayertimes", ctrl.signal);
+    var ptHtml = ptPage.html;
+    out += "طول صفحة prayertimes: " + ptHtml.length + "\n";
+    var ptTimes = ptHtml.match(/\d{1,2}:\d{2}/g) || [];
+    out += "عدد أوقات HH:MM بصفحة prayertimes: " + ptTimes.length + " - " + ptTimes.slice(0,30).join(" ، ") + "\n";
+    ["الفجر","المغرب","العشاء","الظهر","العصر","الشروق","الإمساك"].forEach(function(k){
+      var idx = ptHtml.indexOf(k);
+      if(idx!==-1){
+        var sn = Fc(ptHtml.slice(Math.max(0,idx-120), idx+250)).replace(/\s+/g," ");
+        out += "--- ["+k+"] حول الحرف "+idx+" ---\n" + sn.slice(0,400) + "\n";
+      } else { out += "--- ["+k+"]: مش موجودة ❌ ---\n"; }
+    });
+    // دور على طريقة نداء الـ API جوات صفحة prayertimes
+    out += "\n--- نداءات API جوات صفحة prayertimes ---\n";
+    var apiIdxs = [];
+    var lp = ptHtml.toLowerCase(); var pp = 0;
+    while(true){ var q = lp.indexOf("api", pp); if(q===-1) break; apiIdxs.push(q); pp = q+1; if(apiIdxs.length>12) break; }
+    apiIdxs.forEach(function(p,i){
+      var sn = Fc(ptHtml.slice(Math.max(0,p-120), p+250)).replace(/\s+/g," ");
+      out += "api["+i+"] ... " + sn.slice(0,380) + " ...\n\n";
+    });
+    // 3. جرب الـ API مع المفتاح بـ 6 طرق
+    out += "\n=== تجربة API مع المفتاح ===\n";
+    var today = new Date();
+    var dateStr = today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
+    var tries = [
+      {label:"1 - ?apiKey= بالمفتاح", url:"https://arabic.nojumi.org/api/prayertimes?apiKey="+encodeURIComponent(apiKey)+"&lat="+lat+"&lon="+lon+"&date="+dateStr, headers:null},
+      {label:"2 - ?key= بالمفتاح", url:"https://arabic.nojumi.org/api/prayertimes?key="+encodeURIComponent(apiKey)+"&lat="+lat+"&lon="+lon+"&date="+dateStr, headers:null},
+      {label:"3 - هيدر apiKey", url:"https://arabic.nojumi.org/api/prayertimes?lat="+lat+"&lon="+lon+"&date="+dateStr, headers:{apiKey:apiKey}},
+      {label:"4 - هيدر X-Api-Key", url:"https://arabic.nojumi.org/api/prayertimes?lat="+lat+"&lon="+lon+"&date="+dateStr, headers:{"X-Api-Key":apiKey}},
+      {label:"5 - هيدر X-API-KEY + apiKey كويري", url:"https://arabic.nojumi.org/api/prayertimes?apiKey="+encodeURIComponent(apiKey)+"&lat="+lat+"&lon="+lon, headers:{"X-Api-Key":apiKey, apiKey:apiKey}},
+      {label:"6 - بلا lat/lon - بس apiKey", url:"https://arabic.nojumi.org/api/prayertimes?apiKey="+encodeURIComponent(apiKey), headers:null}
+    ];
+    var success = null;
+    for(var i=0;i<tries.length;i++){
+      try{
+        var r = await fetchBridge(tries[i].url, ctrl.signal, tries[i].headers);
+        var txt = r.html;
+        out += "--- "+tries[i].label+" ---\n";
+        out += "طول الرد: "+txt.length+"\n";
+        out += "الرد:\n"+txt.slice(0,2000)+"\n";
+        var tms = txt.match(/\d{1,2}:\d{2}/g)||[];
+        out += "عدد أوقات بالرد: "+tms.length+" - "+tms.slice(0,15).join(" ، ")+"\n\n";
+        if(txt.indexOf("Failed")===-1 && txt.indexOf("Invalid")!==-1){ out += "لسا Invalid ❌\n\n"; }
+        else if(txt.indexOf("Failed")===-1 && tms.length>=4){ success = {txt:txt, label:tries[i].label}; out += "✅ نجحت هالطريقة!\n\n"; }
+        else if(txt.indexOf("Failed")!==-1){ out += "Failed ❌\n\n"; }
+      }catch(e){ out += "--- "+tries[i].label+" فشل: "+(e instanceof Error?e.message:String(e))+"\n\n"; }
+    }
+    if(success){
+      out += "=== ✅ لقينا الطريقة الصح: "+success.label+" ===\n";
+      try{
+        var j = JSON.parse(success.txt);
+        out += "JSON مفكوك:\n"+JSON.stringify(j,null,2).slice(0,3000)+"\n";
+        // حاول نعرض الأوقات بالجدول إذا لقيناها
+        var flat = JSON.stringify(j);
+        // دور على حقول معروفة
+        var fields = ["fajr","Fajr","sunrise","Sunrise","dhuhr","Dhuhr","asr","Asr","maghrib","Maghrib","isha","Isha","imsak","Imsak"];
+        fields.forEach(function(f){ var mm = flat.match(new RegExp('"'+f+'"\s*:\s*"([^"]+)"')); if(mm) out += f+" = "+mm[1]+"\n"; });
+      }catch(e){ out += "الرد مش JSON صافي، بس فيه أوقات.\n"; }
+    } else {
+      out += "=== لسا ما نجحت ولا طريقة - بعتلي هالسكرين شوت ===\n";
+      out += "إذا ولا طريقة نجحت، معناتا المفتاح بينبعت بطريقة تانية - منشوفها من نداءات API اللي فوق بصفحة prayertimes.\n";
+    }
+    diag.textContent = out;
+    log("خلص تجربة API مع المفتاح - المفتاح: "+apiKey);
+  }catch(e){
+    diag.textContent += "\nفشل: "+(e instanceof Error?e.message:String(e));
   }
 };
 
