@@ -3,16 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>جسر النجومي - مش بروكسي</title>
+<title>الجسر الموحد - نجومي | الصايغ | حقيبة المؤمن</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial;background:#0b2e1f;color:#fff;padding:14px}
-.card{background:#fff;color:#111;border-radius:16px;padding:16px;margin-bottom:12px}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial;background:#0b2e1f;color:#fff;padding:14px;padding-bottom:80px}
 h1{font-size:22px;margin:0 0 6px}
 .small{color:#d6ffe9;font-size:13px;line-height:1.7}
+.tabs{display:flex;gap:8px;position:sticky;top:0;background:#0b2e1f;padding:10px 0;z-index:10}
+.tab-btn{flex:1;border:0;border-radius:999px;padding:14px 8px;font-size:17px;font-weight:800;cursor:pointer;background:#e8f5ee;color:#0b2e1f}
+.tab-btn.active{background:#ffd400;color:#111}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.card{background:#fff;color:#111;border-radius:16px;padding:16px;margin-bottom:12px}
+.card h1,.card h2{color:#111}
 h2{font-size:18px;margin:0 0 10px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 button{border:0;border-radius:999px;padding:10px 16px;font-size:16px;font-weight:700;cursor:pointer}
+button.off{background:#e9e4d6;color:#333}
 .city{background:#e8f5ee;color:#0b2e1f}
 .city.active{background:#0b2e1f;color:#fff}
 .main{background:#ffd400;color:#111;width:100%;padding:14px;font-size:18px}
@@ -21,100 +28,161 @@ button{border:0;border-radius:999px;padding:10px 16px;font-size:16px;font-weight
 .time b{display:block;font-size:22px;margin-top:4px}
 .time span{font-size:14px;color:#444}
 pre{white-space:pre-wrap;word-break:break-word;background:#062015;color:#d6ffe9;border-radius:12px;padding:12px;font-size:12px;line-height:1.7;direction:ltr;text-align:left}
+input,select{padding:10px;border:1px solid #ccc;border-radius:10px;font-family:inherit;min-width:140px}
 input{width:100%;padding:12px;border-radius:12px;border:1px solid #ccc;font-size:16px;text-align:center}
 label{font-size:14px;color:#555}
 .ok{color:#0a7a3a;font-weight:700}
-.err{color:#b00020;font-weight:700}
+.err{color:#a11;background:#ffe8e8;border:1px solid #f5b5b5;padding:10px;border-radius:10px}
+.bad{color:#b00020}
+.mut{color:#6b7a70;font-size:12px}
+.badge{background:#e8f5ee;padding:4px 8px;border-radius:999px;font-size:12px}
+.num{font-family:monospace;direction:ltr}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid #eee;padding:7px 4px;text-align:right}
+th{background:#f7f3e6}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pill{background:#f7f3e6;border-radius:10px;padding:8px}
+.pill b{display:block;font-size:12px;color:#555}
+.logbox{background:#f7f3e6;border-radius:10px;padding:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#111}
 </style>
 </head>
 <body>
+<h1>الجسر الموحد</h1>
+<p class="small">ثلاث جسور بواجهة وحدة، بلا ما يضيع شغلنا. افتح هيدا الملف بـ Chrome: كبسة طويلة &gt; فتح بواسطة &gt; Chrome. ما تفتحو من عارض النصوص، هو اللي بيفرجيه كود وحروف صينية.</p>
+<div class="tabs">
+<button class="tab-btn active" id="tabBtnNojumi" onclick="showTab('nojumi')">نجومي</button>
+<button class="tab-btn" id="tabBtnSayegh" onclick="showTab('sayegh')">الصايغ</button>
+<button class="tab-btn" id="tabBtnHaqibat" onclick="showTab('haqibat')">حقيبة المؤمن</button>
+</div>
+
+<div id="panelNojumi" class="tab-panel active">
 <h1>جسر النجومي — مش بروكسي</h1>
 <p class="small">اتصال مباشر لـ arabic.nojumi.org. بلا وسيط. افتح هيدا الملف بـ Chrome: كبسة طويلة على الملف &gt; فتح بواسطة &gt; Chrome. ما تفتحو من عارض النصوص تبع الملفات، هو اللي بيفرجيه كود وحروف صينية.</p>
 
 <div class="card">
 <h2>المدينة — الدبوس على الخريطة، مش اسم المدينة</h2>
-<div class="row" id="cities"></div>
-<p style="font-size:14px;color:#444">الدبوس الحالي: <b id="pin">—</b></p>
+<div class="row" id="nj_cities"></div>
+<p style="font-size:14px;color:#444">الدبوس الحالي: <b id="nj_pin">—</b></p>
 <label>التاريخ الميلادي (سنة/شهر/يوم)</label>
-<input id="dateInput" value="2026/11/20">
+<input id="nj_dateInput" value="2026/11/20">
 <p style="font-size:13px;color:#666">اسم المدينة بس للعرض. الحساب على الدبوس فقط.</p>
-<button class="main" onclick="getTimes()">جلب أوقات الصلاة</button>
-<p id="status"></p>
+<button class="main" onclick="nj_getTimes()">جلب أوقات الصلاة</button>
+<p id="nj_status"></p>
 </div>
 
 <div class="card">
 <h2>التاريخ الهجري والميلادي — من الموقع نفسه</h2>
-<p>ميلادي من الموقع: <b id="miladiSite">—</b></p>
-<p>هجري من الموقع: <b id="hijriSite">—</b></p>
-<p id="hijriStatus" style="font-size:13px;color:#666"></p>
-<button class="main" style="background:#0b2e1f;color:#fff" onclick="fetchHijriMiladi()">جلب التاريخ الهجري والميلادي</button>
-<pre id="hijriLog" style="margin-top:10px">بانتظار الجلب...</pre>
+<p>ميلادي من الموقع: <b id="nj_miladiSite">—</b></p>
+<p>هجري من الموقع: <b id="nj_hijriSite">—</b></p>
+<p id="nj_hijriStatus" style="font-size:13px;color:#666"></p>
+<button class="main" style="background:#0b2e1f;color:#fff" onclick="nj_fetchHijriMiladi()">جلب التاريخ الهجري والميلادي</button>
+<pre id="nj_hijriLog" style="margin-top:10px">بانتظار الجلب...</pre>
 </div>
 
 <div class="card">
 <h2>آخر بيان استهلال — من الموقع نفسه</h2>
-<div id="istihlalBox" style="font-size:15px;line-height:1.9">بانتظار الجلب...</div>
-<p id="istihlalStatus" style="font-size:13px;color:#666"></p>
-<button class="main" style="background:#0b2e1f;color:#fff" onclick="fetchIstihlal()">جلب آخر بيان استهلال</button>
-<pre id="istihlalLog" style="margin-top:10px">بانتظار الجلب...</pre>
+<div id="nj_istihlalBox" style="font-size:15px;line-height:1.9">بانتظار الجلب...</div>
+<p id="nj_istihlalStatus" style="font-size:13px;color:#666"></p>
+<button class="main" style="background:#0b2e1f;color:#fff" onclick="nj_fetchIstihlal()">جلب آخر بيان استهلال</button>
+<pre id="nj_istihlalLog" style="margin-top:10px">بانتظار الجلب...</pre>
 </div>
 
 <div class="card">
 <h2>مواقيت الصلاة</h2>
-<div class="times" id="times"></div>
-<p id="extra" style="font-size:14px;color:#333;line-height:1.8"></p>
+<div class="times" id="nj_times"></div>
+<p id="nj_extra" style="font-size:14px;color:#333;line-height:1.8"></p>
 </div>
 
 <div class="card">
 <h2>تشخيص — أي طريقة نجحت؟</h2>
-<pre id="log">بانتظار الضغط على زر الجلب...</pre>
+<pre id="nj_log">بانتظار الضغط على زر الجلب...</pre>
+</div>
+</div>
+
+<div id="panelSayegh" class="tab-panel">
+<h1>تقويم الصائغ</h1>
+<div class="mut">البيانات من السيرفر مباشرة · بلا بروكسي · بلا حساب محلي · الفشل بينقال فشل</div>
+<div class="card">
+<div class="row"><label>المدينة ID:</label><input id="sg_cityId" value="1977" inputmode="numeric"><button onclick="sg_loadCity()">جلب من السيرفر</button><button class="off" onclick="sg_loadCities()">لائحة المدن</button></div>
+<div style="margin-top:8px"><input id="sg_citySearch" placeholder="ابحث: طرابلس، بيروت، النجف، الكويت..." style="width:100%" oninput="sg_filterCities()"></div>
+<div id="sg_cityList" style="max-height:180px;overflow:auto;margin-top:8px"></div>
+<div id="sg_cityInfo" style="margin-top:10px"></div>
+<div id="sg_status" style="margin-top:8px"></div>
+</div>
+
+<div class="card"><div class="row">
+<button id="sg_tDay" onclick="sg_show('day')">اليوم</button><button id="sg_tMonth" class="off" onclick="sg_show('month')">الشهر - إمساكية</button><button id="sg_tYear" class="off" onclick="sg_show('year')">السنة</button><button id="sg_tExtra" class="off" onclick="sg_show('extra')">إضافات</button>
+</div></div>
+
+<div id="sg_viewDay" class="card"></div>
+<div id="sg_viewMonth" class="card" style="display:none"></div>
+<div id="sg_viewYear" class="card" style="display:none"></div>
+<div id="sg_viewExtra" class="card" style="display:none"></div>
+</div>
+
+<div id="panelHaqibat" class="tab-panel">
+<h1>جسر حقيبة المؤمن - نسخة مصلحة</h1>
+<p class="small">الـ base المصلح: <b>https://api.hmomen.com/user-api/</b> - الـ base القديم https://hmomen.com/api/ كان غلط للهجري وكان يرجع HTML بدل JSON.<br>مفاتيح JSON الصح: <b>type / amount / forcing_date / forcing_valid_until</b><br>هيدا الملف خام: أول سطر DOCTYPE، بلا BOM، بلا فراغ قبلو. إذا انفتح كـ كود، افتحو بـ "عارض HTML" من قائمة "فتح باستخدام".</p>
+<div class="card"><b>الاعدادات</b><br><label>API Base - لا تغيرو</label><input id="hq_api" value="https://api.hmomen.com/user-api/"><label>Storage Base</label><input id="hq_storage" value="https://storage.hmomen.com"><label>Static Base</label><input id="hq_static" value="https://hmomen.com/static"><button onclick="hq_testConn()">اختبر الاتصال</button><div id="hq_log"></div></div>
+<div class="card"><b>1) التاريخ الهجري والتصحيح</b><br><label>التصحيح اليدوي - بيغلب السيرفر</label><select id="hq_manual"><option value="Auto">Auto - من السيرفر</option><option value="Minus2Days">Minus2Days -2 يوم</option><option value="MinusDay">MinusDay -1 يوم</option><option value="PlusDay">PlusDay +1 يوم</option><option value="Plus2Days">Plus2Days +2 يوم</option></select><button onclick="hq_getHijri()">جيب التصحيح من حقيبة المؤمن</button><div id="hq_hijriLocal"></div><pre id="hq_hijriRaw">ما في بيانات بعد</pre><div id="hq_hijriFixed"></div><div id="hq_hijriLog" class="logbox">لوغ: ما صار طلب بعد</div></div>
+<div class="card"><b>2) التفاسير وفك التشفير</b><br><button onclick="hq_getMeta()">جيب لائحة التفاسير</button><pre id="hq_metaRaw">ما في بيانات بعد</pre><button onclick="hq_dlTafsir('Tafsir_001.db')">حمّل الأمثل Tafsir_001.db</button><button onclick="hq_dlTafsir('Tafsir_002.db')">حمّل الميزان Tafsir_002.db</button><button onclick="hq_dlTafsir('Tafsir_004.db')">حمّل النور Tafsir_004.db</button><div id="hq_dlProg"></div><div id="hq_dbInfo"></div><label>رقم تفسير ID</label><input id="hq_tid" value="1" type="number"><button onclick="hq_getTafsir()">جيب التفسير وفك تشفيرو</button><button onclick="hq_scanTafsir()" class="purple">افحص أول 20 صف - أي واحد نص وأي واحد Patch</button><div id="hq_scanOut" class="logbox"></div><pre id="hq_tafsirOut">ما في بيانات بعد</pre><p class="small">فك التشفير حسب DEX: TafsirService.decodeTafsirBlob(blob, searchText). اذا أول 8 بايت BSDIFF40، منطبق Patch على searchText. اذا لا، UTF-8 مباشرة. ما في gzip ولا بحث عن BSDIFF بنص الـ Blob.</p></div>
+<div class="card"><b>3) قراء القرآن</b><br><label>القارئ</label><select id="hq_rec"><option value="alhusary">الحصري alhusary</option><option value="alminshawi">المنشاوي alminshawi</option><option value="reciter_abdalbasit">عبد الباسط</option><option value="reciter_menshawy">المنشاوي 2</option><option value="reciter_osama">أسامة</option></select><label>السورة</label><input id="hq_sura" value="1" type="number"><label>من آية</label><input id="hq_fromA" value="1" type="number"><label>الى آية</label><input id="hq_toA" value="3" type="number"><button onclick="hq_buildAudio()">ابني الروابط</button><div id="hq_audioList"></div></div>
 </div>
 
 <script>
-const CITIES = [
+function showTab(t){
+  ['nojumi','sayegh','haqibat'].forEach(x=>{
+    document.getElementById('panel'+x[0].toUpperCase()+x.slice(1)).classList.toggle('active', x===t);
+    document.getElementById('tabBtn'+x[0].toUpperCase()+x.slice(1)).classList.toggle('active', x===t);
+  });
+  try{ window.scrollTo({top:0, behavior:'smooth'}); }catch(e){}
+}
+</script>
+<script>
+const NJ_CITIES = [
   {name:"النجف", lat:31.7471, lng:44.2576},
   {name:"كربلاء", lat:32.6160, lng:44.0240},
   {name:"بيروت", lat:33.8938, lng:35.5016},
   {name:"طرابلس", lat:34.4368, lng:35.8497},
 ];
-let cur = CITIES[0];
-const citiesEl = document.getElementById('cities');
-const pinEl = document.getElementById('pin');
-const logEl = document.getElementById('log');
-const timesEl = document.getElementById('times');
-const extraEl = document.getElementById('extra');
-const statusEl = document.getElementById('status');
-const dateEl = document.getElementById('dateInput');
+let nj_cur = NJ_CITIES[0];
+const nj_citiesEl = document.getElementById('nj_cities');
+const nj_pinEl = document.getElementById('nj_pin');
+const nj_logEl = document.getElementById('nj_log');
+const nj_timesEl = document.getElementById('nj_times');
+const nj_extraEl = document.getElementById('nj_extra');
+const nj_statusEl = document.getElementById('nj_status');
+const nj_dateEl = document.getElementById('nj_dateInput');
 // ضع تاريخ اليوم كافتراضي إذا كان مختلفا
-try{ const d=new Date(); const s=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0'); dateEl.value=s; }catch(e){}
+try{ const d=new Date(); const s=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0'); nj_dateEl.value=s; }catch(e){}
 
-function renderCities(){
-  citiesEl.innerHTML='';
-  CITIES.forEach(c=>{
+function nj_renderCities(){
+  nj_citiesEl.innerHTML='';
+  NJ_CITIES.forEach(c=>{
     const b=document.createElement('button');
-    b.className='city'+(c===cur?' active':'');
+    b.className='city'+(c===nj_cur?' active':'');
     b.textContent=c.name;
-    b.onclick=()=>{cur=c; renderCities();};
-    citiesEl.appendChild(b);
+    b.onclick=()=>{nj_cur=c; nj_renderCities();};
+    nj_citiesEl.appendChild(b);
   });
-  pinEl.textContent = cur.name+' — '+cur.lat+' , '+cur.lng;
+  nj_pinEl.textContent = nj_cur.name+' — '+nj_cur.lat+' , '+nj_cur.lng;
 }
-renderCities();
+nj_renderCities();
 
-function cleanD(d){
+function nj_cleanD(d){
   if(typeof d==='object' && d!==null) return d;
   let s=String(d||'');
   s=s.replace(/^[\uFEFF\xA0\s]+/, '').trim();
   try{ return JSON.parse(s); }catch(e){ return {__raw:s, __parseError:String(e)}; }
 }
-function pick(obj, keys){
+function nj_pick(obj, keys){
   if(!obj || typeof obj!=='object') return null;
   const lower={};
   for(const k of Object.keys(obj)) lower[String(k).toLowerCase()]=obj[k];
   for(const k of keys){ if(lower[k]!==undefined && lower[k]!==null && lower[k]!=='') return lower[k]; }
   return null;
 }
-function showTimes(data){
+function nj_showTimes(data){
   // data هو الحقل data من الرد - الصورة أثبتت أن data فيها location و localDateTimeNow و prayerTimes
   // الأوقات جوّا prayerTimes، مش على سطح data، لهيك لازم نفتحها
   let src = (data && data.data) ? data.data : data;
@@ -137,7 +205,7 @@ function showTimes(data){
       src._prayerTimesRaw = pt;
     }
   }
-  const get = (keys)=>pick(src, keys);
+  const get = (keys)=>nj_pick(src, keys);
   const rows=[
     ['اذان الفجر', ['fajr','fajr_time','azan_fajr']],
     ['طلوع الشمس', ['sunrise','sun_rise','tulou']],
@@ -147,7 +215,7 @@ function showTimes(data){
     ['نصف الليل', ['midnight','nisf_allayl','half_night']],
     ['نصف الليل الفلكي', ['astronomicalmidnight','astronomical_midnight','midnight_astronomical','nisf_falaki']],
   ];
-  timesEl.innerHTML='';
+  nj_timesEl.innerHTML='';
   let found=0;
   rows.forEach(([label,keys])=>{
     const v=get(keys);
@@ -155,35 +223,35 @@ function showTimes(data){
       found++;
       const d=document.createElement('div'); d.className='time';
       d.innerHTML='<span>'+label+'</span><b>'+v+'</b>';
-      timesEl.appendChild(d);
+      nj_timesEl.appendChild(d);
     }
   });
   let qibla=get(['qibla','qiblaangle','qibla_angle','zawia','angle','qiblaDirection','qibla_degree']);
-  if(!qibla && src && src.location && typeof src.location==='object') qibla = pick(src.location, ['qibla','qiblaangle','qibla_angle','angle','direction']);
+  if(!qibla && src && src.location && typeof src.location==='object') qibla = nj_pick(src.location, ['qibla','qiblaangle','qibla_angle','angle','direction']);
   let dist=get(['distance','dist','distance_km','masafa','distanceToKaaba','distance_from_kaaba']);
-  if(!dist && src && src.location && typeof src.location==='object') dist = pick(src.location, ['distance','dist','distance_km']);
-  extraEl.innerHTML='';
-  if(qibla) extraEl.innerHTML+='زاوية الانحراف عن القبلة: <b>'+qibla+'</b><br>';
-  if(dist) extraEl.innerHTML+='المسافة عن الكعبة: <b>'+dist+'</b><br>';
+  if(!dist && src && src.location && typeof src.location==='object') dist = nj_pick(src.location, ['distance','dist','distance_km']);
+  nj_extraEl.innerHTML='';
+  if(qibla) nj_extraEl.innerHTML+='زاوية الانحراف عن القبلة: <b>'+qibla+'</b><br>';
+  if(dist) nj_extraEl.innerHTML+='المسافة عن الكعبة: <b>'+dist+'</b><br>';
   if(found===0){
-    timesEl.innerHTML='<p style="grid-column:1/-1">ما رجع ولا وقت. شوف التشخيص تحت — مفاتيح data مطبوعة حرفيا.</p>';
+    nj_timesEl.innerHTML='<p style="grid-column:1/-1">ما رجع ولا وقت. شوف التشخيص تحت — مفاتيح data مطبوعة حرفيا.</p>';
   }
   return {found, src};
 }
 
 
-function stripTags(s){ return String(s||'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
+function nj_stripTags(s){ return String(s||'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
 
-async function fetchHijriMiladi(){
-  const log=document.getElementById('hijriLog');
-  const st=document.getElementById('hijriStatus');
+async function nj_fetchHijriMiladi(){
+  const log=document.getElementById('nj_hijriLog');
+  const st=document.getElementById('nj_hijriStatus');
   log.textContent='عم ينده لـ https://arabic.nojumi.org/ ...';
   st.textContent='';
   try{
     const res=await fetch('https://arabic.nojumi.org/');
     const html=await res.text();
     log.textContent='status='+res.status+' طول='+html.length+'\n';
-    const text=stripTags(html);
+    const text=nj_stripTags(html);
     // ميلادي: دور على صيغة 2026/11/20 أو 20 نوفمبر 2026
     let miladi='—';
     let m=text.match(/20\d\d\/\d{1,2}\/\d{1,2}/);
@@ -199,8 +267,8 @@ async function fetchHijriMiladi(){
     let snippet='';
     const idx=text.toLowerCase().indexOf('هجري');
     if(idx>=0) snippet=text.slice(Math.max(0,idx-200), idx+300);
-    document.getElementById('miladiSite').textContent=miladi;
-    document.getElementById('hijriSite').textContent=hijri;
+    document.getElementById('nj_miladiSite').textContent=miladi;
+    document.getElementById('nj_hijriSite').textContent=hijri;
     if(hijri==='—' && miladi==='—'){
       st.textContent='ما لقيت التاريخ بالصفحة الرئيسية بهالصيغ، شوف المقطع بالتشخيص.';
       log.textContent+='مقطع حول هجري: '+snippet+'\n\nأول 1500 حرف من النص: '+text.slice(0,1500);
@@ -214,17 +282,17 @@ async function fetchHijriMiladi(){
   }
 }
 
-async function fetchIstihlal(){
-  const box=document.getElementById('istihlalBox');
-  const log=document.getElementById('istihlalLog');
-  const st=document.getElementById('istihlalStatus');
+async function nj_fetchIstihlal(){
+  const box=document.getElementById('nj_istihlalBox');
+  const log=document.getElementById('nj_istihlalLog');
+  const st=document.getElementById('nj_istihlalStatus');
   box.textContent='عم ينده...';
   log.textContent='عم ينده للرئيسية...';
   try{
     const res=await fetch('https://arabic.nojumi.org/');
     const html=await res.text();
     log.textContent='الرئيسية status='+res.status+' طول='+html.length+'\n';
-    const text=stripTags(html);
+    const text=nj_stripTags(html);
     // الحل الجديد: الموقع ما حاطط الاستهلال كروابط <a>، حاططو كنص بالصفحة.
     // لهيك منقص النص على كلمة رقم: ومنلقط كل بيان فيه يوم ... هو الأول من شهر ... لعام ...
     const parts=text.split('رقم:');
@@ -267,11 +335,11 @@ async function fetchIstihlal(){
   }
 }
 
-async function getTimes(){
-  const date=dateEl.value.trim();
-  const lat=cur.lat, lng=cur.lng;
-  statusEl.innerHTML='عم ينده للسيرفر...';
-  logEl.textContent='الطريقة الأساسية: POST https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI\nBody: '+JSON.stringify({lat,lng,date,navafel:false})+'\n---';
+async function nj_getTimes(){
+  const date=nj_dateEl.value.trim();
+  const lat=nj_cur.lat, lng=nj_cur.lng;
+  nj_statusEl.innerHTML='عم ينده للسيرفر...';
+  nj_logEl.textContent='الطريقة الأساسية: POST https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI\nBody: '+JSON.stringify({lat,lng,date,navafel:false})+'\n---';
   // 1) الطريقة الأساسية
   try{
     const res=await fetch('https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI', {
@@ -282,43 +350,164 @@ async function getTimes(){
     const txt=await res.text();
     let j=null; try{ j=JSON.parse(txt); }catch(e){ j={__text:txt}; }
     let d = (j && j.d!==undefined) ? j.d : j;
-    const cleaned=cleanD(d);
-    logEl.textContent+='\n[POST الداخلي] status='+res.status+' طول الرد='+txt.length+'\nمفاتيح cleaned: '+(cleaned && typeof cleaned==='object' ? Object.keys(cleaned).join(', ') : String(cleaned).slice(0,500))+'\n';
+    const cleaned=nj_cleanD(d);
+    nj_logEl.textContent+='\n[POST الداخلي] status='+res.status+' طول الرد='+txt.length+'\nمفاتيح cleaned: '+(cleaned && typeof cleaned==='object' ? Object.keys(cleaned).join(', ') : String(cleaned).slice(0,500))+'\n';
     if(cleaned && !cleaned.error && (cleaned.data || cleaned.fajr || cleaned.Fajr)){
-      const r=showTimes(cleaned);
-      statusEl.innerHTML='<span class="ok">نجح — POST الداخلي</span> — لقى '+r.found+' أوقات';
-      logEl.textContent+='\nنجح POST الداخلي. data keys: '+Object.keys(r.src||{}).join(', ')+' | prayerTimes keys: '+((r.src && r.src._prayerTimesRaw && typeof r.src._prayerTimesRaw==='object' && !Array.isArray(r.src._prayerTimesRaw)) ? Object.keys(r.src._prayerTimesRaw).join(', ') : JSON.stringify(r.src && r.src._prayerTimesRaw ? r.src._prayerTimesRaw : '').slice(0,800));
+      const r=nj_showTimes(cleaned);
+      nj_statusEl.innerHTML='<span class="ok">نجح — POST الداخلي</span> — لقى '+r.found+' أوقات';
+      nj_logEl.textContent+='\nنجح POST الداخلي. data keys: '+Object.keys(r.src||{}).join(', ')+' | prayerTimes keys: '+((r.src && r.src._prayerTimesRaw && typeof r.src._prayerTimesRaw==='object' && !Array.isArray(r.src._prayerTimesRaw)) ? Object.keys(r.src._prayerTimesRaw).join(', ') : JSON.stringify(r.src && r.src._prayerTimesRaw ? r.src._prayerTimesRaw : '').slice(0,800));
       return;
     } else {
-      logEl.textContent+='\nPOST الداخلي ما رجع data، error='+(cleaned && cleaned.error ? JSON.stringify(cleaned.error) : 'لا يوجد data')+'\nبيجرّب البديل المباشر...';
+      nj_logEl.textContent+='\nPOST الداخلي ما رجع data، error='+(cleaned && cleaned.error ? JSON.stringify(cleaned.error) : 'لا يوجد data')+'\nبيجرّب البديل المباشر...';
     }
   }catch(e){
-    logEl.textContent+='\n[POST الداخلي] فشل: '+e+'\nملاحظة: إذا فتحت الملف من file:// المتصفح ممكن يمنع CORS. افتحو من رابط السيرفر أو من APK بـ CapacitorHttp.\nبيجرّب البديل المباشر...';
+    nj_logEl.textContent+='\n[POST الداخلي] فشل: '+e+'\nملاحظة: إذا فتحت الملف من file:// المتصفح ممكن يمنع CORS. افتحو من رابط السيرفر أو من APK بـ CapacitorHttp.\nبيجرّب البديل المباشر...';
   }
 
   // 2) البديل: API مباشر بـ Latitude/Longitude + apiKey بالرابط
   try{
     const url='https://arabic.nojumi.org/api/prayertimes?apiKey=NJ5M14WSIA8PI&Latitude='+encodeURIComponent(lat)+'&Longitude='+encodeURIComponent(lng)+'&date='+encodeURIComponent(date);
-    logEl.textContent+='\n[بديل] GET '+url+'\n';
+    nj_logEl.textContent+='\n[بديل] GET '+url+'\n';
     const res2=await fetch(url);
     const txt2=await res2.text();
-    logEl.textContent+='[بديل] status='+res2.status+' طول='+txt2.length+' رد='+txt2.slice(0,1000)+'\n';
+    nj_logEl.textContent+='[بديل] status='+res2.status+' طول='+txt2.length+' رد='+txt2.slice(0,1000)+'\n';
     let j2=null; try{ j2=JSON.parse(txt2); }catch(e){}
     if(j2){
-      const cleaned2=cleanD(j2.d!==undefined?j2.d:j2);
+      const cleaned2=nj_cleanD(j2.d!==undefined?j2.d:j2);
       if(cleaned2 && !cleaned2.error && (cleaned2.data || cleaned2.fajr)){
-        const r=showTimes(cleaned2);
-        statusEl.innerHTML='<span class="ok">نجح — البديل المباشر</span>';
+        const r=nj_showTimes(cleaned2);
+        nj_statusEl.innerHTML='<span class="ok">نجح — البديل المباشر</span>';
         return;
       }
     }
-    statusEl.innerHTML='<span class="err">ما نجح ولا طريقة. شوف التشخيص.</span>';
+    nj_statusEl.innerHTML='<span class="err">ما نجح ولا طريقة. شوف التشخيص.</span>';
   }catch(e){
-    statusEl.innerHTML='<span class="err">فشل البديل: '+e+'</span>';
-    logEl.textContent+='\n[بديل] فشل: '+e;
+    nj_statusEl.innerHTML='<span class="err">فشل البديل: '+e+'</span>';
+    nj_logEl.textContent+='\n[بديل] فشل: '+e;
   }
 }
-window.addEventListener('load', ()=>{ fetchHijriMiladi(); fetchIstihlal(); });
+window.addEventListener('load', ()=>{ nj_fetchHijriMiladi(); nj_fetchIstihlal(); });
+</script>
+<script>
+let SG_CITY=null, SG_CITIES=[], SG_CUR=null, SG_CURMONTH=11;
+const sg_$=id=>document.getElementById(id);
+function sg_esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function sg_num(v){return '<span class="num">'+sg_esc(v)+'</span>'}
+async function sg_get(u){let r=await fetch(u,{headers:{'Accept':'application/json'}}); if(!r.ok) throw new Error('HTTP '+r.status+' - '+r.statusText); return await r.json();}
+function sg_show(t){['day','month','year','extra'].forEach(x=>{sg_$('sg_view'+x[0].toUpperCase()+x.slice(1)).style.display=(x===t?'block':'none'); sg_$('sg_t'+x[0].toUpperCase()+x.slice(1)).className=(x===t?'':'off')}); if(t==='month')sg_renderMonth(); if(t==='year')sg_renderYear();}
+async function sg_loadCities(){try{let d=await sg_get('https://api.sayeghcalendar.com/cities'); SG_CITIES=d; sg_$('sg_status').innerHTML='<span class="badge">تم جلب '+d.length+' مدينة</span>'; sg_filterCities();}catch(e){sg_$('sg_status').innerHTML='<div class="err">فشل جلب المدن: '+sg_esc(e.message)+'</div>'}}
+function sg_filterCities(){let q=(sg_$('sg_citySearch').value||'').trim().toLowerCase(); let list=SG_CITIES.filter(c=>!q||((c.city_en||'').toLowerCase().includes(q)||(c.city_ar||'').includes(q)||(c.country_en||'').toLowerCase().includes(q)||(c.country_ar||'').includes(q))).slice(0,60); sg_$('sg_cityList').innerHTML=list.map(c=>'<div style="padding:7px;border-bottom:1px solid #eee;cursor:pointer" onclick="sg_pickCity('+c.id+')">'+sg_esc(c.city_ar||c.city_en)+' - '+sg_esc(c.city_en)+' - '+sg_esc(c.country_ar||c.country_en)+' - ID '+sg_num(c.id)+'</div>').join('')||'<div class="mut">اكبس لائحة المدن أولاً</div>'}
+function sg_pickCity(id){sg_$('sg_cityId').value=id; sg_loadCity();}
+async function sg_loadCity(){let id=parseInt(sg_$('sg_cityId').value,10); if(!id) return; sg_$('sg_status').innerHTML='جارٍ الجلب...'; try{let d=await sg_get('https://api.sayeghcalendar.com/city/'+id); SG_CITY=d; sg_$('sg_cityInfo').innerHTML='<b>'+sg_esc(d.city_ar||d.city)+' - '+sg_esc(d.city)+'</b> · '+sg_esc(d.country_ar||d.country_en)+' · ID '+sg_num(d.id)+' · خط عرض '+sg_num(d.latitude)+' · خط طول '+sg_num(d.longitude)+' · توقيت '+sg_num(d.timezone)+' · قبلة '+sg_num(d.qibla); sg_$('sg_status').innerHTML='<span class="badge">من السيرفر - api.sayeghcalendar.com/city/'+id+'</span> · '+new Date().toLocaleString('ar-LB'); // find today
+let now=new Date(); let m=now.getMonth()+1, dy=now.getDate(); SG_CURMONTH=m; let md=null; (d.months||[]).forEach(mm=>{if(mm.month===m) md=mm}); if(md){SG_CUR=md.days.find(x=>x.day===dy)||md.days[0];} sg_renderDay(); sg_renderMonth(); sg_renderYear();}catch(e){sg_$('sg_status').innerHTML='<div class="err">فشل: '+sg_esc(e.message)+' - السيرفر قال فشل، ما في داتا مخترعة</div>'; sg_$('sg_cityInfo').innerHTML='';}}
+function sg_dayRow(l,v){return '<tr><td>'+l+'</td><td>'+sg_num(v)+'</td></tr>'}
+function sg_renderDay(){if(!SG_CUR) {sg_$('sg_viewDay').innerHTML='<div class="mut">اجلب مدينة أولاً</div>'; return;} let d=SG_CUR; sg_$('sg_viewDay').innerHTML='<h2>'+sg_esc(d.longDateAr||'')+'</h2><div class="mut">'+sg_esc(d.longDateEn||'')+' · هجري '+sg_esc(d.hijriDate)+' - '+sg_esc(d.hijriMonthAr)+'</div><div class="row" style="margin:10px 0"><button onclick="sg_prevDay()">◀ اليوم السابق</button><button onclick="sg_nextDay()">اليوم التالي ▶</button><button class="off" onclick="sg_loadCity()">اليوم</button></div><table>'+sg_dayRow('السحر',d.saharTime)+sg_dayRow('الإمساك',d.imsakTime)+sg_dayRow('الفجر',d.dawnTime)+sg_dayRow('الصبح',d.subhTime)+sg_dayRow('نهاية فضيلة الصبح',d.subhFadhilatEndTime)+sg_dayRow('الشروق',d.sunriseTime)+sg_dayRow('الزوال',d.zawalTime)+sg_dayRow('الظهر',d.dhuhrTime)+sg_dayRow('نهاية فضيلة الظهر',d.dhuhrFadhilatEndTime)+sg_dayRow('العصر 1',d.asrTime_1)+sg_dayRow('العصر 2',d.asrTime_2)+sg_dayRow('بداية فضيلة العصر',d.asrFadhilatBeginTime)+sg_dayRow('نهاية فضيلة العصر',d.asrFadhilatEndTime)+sg_dayRow('الغروب',d.sunsetTime)+sg_dayRow('المغرب',d.maghrebTime)+sg_dayRow('المغرب +15',d.maghreb_15min)+sg_dayRow('المغرب 35°',d.maghreb_35deg)+sg_dayRow('العشاء',d.ishaTime)+sg_dayRow('بداية فضيلة العشاء',d.ishaFadhilatBeginTime)+sg_dayRow('منتصف الليل',d.midnightTime)+sg_dayRow('منتصف الليل الفلكي',d.astroMidnightTime)+sg_dayRow('وقت القبلة',d.qiblaTime)+'</table><h3>كل التفاصيل</h3><div class="grid"><div class="pill"><b>فارسي</b><span>'+sg_esc(d.farsiDate||'')+'</span></div><div class="pill"><b>قبطي</b><span>'+sg_esc(d.copticDate||'')+'</span></div><div class="pill"><b>عبري</b><span>'+sg_esc(d.hebrewDate||'')+'</span></div><div class="pill"><b>يولياني</b><span>'+sg_esc(d.julianDate||'')+'</span></div><div class="pill"><b>طلوع القمر</b><span>'+sg_esc(d.moonriseTime||'')+'</span></div><div class="pill"><b>غروب القمر</b><span>'+sg_esc(d.moonsetTime||'')+'</span></div><div class="pill"><b>الأنواء</b><span>'+sg_esc(d.anwaaName||'')+'</span></div><div class="pill"><b>المواسم</b><span>'+sg_esc(d.mawasemName||'')+'</span></div><div class="pill"><b>البرج الحقيقي</b><span>'+sg_esc(d.trueZodiacName||'')+'</span></div><div class="pill"><b>البرج الشائع</b><span>'+sg_esc(d.commonZodiacName||'')+'</span></div></div>';}
+function sg_findDay(month,day){let mm=(SG_CITY.months||[]).find(x=>x.month===month); if(!mm) return null; return mm.days.find(x=>x.day===day)||null;}
+function sg_prevDay(){if(!SG_CUR) return; let dt=new Date(2026,SG_CURMONTH-1,SG_CUR.day); dt.setDate(dt.getDate()-1); SG_CUR=sg_findDay(dt.getMonth()+1,dt.getDate()); SG_CURMONTH=dt.getMonth()+1; sg_renderDay();}
+function sg_nextDay(){if(!SG_CUR) return; let dt=new Date(2026,SG_CURMONTH-1,SG_CUR.day); dt.setDate(dt.getDate()+1); SG_CUR=sg_findDay(dt.getMonth()+1,dt.getDate()); SG_CURMONTH=dt.getMonth()+1; sg_renderDay();}
+function sg_renderMonth(){if(!SG_CITY){sg_$('sg_viewMonth').innerHTML='اجلب مدينة أولاً'; return;} let sel=sg_$('sg_monthSel')?parseInt(sg_$('sg_monthSel').value,10):SG_CURMONTH; let mm=(SG_CITY.months||[]).find(x=>x.month===sel); if(!mm){sg_$('sg_viewMonth').innerHTML='لا يوجد شهر '+sel; return;} let opts=(SG_CITY.months||[]).map(x=>'<option value="'+x.month+'" '+(x.month===sel?'selected':'')+'>'+x.month+' - '+(x.days[0]?x.days[0].monthNameAr:'')+'</option>').join(''); sg_$('sg_viewMonth').innerHTML='<h2>إمساكية الشهر - '+sg_esc(mm.days[0].monthNameAr)+' 2026</h2><select id="monthSel" onchange="sg_renderMonth()">'+opts+'</select><div style="overflow:auto"><table><tr><th>اليوم</th><th>التاريخ</th><th>هجري</th><th>إمساك</th><th>صبح</th><th>شروق</th><th>ظهر</th><th>عصر 1</th><th>مغرب</th><th>عشاء</th></tr>'+mm.days.map(d=>'<tr><td>'+sg_num(d.day)+'</td><td>'+sg_num(d.date)+'</td><td>'+sg_num(d.hijriDate)+'</td><td>'+sg_num(d.imsakTime)+'</td><td>'+sg_num(d.subhTime)+'</td><td>'+sg_num(d.sunriseTime)+'</td><td>'+sg_num(d.dhuhrTime)+'</td><td>'+sg_num(d.asrTime_1)+'</td><td>'+sg_num(d.maghrebTime)+'</td><td>'+sg_num(d.ishaTime)+'</td></tr>').join('')+'</table></div>';}
+function sg_renderYear(){if(!SG_CITY){sg_$('sg_viewYear').innerHTML='اجلب مدينة أولاً'; return;} sg_$('sg_viewYear').innerHTML='<h2>تقويم السنة - 2026</h2><div class="grid">'+(SG_CITY.months||[]).map(mm=>{let f=mm.days[0],l=mm.days[mm.days.length-1]; return '<div class="pill" style="cursor:pointer" onclick="document.getElementById(\'monthSel\').value='+mm.month+';sg_show(\'month\')"><b>'+sg_esc(f.monthNameAr)+' - شهر '+sg_num(mm.month)+'</b><span>'+mm.days.length+' يوم</span><div class="mut">من '+sg_esc(f.hijriDate)+' إلى '+sg_esc(l.hijriDate)+'</div></div>'}).join('')+'</div>';}
+async function sg_loadExtra(kind){let box=sg_$('sg_extraBox'); box.innerHTML='جارٍ الجلب...'; try{let url='',d; let cityEn=SG_CITY?SG_CITY.city:SG_CITY; let countryEn=SG_CITY?SG_CITY.country_en:''; if(kind==='events'){url='https://api.sayeghcalendar.com/events/'+countryEn; d=await sg_get(url);} else if(kind==='crescent'){url='https://api.sayeghcalendar.com/crescent/'+cityEn+'/'+SG_CURMONTH; d=await sg_get(url);} else if(kind==='tide'){url='https://api.sayeghcalendar.com/tidewave/'+countryEn; d=await sg_get(url);} else if(kind==='moon'){let w=sg_$('sg_moonWhich').value; url='https://api.sayeghcalendar.com/moon/'+w; d=await sg_get(url);} else if(kind==='hijri'){url='https://api.sayeghcalendar.com/hijri-calendar/2026'; d=await sg_get(url);} box.innerHTML='<div class="mut">المصدر: '+sg_esc(url)+'</div><div style="margin-top:8px">'+sg_renderObj(d)+'</div>';}catch(e){box.innerHTML='<div class="err">غير متوفر من السيرفر: '+sg_esc(e.message)+'</div>';}}
+function sg_renderObj(o){if(o==null) return '<span class="mut">-</span>'; if(Array.isArray(o)){if(o.length===0) return '<span class="mut">لا يوجد</span>'; if(o.every(x=>x==null||typeof x!=='object')) return o.map(x=>'<span class="badge" style="margin:2px">'+sg_esc(x)+'</span>').join(' '); return '<div class="mut">'+o.length+' عنصر</div>'+o.slice(0,30).map(x=>'<div style="border:1px solid #eee;border-radius:10px;padding:8px;margin:6px 0">'+sg_renderObj(x)+'</div>').join('');} if(typeof o==='object'){return '<table>'+Object.keys(o).map(k=>{let v=o[k]; let cell; if(v==null) cell='<span class="mut">-</span>'; else if(typeof v==='object') cell=sg_renderObj(v); else cell=sg_num(v); return '<tr><td style="font-weight:700;width:35%">'+sg_esc(k)+'</td><td>'+cell+'</td></tr>';}).join('')+'</table>';} return '<span class="num">'+sg_esc(o)+'</span>';}
+sg_$('sg_viewExtra').innerHTML='<h2>إضافات - من السيرفر فقط</h2><div class="row"><button onclick="sg_loadExtra(\'events\')">المناسبات</button><button class="off" onclick="sg_loadExtra(\'crescent\')">الهلال</button><button class="off" onclick="sg_loadExtra(\'tide\')">المد والجزر</button><button class="off" onclick="sg_loadExtra(\'hijri\')">التقويم الهجري</button><select id="moonWhich"><option value="man">القمر - منازل man</option><option value="zod">القمر - أبراج zod</option><option value="true">القمر - حقيقي true</option></select><button class="off" onclick="sg_loadExtra(\'moon\')">القمر</button></div><div id="extraBox" style="margin-top:10px"></div>';
+sg_loadCity();
+</script>
+<script>
+function hq_log(m,ok){var d=document.getElementById('hq_log');d.innerHTML+='<div class="'+(ok?'ok':'bad')+'">'+new Date().toLocaleTimeString()+' - '+m+'</div>';}
+function hq_api(){return document.getElementById('hq_api').value.replace(/\/$/,'')+'/';}
+function hq_storage(){return document.getElementById('hq_storage').value.replace(/\/$/,'');}
+function hq_stat(){return document.getElementById('hq_static').value.replace(/\/$/,'');}
+function hq_saveManual(){try{localStorage.setItem('hijri.date.correction.value',document.getElementById('hq_manual').value);}catch(e){}}
+try{var _m=localStorage.getItem('hijri.date.correction.value');if(_m)document.getElementById('hq_manual').value=_m;}catch(e){}
+document.getElementById('hq_manual').addEventListener('change',saveManual);
+var HQ_LAST_JSON=null;
+function hq_applyHijri(j){
+  var out='', lg='';
+  lg+='HijriAdjustmentInfo -> fromJSON parsed: '+JSON.stringify(j)+'\n';
+  var manual=document.getElementById('hq_manual').value;
+  if(manual && manual!=='Auto'){
+    var map={Minus2Days:-2,MinusDay:-1,PlusDay:1,Plus2Days:2};
+    out='<b>تصحيح يدوي يغلب السيرفر:</b> '+manual+' = '+map[manual]+' يوم. السيرفر تجاهل بهالحالة.';
+    lg+='HijriDate -> manual correction wins: '+manual+'\n';
+    document.getElementById('hq_hijriFixed').innerHTML=out;
+    document.getElementById('hq_hijriLog').textContent=lg;
+    return;
+  }
+  if(!j || typeof j!=='object'){document.getElementById('hq_hijriFixed').innerHTML='<span class=bad>JSON مش مفهوم</span>';return;}
+  var type=j.type||j.Type||'', amount=j.amount!=null?j.amount:j.Amount, fd=j.forcing_date||j.forcingDate||j.ForcingDate||null, valid=j.forcing_valid_until||j.forcingValidUntil||j.ForcingValidUntil||null;
+  if(type==='ForceDate' && fd){
+    var d=fd.Day!=null?fd.Day:fd.day, mo=fd.Month!=null?fd.Month:fd.month, y=fd.Year!=null?fd.Year:fd.year;
+    var expired=false;
+    if(valid){
+      try{var vd=new Date(String(valid).replace(' ','T'));if(!isNaN(vd.getTime()) && vd < new Date()) expired=true;}catch(e){}
+    }
+    if(expired){
+      out='<b>forcing_valid_until انتهى ('+valid+') - رجوع للـ amount:</b> '+(amount!=null?amount:'-')+' يوم. التاريخ المفروض تجاهل.';
+      lg+='HijriDate -> forcing_valid_until expired, fallback to amount='+amount+'\n';
+    } else {
+      out='<b>تاريخ مفروض ForceDate:</b> '+d+' / '+mo+' / '+y+' - صالح حتى: '+(valid||'غير مذكور');
+      lg+='HijriDate -> applied ForceDate: '+d+'/'+mo+'/'+y+' validUntil='+valid+'\n';
+    }
+  } else if(type==='Natural' || type==='' ){
+    out='<b>تعديل طبيعي Natural:</b> amount = '+(amount!=null?amount:'-')+' يوم على أم القرى.';
+    lg+='HijriDate -> applied Natural adjustment: amount='+amount+'\n';
+  } else {
+    out='<b>نوع غير معروف:</b> '+type+' - amount: '+(amount!=null?amount:'-');
+    lg+='HijriDate -> unknown type: '+type+'\n';
+  }
+  document.getElementById('hq_hijriFixed').innerHTML=out;
+  document.getElementById('hq_hijriLog').textContent=lg;
+}
+async function hq_getHijri(){
+  var local='-';
+  try{local=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date());}catch(e){}
+  document.getElementById('hq_hijriLocal').innerHTML='<b>محلي أم القرى:</b> '+local;
+  var url=hq_api()+'hijri-date/current?api_key=1a502da1-00e4-49bb-987a-ca3ba232a846&lang=ar&platform=android';
+  document.getElementById('hq_hijriLog').textContent='الطلب: '+url;
+  try{
+    var r=await fetch(url);
+    var t=await r.text();
+    if(!r.ok || t.trim().startsWith('<')){
+      document.getElementById('hq_hijriRaw').textContent='السيرفر رجع HTTP '+r.status+' - صفحة HTML، مش JSON. أول 300 حرف: '+t.slice(0,300);
+      document.getElementById('hq_hijriFixed').innerHTML='<span class=bad>فشل - رجع '+r.status+' مش JSON، ما تم التصحيح.</span>';
+      hq_log('الهجري فشل: رجع '+r.status+' HTML مش JSON',false);
+      return;
+    }
+    document.getElementById('hq_hijriRaw').textContent=t;
+    var j=JSON.parse(t); HQ_LAST_JSON=j;
+    try{localStorage.setItem('hijri_date_adjusment_info',t);}catch(e){}
+    hq_applyHijri(j);
+    hq_log('الهجري نجح',true);
+  }catch(e){
+    document.getElementById('hq_hijriFixed').innerHTML='<span class=bad>فشل الاتصال - ما تم التصحيح: '+e.message+'</span>';
+    hq_log('الهجري فشل: '+e.message,false);
+  }
+}
+async function hq_testConn(){
+  var url=hq_api()+'hijri-date/current?api_key=1a502da1-00e4-49bb-987a-ca3ba232a846&lang=ar&platform=android';
+  try{
+    var r=await fetch(url); var t=await r.text();
+    if(!r.ok || t.trim().startsWith('<')){hq_log('hijri-date/current: '+r.status+' - رجع HTML مش JSON',false);return;}
+    hq_log('hijri-date/current: '+r.status,true);
+  }catch(e){hq_log('فشل الاتصال: '+e.message,false);}
+}
+async function hq_getMeta(){try{var r=await fetch(hq_storage()+'/databases/database_metadata.json');var t=await r.text();document.getElementById('hq_metaRaw').textContent=t;hq_log('ميتاداتا نجحت',true);}catch(e){document.getElementById('hq_metaRaw').textContent='فشل: '+e.message;hq_log('ميتاداتا فشلت',false);}}
+var HQ_SQL=null, db=null, hq_dbName='';
+async function hq_dlTafsir(name){try{document.getElementById('hq_dlProg').textContent='عم نزّل '+name+'...';var r=await fetch(hq_stat()+'/databases/'+name);if(!r.ok) throw new Error('HTTP '+r.status);var buf=await r.arrayBuffer();document.getElementById('hq_dlProg').textContent='نزل '+(buf.byteLength/1024/1024).toFixed(2)+' MB';if(!HQ_SQL) HQ_SQL=await initSqlJs({locateFile:function(f){return 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f;}});db=new HQ_SQL.Database(new Uint8Array(buf));hq_dbName=name;var cols=db.exec("SELECT name FROM sqlite_master WHERE type='table'");document.getElementById('hq_dbInfo').innerHTML='<b>'+name+'</b> انفتح. الجداول: '+JSON.stringify(cols);try{var c=db.exec("SELECT COUNT(*) FROM Tafsir");document.getElementById('hq_dbInfo').innerHTML+='<br>عدد صفوف Tafsir: '+c[0].values[0][0];}catch(e){}hq_log(name+' نزل وانفتح',true);}catch(e){document.getElementById('hq_dlProg').textContent='فشل: '+e.message;hq_log(name+' فشل: '+e.message,false);}}
+function hq_isBsDiff(bytes){if(!bytes||bytes.length<8) return false;return bytes[0]===0x42&&bytes[1]===0x53&&bytes[2]===0x44&&bytes[3]===0x49&&bytes[4]===0x46&&bytes[5]===0x46&&bytes[6]===0x34&&bytes[7]===0x30;}
+function hq_decodeTextFromBytes(bytes){return new TextDecoder('utf-8').decode(bytes);}
+function hq_readInt64(b,off){var mag=0;for(var i=0;i<7;i++) mag+=b[off+i]*Math.pow(256,i);mag+=(b[off+7]&0x7F)*Math.pow(256,7);return (b[off+7]&0x80)?-mag:mag;}
+function hq_decodeTafsirBlob(blob,baseText){var bytes=new Uint8Array(blob);if(hq_isBsDiff(bytes)){try{return {how:'BSDIFF - hq_reconstructFromBsDiff(blob, searchText)',text:hq_reconstructFromBsDiff(bytes,baseText)};}catch(e){return {how:'BSDIFF فشل',text:'[تحتاج النص الأساسي لإعادة البناء] - الخطأ: '+e.message+'\nالـ base المستعمل هو searchText من نفس الصف، مش الصف السابق ولا ملف قديم.'};}}return {how:'UTF-8 مباشرة - decodeTextFromBytes',text:hq_decodeTextFromBytes(bytes)};}
+function hq_reconstructFromBsDiff(patchBytes,baseText){var oldBytes=new TextEncoder().encode(baseText||'');var out=hq_applyBsDiffPatch(patchBytes,oldBytes);return hq_decodeTextFromBytes(out);}
+function hq_applyBsDiffPatch(patch,oldBytes){if(patch.length<32) throw new Error('BSDIFF patch too short');var ctrlLen=hq_readInt64(patch,8);var diffLen=hq_readInt64(patch,16);var newSize=hq_readInt64(patch,24);if(ctrlLen<0||diffLen<0||newSize<0) throw new Error('Invalid BSDIFF header values');if(32+ctrlLen+diffLen>patch.length) throw new Error('BSDIFF patch sections exceed buffer');throw new Error('يحتاج BZip2 decompression - ctrlLen='+ctrlLen+' diffLen='+diffLen+' newSize='+newSize+' oldLen='+oldBytes.length+' - الـ Patch موجود كامل، بس المتصفح ما بيفك BZip2 بدون مكتبة. الـ base هو searchText.');}
+async function hq_getTafsir(){if(!db){document.getElementById('hq_tafsirOut').textContent='حمّل ملف التفسير أولا';return;}var id=parseInt(document.getElementById('hq_tid').value);try{var res=db.exec("SELECT data, searchText FROM Tafsir WHERE id="+id+" LIMIT 1");if(!res.length||!res[0].values.length){document.getElementById('hq_tafsirOut').textContent='ما في تفسير بهالـ ID';return;}var blob=res[0].values[0][0];var search=res[0].values[0][1];var bytes=new Uint8Array(blob);var dec=hq_decodeTafsirBlob(blob,search);var out='الطريقة: '+dec.how+'\n';out+='hq_isBsDiff(أول 8 بايت فقط): '+(hq_isBsDiff(bytes)?'نعم - BSDIFF40':'لا')+'\n';out+='searchText (هو الـ base): '+(search||'').slice(0,300)+'\n';out+='طول الـ Blob: '+bytes.length+' بايت\n';out+='------------------------------------------------\n';out+=dec.text.slice(0,4000);document.getElementById('hq_tafsirOut').textContent=out;}catch(e){document.getElementById('hq_tafsirOut').textContent='فشل: '+e.message;}}
+async function hq_scanTafsir(){if(!db){document.getElementById('hq_scanOut').textContent='حمّل ملف التفسير أولا';return;}document.getElementById('hq_scanOut').textContent='عم افحص...';try{var res=db.exec("SELECT id FROM Tafsir ORDER BY id LIMIT 20");var ids=res[0].values.map(function(r){return r[0];});var out='فحص '+hq_dbName+' - أول 20 صف:\n';for(var k=0;k<ids.length;k++){var id=ids[k];var r=db.exec("SELECT data FROM Tafsir WHERE id="+id);var bytes=new Uint8Array(r[0].values[0][0]);if(hq_isBsDiff(bytes)){out+='ID '+id+': '+bytes.length+' بايت - أول 8 بايت BSDIFF40 - Patch \n';}else{try{var t=new TextDecoder().decode(bytes);var isArabic=/[\u0600-\u06FF]/.test(t.slice(0,500));out+='ID '+id+': '+bytes.length+' بايت - '+(isArabic?'نص UTF-8 - مفكوك':'مش عربي - مشكوك')+'\n';}catch(e){out+='ID '+id+': فشل UTF-8\n';}}}out+='\nالخلاصة: اللي مكتوب نص فك، اللي مكتوب Patch بدو تطبيق Patch على الأساس.';document.getElementById('hq_scanOut').textContent=out;}catch(e){document.getElementById('hq_scanOut').textContent='فشل الفحص: '+e.message;}}
+function hq_pad(n){return String(n).padStart(3,'0');}
+function hq_buildAudio(){var rec=document.getElementById('hq_rec').value;var s=parseInt(document.getElementById('hq_sura').value);var f=parseInt(document.getElementById('hq_fromA').value);var t=parseInt(document.getElementById('hq_toA').value);var h='';for(var a=f;a<=t;a++){var url=hq_storage()+'/audio/'+rec+'/'+hq_pad(s)+hq_pad(a)+'.mp3';h+='<div><b>'+s+':'+a+'</b><br><a href="'+url+'" target="_blank">'+url+'</a><br><audio controls src="'+url+'" style="width:100%"></audio><br><a href="'+url+'" download><button>حمّل هالآية</button></a></div><hr>';}document.getElementById('hq_audioList').innerHTML=h;}
+</script>
+<script>
+// تحميل تلقائي لنجومي متل ما كان
+window.addEventListener('load', ()=>{ try{ nj_fetchHijriMiladi(); nj_fetchIstihlal(); }catch(e){} });
 </script>
 </body>
 </html>
