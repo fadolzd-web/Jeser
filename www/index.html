@@ -1,500 +1,188 @@
-﻿﻿﻿﻿﻿﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
+<head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>جسر النجومي - مش بروكسي</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,Tahoma,Arial,sans-serif;background:#0b1512;color:#eef2ef}header{position:sticky;top:0;background:#0b1512;border-bottom:2px solid #d4af37;padding:14px 16px}h1{margin:0;font-size:22px;color:#e8c85a}.sub{color:#a8b5ad;font-size:13px;margin-top:4px}.badge{display:inline-block;background:#1a5c2e;color:#fff;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:900;margin-top:8px}.note{margin:12px 16px;background:#14251f;border:1px solid #2a3a32;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7}main{max-width:760px;margin:0 auto;padding:12px 16px 40px}.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{min-height:52px;border-radius:14px;border:1px solid #d4af37;background:#d4af37;color:#071f16;font-weight:900;font-size:15px;cursor:pointer}button.ghost{background:#14251f;color:#e8c85a}button.plain{background:#1a2e26;color:#eef2ef;border-color:#2a3a32}.card{background:#14251f;border:1px solid #2a3a32;border-radius:16px;padding:14px;margin-top:12px}.card h2{margin:0 0 8px;color:#e8c85a;font-size:17px}.row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed #2a3a32;font-size:15px}.row:last-child{border-bottom:0}.row span:first-child{color:#a8b5ad}.row span:last-child{font-weight:800}table{width:100%;border-collapse:collapse}td{padding:8px;border-bottom:1px solid #2a3a32}td:last-child{font-weight:900;text-align:left}.err{color:#ff9a9a;font-weight:800}.log{background:#07100d;border:1px solid #2a3a32;border-radius:12px;padding:10px;font-family:monospace;font-size:12px;white-space:pre-wrap;max-height:220px;overflow:auto;direction:ltr;text-align:left}.bayan p{line-height:1.9;margin:10px 0}a{color:#e8c85a;word-break:break-all}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial;background:#0b2e1f;color:#fff;padding:14px}
+.card{background:#fff;color:#111;border-radius:16px;padding:16px;margin-bottom:12px}
+h1{font-size:22px;margin:0 0 6px}
+.small{color:#d6ffe9;font-size:13px;line-height:1.7}
+h2{font-size:18px;margin:0 0 10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+button{border:0;border-radius:999px;padding:10px 16px;font-size:16px;font-weight:700;cursor:pointer}
+.city{background:#e8f5ee;color:#0b2e1f}
+.city.active{background:#0b2e1f;color:#fff}
+.main{background:#ffd400;color:#111;width:100%;padding:14px;font-size:18px}
+.times{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.time{background:#f2f6f3;border-radius:12px;padding:12px;text-align:center}
+.time b{display:block;font-size:22px;margin-top:4px}
+.time span{font-size:14px;color:#444}
+pre{white-space:pre-wrap;word-break:break-word;background:#062015;color:#d6ffe9;border-radius:12px;padding:12px;font-size:12px;line-height:1.7;direction:ltr;text-align:left}
+input{width:100%;padding:12px;border-radius:12px;border:1px solid #ccc;font-size:16px;text-align:center}
+label{font-size:14px;color:#555}
+.ok{color:#0a7a3a;font-weight:700}
+.err{color:#b00020;font-weight:700}
 </style>
-<header><h1>🌙 جسر النجومي - مش بروكسي</h1><div class="sub">اتصال مباشر مع arabic.nojumi.org - من دون أي وسيط</div><span class="badge">✅ جسر مباشر - بلا بروكسي - بلا وسيط - بلا سيرفر بالنص</span></header>
-<div class="note"><b>شو يعني جسر مش بروكسي؟</b><br>بروكسي = سيرفر بالنص بيجيب الصفحة عنك وبيرجعلك ياها.<br><b>جسر = التطبيق بيحكي مع موقع النجومي دغري، بلا أي سيرفر بالنص.</b> هيدا الملف ما فيه أي رابط بروكسي، ولا بيبعت طلب لأي سيرفر تاني. الطلب بيروح دغري على <b>arabic.nojumi.org</b> وبس.</div>
-<main>
-<div class="btns">
-<button id="btn-live">جلب من الجسر - النجومي</button>
-<button id="btn-bayan" class="ghost">جلب آخر بيان استهلال - جسر</button>
-<button id="btn-stop" class="plain">قطع</button>
-<button id="btn-clear" class="plain">مسح</button>
+</head>
+<body>
+<h1>جسر النجومي — مش بروكسي</h1>
+<p class="small">اتصال مباشر لـ arabic.nojumi.org. بلا وسيط. افتح هيدا الملف بـ Chrome: كبسة طويلة على الملف &gt; فتح بواسطة &gt; Chrome. ما تفتحو من عارض النصوص تبع الملفات، هو اللي بيفرجيه كود وحروف صينية.</p>
+
+<div class="card">
+<h2>المدينة — الدبوس على الخريطة، مش اسم المدينة</h2>
+<div class="row" id="cities"></div>
+<p style="font-size:14px;color:#444">الدبوس الحالي: <b id="pin">—</b></p>
+<label>التاريخ الميلادي (سنة/شهر/يوم)</label>
+<input id="dateInput" value="2026/11/20">
+<p style="font-size:13px;color:#666">اسم المدينة بس للعرض. الحساب على الدبوس فقط.</p>
+<button class="main" onclick="getTimes()">جلب أوقات الصلاة</button>
+<p id="status"></p>
 </div>
-<div class="card"><h2>النتيجة - من الجسر</h2>
-<div class="row"><span>نوع الاتصال</span><span>جسر مباشر - مش بروكسي</span></div>
-<div class="row"><span>الوسيط</span><span>لا يوجد - بلا بروكسي</span></div>
-<div class="row"><span>الحالة</span><span id="status">بعد ما بلّشنا - كبوس جلب من الجسر</span></div>
-<div class="row"><span>الطريقة</span><span id="method">--</span></div>
-<div class="row"><span>المصدر</span><span><a id="source" href="https://arabic.nojumi.org/" target="_blank" rel="noopener">arabic.nojumi.org - مباشر</a></span></div>
-<div class="row"><span>الهجري (قمري)</span><span id="hijri">--</span></div>
-<div class="row"><span>الميلادي</span><span id="miladi">--</span></div>
-<div class="row"><span>الشمسي</span><span id="shamsi">--</span></div>
-<div class="row"><span>تاريخ جهازك</span><span id="device">--</span></div>
-<div class="row"><span>الفرق</span><span id="diff">--</span></div>
-<div id="err" class="err" style="margin-top:8px"></div>
+
+<div class="card">
+<h2>مواقيت الصلاة</h2>
+<div class="times" id="times"></div>
+<p id="extra" style="font-size:14px;color:#333;line-height:1.8"></p>
 </div>
-<div class="card"><h2>🕌 أوقات الصلاة - من الجسر</h2><p style="color:#a8b5ad;font-size:13px;margin:0 0 8px">من صفحة الموقع بس. إذا ما لقينا وقت، منبيّن -- وما منخترع وقت.</p>
-<table id="prayers"><tbody></tbody></table></div>
-<div class="card"><h2>🔍 تشخيص أوقات الصلاة - من الجسر</h2>
-<p style="color:#a8b5ad;font-size:13px;margin:0 0 8px">هيدا التشخيص بيفرجيك شو عم يوصل من الموقع بالضبط. كبوس زر التشخيص وابعتلي سكرين شوت.</p>
-<button id="btn-diag" class="ghost" style="width:100%">تشخيص أوقات الصلاة - فحص عميق من الجسر</button>
-<button id="btn-js" class="ghost" style="width:100%;margin-top:8px">فحص ملفات JS - وين مخباية الأوقات؟</button>
-<button id="btn-api" style="width:100%;margin-top:8px;background:#1a5c2e;color:#fff;border-color:#1a5c2e">جلب أوقات الصلاة من API الموقع - prayertimes</button>
-<button id="btn-api-key" style="width:100%;margin-top:8px;background:#d4af37;color:#071f16;border-color:#d4af37">جلب الأوقات مع المفتاح - API + apiKey</button>
-<div id="diag" style="margin-top:10px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-all"></div>
-<div style="margin-top:8px"><b>المدينة للصلاة:</b> <span style="font-size:12px;color:#a8b5ad">الموقع بيعرض النجف افتراضيا. اختار مدينتك هون، والجسر رح يجرب يجيب أوقاتها:</span></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-<button class="plain" data-city="najaf">النجف - افتراضي الموقع</button>
-<button class="plain" data-city="karbala">كربلاء</button>
-<button class="plain" data-city="beirut">بيروت</button>
-<button class="plain" data-city="tripoli">طرابلس - لبنان</button>
+
+<div class="card">
+<h2>تشخيص — أي طريقة نجحت؟</h2>
+<pre id="log">بانتظار الضغط على زر الجلب...</pre>
 </div>
-<div id="city-info" style="margin-top:8px;font-size:13px;color:#e8c85a">المدينة الحالية: النجف (افتراضي الموقع)</div>
-</div>
-<div class="card" id="bayan-card" style="display:none"><h2>📜 آخر بيان استهلال - من الجسر</h2><div id="bayan-title" style="font-weight:900"></div><div id="bayan-date" style="color:#a8b5ad;font-size:13px;margin-top:4px"></div><div id="bayan-source" style="font-size:12px;margin-top:4px"></div><div class="bayan" id="bayan-body"></div></div>
-<div class="card"><h2>السجل - الجسر</h2><div class="log" id="log">—</div><div style="margin-top:8px;font-size:12px;color:#a8b5ad">طول آخر HTML: <span id="html-len">0</span></div></div>
-</main>
+
 <script>
-// ===== جسر النجومي - مش بروكسي - اتصال مباشر فقط =====
-// لا يوجد أي رابط بروكسي بهيدا الملف. الطلب بيروح دغري على arabic.nojumi.org
-// CapacitorHttp = اتصال مباشر من داخل الـ APK نفسه، مش سيرفر وسيط
-// fetch = اتصال مباشر من المتصفح، مش سيرفر وسيط
-var ET="https://arabic.nojumi.org/";
-var Pc=function(id){return "https://arabic.nojumi.org/news/"+id+"/";};
-var Ti=[{id:"fajr",label:"الفجر",aliases:["الفجر"]},{id:"sunrise",label:"الشروق",aliases:["الشروق"]},{id:"dhuhr",label:"الظهر",aliases:["الظهر"]},{id:"asr",label:"العصر",aliases:["العصر"]},{id:"maghrib",label:"المغرب",aliases:["المغرب"]},{id:"isha",label:"العشاء",aliases:["العشاء"]},{id:"imsak",label:"الإمساك",aliases:["الإمساك","الامساك","إمساك","امساك"]},{id:"midnight",label:"منتصف الليل",aliases:["منتصف الليل"]},{id:"sahar",label:"السحر",aliases:["السحر"]}];
-var Tc=["ذو الحجة","ذو القعدة","ربيع الآخر","ربيع الأول","جمادى الآخرة","جمادى الأولى","محرم","صفر","رجب","شعبان","رمضان","شوال"];
-var bl={"تشرين الثاني":11,"تشرين الاول":10,"تشرين الأول":10,"كانون الثاني":1,"كانون الاول":12,"كانون الأول":12,"شباط":2,"آذار":3,"اذار":3,"نيسان":4,"أيار":5,"ايار":5,"حزيران":6,"تموز":7,"آب":8,"اب":8,"أيلول":9,"ايلول":9,"يناير":1,"فبراير":2,"مارس":3,"أبريل":4,"ابريل":4,"مايو":5,"يونيو":6,"يوليو":7,"أغسطس":8,"اغسطس":8,"سبتمبر":9,"أكتوبر":10,"اكتوبر":10,"نوفمبر":11,"ديسمبر":12,january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
-var hv=["كانون الثاني","شباط","آذار","نيسان","أيار","حزيران","تموز","آب","أيلول","تشرين الأول","تشرين الثاني","كانون الأول"];
-function Fi(e){return String(e||"").replace(/[٠-٩]/g,function(n){return String("٠١٢٣٤٥٦٧٨٩".indexOf(n));}).replace(/[۰-۹]/g,function(n){return String("۰۱۲۳۴۵۶۷۸۹".indexOf(n));});}
-function Fc(e){var s=String(e||"").replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<[^>]+>/g," ");
-// فك ترميز الكيانات الرقمية: &#8226; -> • , &#39; -> ' , &#160; -> مسافة
-s=s.replace(/&#(\d+);/g,function(m,n){try{return String.fromCharCode(parseInt(n,10));}catch(e){return " ";}}).replace(/&#[xX]([0-9a-fA-F]+);/g,function(m,n){try{return String.fromCharCode(parseInt(n,16));}catch(e){return " ";}});
-s=s.replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">");
-// إذا ضل شي مقلوب متل ;8226#& بسبب RTL، شيلو
-s=s.replace(/;\d+#&/g," • ").replace(/&\d+;/g," ");
-return s.replace(/\s+/g," ").trim();}
-function mv(e){return String(e||"").replace(/[\u064B-\u0652\u0670\u0640]/g,"");}
-function yv(e){return mv(e).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه");}
-function xi(e){return Fc(Fi(e)).replace(/\s+/g," ").trim();}
-function zi(e,n){var t=new RegExp('id=["\']'+n+'["\'][^>]*>([\\s\\S]*?)<',"i"),r=e.match(t);return r?xi(r[1]):"";}
-function Oc(e){return Fi(Fc(e));}
-function gv(e){
-  var raw=String(e||""); var l=Oc(e);
-  var hijriMonths=["","محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
-  var hDay=null,hMonth=null,hYear=null;
-  var mD=raw.match(/headerHijriDay\s*:\s*(\d{1,2})/i); var mM=raw.match(/headerHijriMonth\s*:\s*(\d{1,2})/i); var mY=raw.match(/headerHijriYear\s*:\s*(\d{3,4})/i);
-  if(mD) hDay=parseInt(mD[1],10); if(mM) hMonth=parseInt(mM[1],10); if(mY) hYear=parseInt(mY[1],10);
-  var n="",t="",r="";
-  if(hDay && hMonth && hYear && hijriMonths[hMonth]) t=hDay+" "+hijriMonths[hMonth]+" "+hYear;
-  var combined=l.match(/(\d{1,2}\s+جمادى الآخرة\s+144\d)\s*-\s*(202\d\/\d{1,2}\/\d{1,2})/);
-  if(!combined) combined=raw.match(/(\d{1,2}\s+جمادى الآخرة\s+144\d)\s*-\s*(202\d\/\d{1,2}\/\d{1,2})/);
-  if(combined){ if(!t) t=combined[1].replace(/\s+/g," ").trim(); r=combined[2].trim(); }
-  if(!r){ var anyDate=raw.match(/(202\d\/\d{1,2}\/\d{1,2})/); if(anyDate) r=anyDate[1]; else { var anyDate2=l.match(/(202\d\/\d{1,2}\/\d{1,2})/); if(anyDate2) r=anyDate2[1]; } }
-  if(!t) t=zi(e,"ctl00_lblQamariDate");
-  if(!r) r=zi(e,"ctl00_lblMiladiDate");
-  if(!n) n=zi(e,"ctl00_lblShamsiDate");
-  if(!t){ var o=l.match(new RegExp("(\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4})")); if(o) t=o[1].replace(/\s+/g," ").trim(); }
-  if(!r){ var o2=Object.keys(bl).sort(function(s,f){return f.length-s.length;}), i=l.match(new RegExp("(\\d{1,2}\\s*(?:"+o2.join("|")+")\\s*\\d{4})","i")); if(i) r=i[1].replace(/\s+/g," ").trim(); }
-  if(!n){ var o3=l.match(/(\d{1,2}\s*(?:فروردين|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)\s*\d{4})/); if(o3) n=o3[1].trim(); }
-  var u={};for(var k=0;k<Ti.length;k++){var o4=Ti[k];var val="--";
-  // جرب بالنص المنظف أولا
-  for(var a=0;a<o4.aliases.length;a++){var s=o4.aliases[a];var f=l.indexOf(s);if(f===-1)continue;var h=l.slice(f,f+160).match(/(\d{1,2}:\d{2})/);if(h){val=h[1];break;}var g=l.slice(Math.max(0,f-40),f+s.length).match(/(\d{1,2}:\d{2})/);if(g){val=g[1];break;}}
-  // إذا ما لقينا، جرب بالـ HTML الخام - لأن الأوقات ممكن تكون بـ JSON داخل سكربت
-  if(val==="--"){ for(var a2=0;a2<o4.aliases.length;a2++){var s2=o4.aliases[a2];var f2=raw.indexOf(s2);if(f2===-1)continue;var h2=raw.slice(f2,f2+300).match(/(\d{1,2}:\d{2})/);if(h2){val=h2[1];break;}} }
-  u[o4.id]=val;}
-  return{shamsi:n,qamari:t,miladi:r,prayers:u};}
-function wv(e){ var s=String(e||"").trim(); var ymd=s.match(/(202\d)[\/-](\d{1,2})[\/-](\d{1,2})/); if(ymd) return new Date(Number(ymd[1]),Number(ymd[2])-1,Number(ymd[3])); var n=Fi(s),t=Object.keys(bl).sort(function(l,u){return u.length-l.length;}); for(var k=0;k<t.length;k++){var l=t[k];var u=bl[l];var o=new RegExp("(\\d{1,2})\\s*"+l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{4})","i");var i=n.match(o);if(i)return new Date(Number(i[2]),u-1,Number(i[1]));var s2=new RegExp(l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{1,2})\\s*,?\\s*(\\d{4})","i");var f=n.match(s2);if(f)return new Date(Number(f[2]),u-1,Number(f[1]));} var r=n.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(r) return new Date(Number(r[3]),Number(r[2])-1,Number(r[1])); return null; }
-function Nc(e){return e.getDate()+" "+hv[e.getMonth()]+" "+e.getFullYear();}
-function kv(e){
-  var n=e.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i),t=n?xi(n[1]):"",r=Oc(e),l="",u=r.match(/\d{4}[\/-]\d{1,2}[\/-]\d{1,2}/),o=Object.keys(bl).sort(function(p,g){return g.length-p.length;}),i=r.match(new RegExp("\\d{1,2}\\s*(?:"+o.join("|")+")\\s*\\d{4}","i")),s=r.match(new RegExp("\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4}"));
-  if(i)l=i[0].trim();else if(s)l=s[0].trim();else if(u)l=u[0];
-  // --- تنظيف البيان: شيل فقرات القوائم والتنقل ---
-  var allParas=Array.from(e.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)).map(function(p){return xi(p[1]);}).filter(function(p){return p.length>25;});
-  // كلمات القوائم اللي لازم تنشال
-  var navWords=["تسجيل الدخول","عضوية","فارسي","English","العربية","الصفحة الرئيسية","تعيين القبلة","مواقيت الصلاة","قسم الاخبار","مركز البحوث","Astronomical Research","A.R.C.","صورة اليوم","ألبوم الصور","معلومات فلكية","الخسوف","الكسوف","المؤتمرات","قسم هواة","وضعية الهلال","الصور","الأخبار"];
-  var keepWords=["السيستاني","أعلن","اعلن","مكتب","الهلال","جمادى","الأول من شهر","الاول من شهر","يوم الخميس","يوم الثلاثاء","يوم الاربعاء","يوم الجمعة"];
-  var f=allParas.filter(function(p){
-    // إذا الفقرة فيها كلمة بيان قوية، خليها حتى لو فيها كلمة قائمة
-    var hasKeep=false; for(var k=0;k<keepWords.length;k++){ if(p.indexOf(keepWords[k])!==-1){ hasKeep=true; break; } }
-    if(hasKeep) return true;
-    // إذا ما فيها كلمة بيان، وشيلها إذا فيها كلمة قائمة
-    for(var j=0;j<navWords.length;j++){ if(p.indexOf(navWords[j])!==-1) return false; }
-    // إذا ما فيها لا هيدي ولا هيدي، وطولها طويل وبتحكي عن الهلال، خليها
-    if(p.indexOf("هلال")!==-1 || p.indexOf("شهر")!==-1) return true;
-    return false;
+const CITIES = [
+  {name:"النجف", lat:31.7471, lng:44.2576},
+  {name:"كربلاء", lat:32.6160, lng:44.0240},
+  {name:"بيروت", lat:33.8938, lng:35.5016},
+  {name:"طرابلس", lat:34.4368, lng:35.8497},
+];
+let cur = CITIES[0];
+const citiesEl = document.getElementById('cities');
+const pinEl = document.getElementById('pin');
+const logEl = document.getElementById('log');
+const timesEl = document.getElementById('times');
+const extraEl = document.getElementById('extra');
+const statusEl = document.getElementById('status');
+const dateEl = document.getElementById('dateInput');
+// ضع تاريخ اليوم كافتراضي إذا كان مختلفا
+try{ const d=new Date(); const s=d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0'); dateEl.value=s; }catch(e){}
+
+function renderCities(){
+  citiesEl.innerHTML='';
+  CITIES.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='city'+(c===cur?' active':'');
+    b.textContent=c.name;
+    b.onclick=()=>{cur=c; renderCities();};
+    citiesEl.appendChild(b);
   });
-  // إذا بعد التصفية ما ضل شي، رجع للفقرات اللي فيها السيستاني بس
-  if(f.length===0){
-    f=allParas.filter(function(p){ return p.indexOf("السيستاني")!==-1; });
-  }
-  // إذا بعدو ما ضل شي، خذ أول 3 فقرات نظيفة من وسط الصفحة
-  if(f.length===0) f=allParas.slice(0,3);
-  var v=yv(r),h=v.includes("اعلن مكتب")&&v.includes("السيستاني");
-  return{title:t,dateText:l,paragraphs:f,hasSistani:h};}
-var ctrl=null, stopped=false;
-function log(m){var el=document.getElementById("log");var t=new Date().toLocaleTimeString("en-GB");var line=t+" — "+m;el.textContent = el.textContent==="—" ? line : el.textContent+"\n"+line; el.scrollTop=el.scrollHeight;}
-function setPrayers(p){var tb=document.querySelector("#prayers tbody");tb.innerHTML="";for(var i=0;i<Ti.length;i++){var tr=document.createElement("tr");var td1=document.createElement("td");td1.textContent=Ti[i].label;var td2=document.createElement("td");td2.textContent=p[Ti[i].id]||"--";tr.appendChild(td1);tr.appendChild(td2);tb.appendChild(tr);}}
-setPrayers(Object.fromEntries(Ti.map(function(e){return [e.id,"--"];})));
-async function fetchBridge(url, signal, extraHeaders){
-  var headers = Object.assign({Accept:"text/html,application/json"}, extraHeaders||{});
-  var cap = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp;
-  if(cap){ try{ log("جسر مباشر - CapacitorHttp - "+url+" - هيدرز: "+JSON.stringify(headers)); var res=await cap.get({url:url,headers:headers,connectTimeout:20000,readTimeout:20000,responseType:"text"}); return {html: typeof res.data==="string"?res.data:JSON.stringify(res.data||""), method:"جسر مباشر - CapacitorHttp"}; }catch(e){ var msg=e instanceof Error?e.message:String(e); log("CapacitorHttp فشل: "+msg+" - عم جرّب جسر مباشر fetch"); } }
-  log("جسر مباشر - fetch - "+url); var r=await fetch(url,{cache:"no-store",signal:signal,headers:headers}); var t=await r.text(); if(!r.ok) throw new Error("HTTP "+r.status); return {html:t, method:"جسر مباشر - fetch"}; 
+  pinEl.textContent = cur.name+' — '+cur.lat+' , '+cur.lng;
 }
-document.getElementById("btn-live").onclick=async function(){
-  stopped=false; ctrl=new AbortController();
-  document.getElementById("err").textContent=""; document.getElementById("status").textContent="عم نجيب من الجسر…";
-  log("— بلّش جلب من الجسر — بلا بروكسي —");
-  try{
-    var res=await fetchBridge(ET, ctrl.signal);
-    document.getElementById("html-len").textContent=res.html.length;
-    document.getElementById("method").textContent=res.method;
-    log("وصل HTML من الجسر - الطول "+res.html.length+" - الطريقة "+res.method);
-    if(res.html.length<500) throw new Error("HTML قصير كتير ("+res.html.length+")");
-    var o=gv(res.html); setPrayers(o.prayers);
-    if(!o.qamari || !o.miladi){ document.getElementById("err").textContent="❌ بلا ميلادي - ما تم الفحص | الجسر: "+ET; document.getElementById("status").textContent="ما انقرا الميلادي - ما تحدّثنا"; log("ناقص: هجري="+(o.qamari||"—")+" | ميلادي="+(o.miladi||"—")); return; }
-    var now=new Date(); var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var parsed=wv(o.miladi);
-    if(!parsed){ document.getElementById("err").textContent="❌ بلا ميلادي - ما تم الفحص | الجسر: "+ET; document.getElementById("status").textContent="تاريخ الجسر ما انقرا صح"; return; }
-    var diffDays=Math.round((parsed.getTime()-today.getTime())/86400000);
-    var diffText= diffDays===0 ? "✅ مطابق - نفس اليوم" : diffDays>0 ? "متقدم "+diffDays+" يوم" : "متأخر "+Math.abs(diffDays)+" يوم";
-    document.getElementById("hijri").textContent=o.qamari;
-    document.getElementById("miladi").textContent=o.miladi;
-    document.getElementById("shamsi").textContent=o.shamsi||"--";
-    document.getElementById("device").textContent=Nc(today);
-    document.getElementById("diff").textContent=diffText;
-    document.getElementById("status").textContent= diffDays===0 ? "✅ مطابق - نفس اليوم" : "الفرق "+diffDays+" يوم";
-    log("نتيجة الجسر: الموقع "+o.miladi+" | جهازك "+Nc(today)+" | الفرق "+diffDays);
-    var allTimes = (res.html.match(/\d{1,2}:\d{2}/g)||[]);
-    log("عدد الأوقات HH:MM بالصفحة الرئيسية: "+allTimes.length+" - أول أوقات: "+allTimes.slice(0,10).join(" ، "));
-    if(o.prayers.fajr==="--") log("تنبيه: أوقات الصلاة ما انقرت من الرئيسية - كبوس زر التشخيص لنشوف وينها");
-  }catch(e){
-    if(stopped){ document.getElementById("status").textContent="انقطع الجلب"; log("انقطع الجلب من زر قطع"); }
-    else{ var m=e instanceof Error?e.message:String(e); document.getElementById("status").textContent="فشل الجسر - ما وصلنا للموقع"; document.getElementById("err").textContent="فشل الجسر: "+m; log("فشل الجسر: "+m); }
+renderCities();
+
+function cleanD(d){
+  if(typeof d==='object' && d!==null) return d;
+  let s=String(d||'');
+  s=s.replace(/^[\uFEFF\xA0\s]+/, '').trim();
+  try{ return JSON.parse(s); }catch(e){ return {__raw:s, __parseError:String(e)}; }
+}
+function pick(obj, keys){
+  if(!obj || typeof obj!=='object') return null;
+  const lower={};
+  for(const k of Object.keys(obj)) lower[String(k).toLowerCase()]=obj[k];
+  for(const k of keys){ if(lower[k]!==undefined && lower[k]!==null && lower[k]!=='') return lower[k]; }
+  return null;
+}
+function showTimes(data){
+  // data هو الحقل data من الرد
+  const src = (data && data.data) ? data.data : data;
+  const get = (keys)=>pick(src, keys);
+  const rows=[
+    ['اذان الفجر', ['fajr','fajr_time','azan_fajr']],
+    ['طلوع الشمس', ['sunrise','sun_rise','tulou']],
+    ['اذان الظهر', ['dhuhr','zuhr','dhuhr_time','azan_dhuhr','azan_zuhr']],
+    ['غروب الشمس', ['sunset','ghurub','sun_set']],
+    ['اذان المغرب', ['maghrib','maghreb','maghrib_time','azan_maghrib']],
+    ['نصف الليل', ['midnight','nisf_allayl','half_night']],
+    ['نصف الليل الفلكي', ['astronomicalmidnight','astronomical_midnight','midnight_astronomical','nisf_falaki']],
+  ];
+  timesEl.innerHTML='';
+  let found=0;
+  rows.forEach(([label,keys])=>{
+    const v=get(keys);
+    if(v!==null && v!==undefined){
+      found++;
+      const d=document.createElement('div'); d.className='time';
+      d.innerHTML='<span>'+label+'</span><b>'+v+'</b>';
+      timesEl.appendChild(d);
+    }
+  });
+  const qibla=get(['qibla','qiblaangle','qibla_angle','zawia','angle']);
+  const dist=get(['distance','dist','distance_km','masafa']);
+  extraEl.innerHTML='';
+  if(qibla) extraEl.innerHTML+='زاوية الانحراف عن القبلة: <b>'+qibla+'</b><br>';
+  if(dist) extraEl.innerHTML+='المسافة عن الكعبة: <b>'+dist+'</b><br>';
+  if(found===0){
+    timesEl.innerHTML='<p style="grid-column:1/-1">ما رجع ولا وقت. شوف التشخيص تحت — مفاتيح data مطبوعة حرفيا.</p>';
   }
-};
-document.getElementById("btn-bayan").onclick=async function(){
-  stopped=false; ctrl=new AbortController();
-  document.getElementById("status").textContent="عم نبلّش الفحص من الجسر…"; log("— بلّش جلب آخر بيان استهلال من الجسر - بلا بروكسي —");
-  var found=null;
+  return {found, src};
+}
+
+async function getTimes(){
+  const date=dateEl.value.trim();
+  const lat=cur.lat, lng=cur.lng;
+  statusEl.innerHTML='عم ينده للسيرفر...';
+  logEl.textContent='الطريقة الأساسية: POST https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI\nBody: '+JSON.stringify({lat,lng,date,navafel:false})+'\n---';
+  // 1) الطريقة الأساسية
   try{
-    for(var id=1050; id>=998; id--){
-      if(stopped){ log("انقطع فحص البيانات"); break; }
-      document.getElementById("status").textContent="فحص البيان رقم "+id+" - جسر"; log("فحص البيان رقم "+id+" - جسر");
-      try{
-        var res=await fetchBridge(Pc(id), ctrl.signal);
-        document.getElementById("html-len").textContent=res.html.length;
-        document.getElementById("method").textContent=res.method;
-        if(res.html.length<500){ log("بيان "+id+": HTML قصير - منكمّل"); continue; }
-        var j=kv(res.html);
-        if(!j.hasSistani){ log("بيان "+id+": مش بيان استهلال السيستاني - منكمّل"); continue; }
-        found={id:id,title:j.title||("بيان استهلال رقم "+id),dateText:j.dateText,paragraphs:j.paragraphs,source:Pc(id)};
-        document.getElementById("status").textContent="لقينا البيان رقم "+id+" - جسر";
-        log("لقينا البيان رقم "+id+" - "+(j.title||"بلا عنوان")+" - "+res.method);
-        break;
-      }catch(e){ if(stopped) break; log("بيان "+id+" فشل: "+(e instanceof Error?e.message:String(e))+" - منكمّل"); continue; }
-    }
-    if(found){
-      document.getElementById("bayan-card").style.display="block";
-      document.getElementById("bayan-title").textContent=found.title;
-      document.getElementById("bayan-date").textContent=found.dateText||"";
-      document.getElementById("bayan-source").innerHTML='المصدر - جسر مباشر: <a href="'+found.source+'" target="_blank" rel="noopener">'+found.source+'</a>';
-      var body=document.getElementById("bayan-body"); body.innerHTML="";
-      found.paragraphs.forEach(function(p){ var el=document.createElement("p"); el.textContent=p; body.appendChild(el); });
-      try{ localStorage.setItem("nojumi_last_bayan_bridge", JSON.stringify(found)); }catch(e){}
-    } else if(!stopped){ document.getElementById("status").textContent="خلّص الفحص من 1050 لـ 998 - جسر"; log("لم يعثر على بيان - جسر"); }
-  }catch(e){ if(!stopped) log("فشل فحص البيان - جسر: "+(e instanceof Error?e.message:String(e))); }
-};
-
-var currentCity = "najaf";
-var cityLatLon = {
-  najaf: {lat: 31.9959, lon: 44.3147, name: "النجف"},
-  karbala: {lat: 32.6160, lon: 44.0240, name: "كربلاء"},
-  beirut: {lat: 33.8938, lon: 35.5016, name: "بيروت"},
-  tripoli: {lat: 34.4367, lon: 35.8497, name: "طرابلس - لبنان"}
-};
-document.querySelectorAll("[data-city]").forEach(function(b){
-  b.onclick = function(){
-    currentCity = b.getAttribute("data-city");
-    var c = cityLatLon[currentCity];
-    document.getElementById("city-info").textContent = "المدينة الحالية: " + c.name + " - خط عرض " + c.lat + " - خط طول " + c.lon;
-    log("تغيير المدينة للصلاة: " + c.name);
-  };
-});
-document.getElementById("btn-diag").onclick = async function(){
-  var diag = document.getElementById("diag");
-  diag.textContent = "عم نفحص من الجسر...\n";
-  stopped = false; ctrl = new AbortController();
-  try{
-    var res = await fetchBridge(ET, ctrl.signal);
-    var html = res.html;
-    var out = "";
-    out += "=== طول HTML: " + html.length + " ===\n";
-    out += "=== الطريقة: " + res.method + " ===\n\n";
-    // 1. كل الأوقات HH:MM اللي بالصفحة
-    var times = html.match(/\d{1,2}:\d{2}/g) || [];
-    out += "عدد الأوقات HH:MM بالصفحة: " + times.length + "\n";
-    out += "أول 30 وقت: " + times.slice(0,30).join(" ، ") + "\n\n";
-    // 2. هل فيه PrayTimesPanel / JadvalOghat / OghatTable ؟
-    ["PrayTimesPanel","JadvalOghat","OghatTable","PrayTimes","Oghat","Fajr","Maghrib","Isha","Dhuhr","Asr","Sunrise","الصلاة","الفجر","المغرب","العشاء","الظهر","العصر","الشروق"].forEach(function(k){
-      var idx = html.indexOf(k);
-      out += "كلمة ["+k+"]: " + (idx===-1 ? "مش موجودة ❌" : "موجودة ✅ بالحرف "+idx) + "\n";
+    const res=await fetch('https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI', {
+      method:'POST',
+      headers:{'Content-Type':'application/json; charset=utf-8'},
+      body: JSON.stringify({lat,lng,date,navafel:false})
     });
-    out += "\n";
-    // 3. مقتطف حول PrayTimesPanel
-    var pIdx = html.indexOf("PrayTimesPanel");
-    if(pIdx!==-1){
-      var snippet = Fc(html.slice(Math.max(0,pIdx-200), pIdx+1200));
-      out += "--- مقتطف حول PrayTimesPanel ---\n" + snippet.slice(0,1200) + "\n\n";
-    }
-    // 4. مقتطف حول JadvalOghat
-    var jIdx = html.indexOf("JadvalOghat");
-    if(jIdx!==-1){
-      var snippet2 = Fc(html.slice(Math.max(0,jIdx-200), jIdx+1200));
-      out += "--- مقتطف حول JadvalOghat ---\n" + snippet2.slice(0,1200) + "\n\n";
-    }
-    // 5. كل الـ IDs اللي فيها Oghat أو Pray
-    var ids = Array.from(html.matchAll(/id=["']([^"']*(Oghat|Pray)[^"']*)["']/gi)).map(function(m){return m[1];});
-    out += "IDs فيها Oghat/Pray: " + (ids.length? ids.join(" ، ") : "ما فيه ❌") + "\n\n";
-    // 6. جرب صفحات أوقات الصلاة المحتملة من الجسر
-    var candidates = [
-      "https://arabic.nojumi.org/Oghat.aspx",
-      "https://arabic.nojumi.org/PrayerTimes.aspx",
-      "https://arabic.nojumi.org/JadvalOghat.aspx",
-      "https://arabic.nojumi.org/Default.aspx"
-    ];
-    for(var i=0;i<candidates.length;i++){
-      try{
-        var r2 = await fetchBridge(candidates[i], ctrl.signal);
-        var t2 = (r2.html.match(/\d{1,2}:\d{2}/g)||[]).length;
-        out += "صفحة ["+candidates[i]+"]: طول "+r2.html.length+" - عدد أوقات "+t2+" - " + (t2>0 ? "فيها أوقات ✅" : "ما فيها أوقات") + "\n";
-        if(t2>0 && candidates[i].indexOf("Default")===-1){
-          // إذا لقينا صفحة فيها أوقات، جرب نقرا منها
-          var g2 = gv(r2.html);
-          out += "  أوقات هالصفحة: فجر "+g2.prayers.fajr+" - ظهر "+g2.prayers.dhuhr+" - عصر "+g2.prayers.asr+" - مغرب "+g2.prayers.maghrib+" - عشاء "+g2.prayers.isha+"\n";
-        }
-      }catch(e){ out += "صفحة ["+candidates[i]+"]: فشل - "+(e instanceof Error?e.message:String(e))+"\n"; }
-    }
-    out += "\n=== المدينة الحالية للصلاة: "+cityLatLon[currentCity].name+" ===\n";
-    out += "ملاحظة: أوقات الصلاة بالموقع بتنحسب على خط العرض والطول. إذا الموقع ما بيعطي أوقات طرابلس بالـ HTML، الجسر رح يجيبها من صفحة الأوقات تبع الموقع، مش من حساب محلي.\n";
-    diag.textContent = out;
-    log("خلص تشخيص أوقات الصلاة - عدد الأوقات بالرئيسية: "+times.length);
-  }catch(e){
-    diag.textContent += "\nفشل التشخيص: "+(e instanceof Error?e.message:String(e));
-  }
-};
-
-
-document.getElementById("btn-js").onclick = async function(){
-  var diag = document.getElementById("diag");
-  diag.textContent = "عم نفحص ملفات JS من الجسر...\n";
-  stopped = false; ctrl = new AbortController();
-  try{
-    var res = await fetchBridge(ET, ctrl.signal);
-    var html = res.html;
-    var out = "";
-    out += "=== طول HTML الرئيسي: " + html.length + " ===\n\n";
-    // 1. كل ملفات script src
-    var scripts = Array.from(html.matchAll(/<script[^>]*src=["']([^"']+)["']/gi)).map(function(m){return m[1];});
-    out += "عدد ملفات script: " + scripts.length + "\n";
-    scripts.forEach(function(s,i){ out += "  JS["+i+"]: " + s + "\n"; });
-    out += "\n";
-    // 2. كل ملفات CSS link
-    var links = Array.from(html.matchAll(/<link[^>]*href=["']([^"']+)["']/gi)).map(function(m){return m[1];});
-    out += "عدد ملفات CSS: " + links.length + "\n";
-    links.slice(0,20).forEach(function(s,i){ out += "  CSS["+i+"]: " + s + "\n"; });
-    out += "\n";
-    // 3. كل الروابط اللي فيها api / asmx / ashx / Service / Oghat / Pray
-    var allUrls = Array.from(html.matchAll(/["']([^"']*(api|asmx|ashx|Service|Oghat|Pray|pray|oghat)[^"']*)["']/gi)).map(function(m){return m[1];});
-    var uniqUrls = Array.from(new Set(allUrls));
-    out += "روابط فيها api/asmx/ashx/Service/Oghat/Pray: " + uniqUrls.length + "\n";
-    uniqUrls.slice(0,40).forEach(function(u){ out += "  - " + u + "\n"; });
-    out += "\n";
-    // 4. كل الـ __doPostBack / WebMethod / PageMethods
-    var postbacks = Array.from(html.matchAll(/__doPostBack\(['"]([^'"]+)['"]/gi)).map(function(m){return m[1];});
-    out += "__doPostBack targets: " + (postbacks.length? postbacks.join(" ، ") : "ما فيه") + "\n";
-    var pageMethods = Array.from(html.matchAll(/PageMethods\.(\w+)/gi)).map(function(m){return m[1];});
-    out += "PageMethods: " + (pageMethods.length? pageMethods.join(" ، ") : "ما فيه") + "\n\n";
-    // 5. جرب جيب كل ملف JS ودور فيه على كلمات الأوقات
-    for(var i=0;i<scripts.length;i++){
-      var jsUrl = scripts[i];
-      if(jsUrl.indexOf("http")!==0){
-        if(jsUrl.indexOf("//")===0) jsUrl = "https:" + jsUrl;
-        else if(jsUrl.charAt(0)==="/") jsUrl = "https://arabic.nojumi.org" + jsUrl;
-        else jsUrl = "https://arabic.nojumi.org/" + jsUrl;
-      }
-      try{
-        var jr = await fetchBridge(jsUrl, ctrl.signal);
-        var jt = jr.html;
-        var hasPray = jt.indexOf("Pray")!==-1 || jt.indexOf("Oghat")!==-1 || jt.indexOf("Fajr")!==-1 || jt.indexOf("Maghrib")!==-1 || jt.indexOf("الفجر")!==-1 || jt.indexOf("getTimes")!==-1 || jt.indexOf("api")!==-1;
-        out += "JS["+i+"] " + jsUrl + " - طول " + jt.length + " - " + (hasPray? "فيه كلمات أوقات ✅" : "ما فيه أوقات") + "\n";
-        if(hasPray){
-          // طلع مقتطفات حول الكلمات
-          ["Pray","Oghat","Fajr","Maghrib","getTimes","api","asmx","ashx"].forEach(function(k){
-            var idx = jt.indexOf(k);
-            if(idx!==-1){
-              var sn = jt.slice(Math.max(0,idx-80), idx+180).replace(/\s+/g," ").slice(0,260);
-              out += "    ["+k+"] ... " + sn + " ...\n";
-            }
-          });
-        }
-      }catch(e){ out += "JS["+i+"] " + jsUrl + " - فشل: " + (e instanceof Error?e.message:String(e)) + "\n"; }
-    }
-    out += "\n=== خلص فحص JS ===\n";
-    out += "إذا ما لقينا API بالـ JS، معناتا الأوقات بتنحسب بـ JS محلي بنفس الصفحة - وساعتها منجيب طريقة الحساب تبع الموقع نفسها، مش من API تاني.\n";
-    diag.textContent = out;
-    log("خلص فحص JS - عدد ملفات JS: " + scripts.length);
-  }catch(e){
-    diag.textContent += "\nفشل فحص JS: " + (e instanceof Error?e.message:String(e));
-  }
-};
-
-
-document.getElementById("btn-api").onclick = async function(){
-  var diag = document.getElementById("diag");
-  diag.textContent = "عم نجيب أوقات الصلاة من API الموقع...\n";
-  stopped = false; ctrl = new AbortController();
-  try{
-    var home = await fetchBridge(ET, ctrl.signal);
-    var html = home.html;
-    var out = "";
-    out += "=== طول الرئيسية: " + html.length + " ===\n\n";
-    // 1. طلع كل مقتطف حول prayertimes
-    var lower = html.toLowerCase();
-    var idxs = [];
-    var pos = 0;
-    while(true){ var p = lower.indexOf("prayertimes", pos); if(p===-1) break; idxs.push(p); pos = p+1; if(idxs.length>10) break; }
-    out += "عدد مرات prayertimes بالرئيسية: " + idxs.length + "\n";
-    idxs.forEach(function(p,i){
-      var sn = Fc(html.slice(Math.max(0,p-250), p+350)).replace(/\s+/g," ");
-      out += "--- prayertimes["+i+"] حول الحرف "+p+" ---\n" + sn.slice(0,600) + "\n\n";
-    });
-    // 2. طلع apiKey
-    var keyIdxs = [];
-    pos = 0;
-    while(true){ var p2 = lower.indexOf("apikey", pos); if(p2===-1) break; keyIdxs.push(p2); pos = p2+1; if(keyIdxs.length>5) break; }
-    out += "عدد مرات apiKey: " + keyIdxs.length + "\n";
-    keyIdxs.forEach(function(p,i){
-      var sn2 = Fc(html.slice(Math.max(0,p-150), p+250)).replace(/\s+/g," ");
-      out += "--- apiKey["+i+"] ---\n" + sn2.slice(0,400) + "\n\n";
-    });
-    // 3. جرب جيب /prayertimes مباشرة
-    var apiUrls = [
-      "https://arabic.nojumi.org/prayertimes",
-      "https://arabic.nojumi.org/prayertimes?lat=31.9959&lon=44.3147",
-      "https://arabic.nojumi.org/prayertimes?city=Najaf",
-      "https://arabic.nojumi.org/api/prayertimes",
-      "https://arabic.nojumi.org/api/prayertimes?lat=31.9959&lon=44.3147"
-    ];
-    for(var i=0;i<apiUrls.length;i++){
-      try{
-        var r = await fetchBridge(apiUrls[i], ctrl.signal);
-        var txt = r.html;
-        out += "=== API ["+apiUrls[i]+"] ===\n";
-        out += "طول الرد: " + txt.length + " - الطريقة: " + r.method + "\n";
-        out += "أول 1500 حرف:\n" + txt.slice(0,1500) + "\n\n";
-        // جرب نقرا أوقات من JSON
-        var times = txt.match(/\d{1,2}:\d{2}/g) || [];
-        out += "عدد أوقات HH:MM بالرد: " + times.length + " - " + times.slice(0,20).join(" ، ") + "\n\n";
-        // إذا فيه JSON، جرب نفهمو
-        try{
-          var j = JSON.parse(txt);
-          out += "JSON مفكوك: " + JSON.stringify(j).slice(0,1200) + "\n\n";
-        }catch(e){ out += "(مش JSON صافي)\n\n"; }
-      }catch(e){ out += "API ["+apiUrls[i]+"] فشل: " + (e instanceof Error?e.message:String(e)) + "\n\n"; }
-    }
-    diag.textContent = out;
-    log("خلص جلب API prayertimes");
-  }catch(e){
-    diag.textContent += "\nفشل: " + (e instanceof Error?e.message:String(e));
-  }
-};
-
-
-document.getElementById("btn-api-key").onclick = async function(){
-  var diag = document.getElementById("diag");
-  diag.textContent = "عم نجيب الأوقات مع المفتاح...\n";
-  stopped = false; ctrl = new AbortController();
-  try{
-    var out = "";
-    // 1. جيب المفتاح من الرئيسية دغري
-    var home = await fetchBridge(ET, ctrl.signal);
-    var mKey = home.html.match(/apiKey\s*:\s*['"]([^'"]+)['"]/);
-    var apiKey = mKey ? mKey[1] : "NJ5M14WSIA8PI";
-    out += "المفتاح من الموقع: " + apiKey + "\n\n";
-    var city = cityLatLon[currentCity];
-    var lat = city.lat, lon = city.lon;
-    out += "المدينة: " + city.name + " - lat " + lat + " - lon " + lon + "\n\n";
-    // 2. جيب صفحة prayertimes نفسها ودور فيها على الأوقات
-    out += "=== صفحة prayertimes نفسها ===\n";
-    var ptPage = await fetchBridge("https://arabic.nojumi.org/prayertimes", ctrl.signal);
-    var ptHtml = ptPage.html;
-    out += "طول صفحة prayertimes: " + ptHtml.length + "\n";
-    var ptTimes = ptHtml.match(/\d{1,2}:\d{2}/g) || [];
-    out += "عدد أوقات HH:MM بصفحة prayertimes: " + ptTimes.length + " - " + ptTimes.slice(0,30).join(" ، ") + "\n";
-    ["الفجر","المغرب","العشاء","الظهر","العصر","الشروق","الإمساك"].forEach(function(k){
-      var idx = ptHtml.indexOf(k);
-      if(idx!==-1){
-        var sn = Fc(ptHtml.slice(Math.max(0,idx-120), idx+250)).replace(/\s+/g," ");
-        out += "--- ["+k+"] حول الحرف "+idx+" ---\n" + sn.slice(0,400) + "\n";
-      } else { out += "--- ["+k+"]: مش موجودة ❌ ---\n"; }
-    });
-    // دور على طريقة نداء الـ API جوات صفحة prayertimes
-    out += "\n--- نداءات API جوات صفحة prayertimes ---\n";
-    var apiIdxs = [];
-    var lp = ptHtml.toLowerCase(); var pp = 0;
-    while(true){ var q = lp.indexOf("api", pp); if(q===-1) break; apiIdxs.push(q); pp = q+1; if(apiIdxs.length>12) break; }
-    apiIdxs.forEach(function(p,i){
-      var sn = Fc(ptHtml.slice(Math.max(0,p-120), p+250)).replace(/\s+/g," ");
-      out += "api["+i+"] ... " + sn.slice(0,380) + " ...\n\n";
-    });
-    // 3. جرب الـ API مع المفتاح بـ 6 طرق
-    out += "\n=== تجربة API مع المفتاح ===\n";
-    var today = new Date();
-    var dateStr = today.getFullYear()+"-"+String(today.getMonth()+1).padStart(2,"0")+"-"+String(today.getDate()).padStart(2,"0");
-    var tries = [
-      {label:"1 - ?apiKey= بالمفتاح", url:"https://arabic.nojumi.org/api/prayertimes?apiKey="+encodeURIComponent(apiKey)+"&lat="+lat+"&lon="+lon+"&date="+dateStr, headers:null},
-      {label:"2 - ?key= بالمفتاح", url:"https://arabic.nojumi.org/api/prayertimes?key="+encodeURIComponent(apiKey)+"&lat="+lat+"&lon="+lon+"&date="+dateStr, headers:null},
-      {label:"3 - هيدر apiKey", url:"https://arabic.nojumi.org/api/prayertimes?lat="+lat+"&lon="+lon+"&date="+dateStr, headers:{apiKey:apiKey}},
-      {label:"4 - هيدر X-Api-Key", url:"https://arabic.nojumi.org/api/prayertimes?lat="+lat+"&lon="+lon+"&date="+dateStr, headers:{"X-Api-Key":apiKey}},
-      {label:"5 - هيدر X-API-KEY + apiKey كويري", url:"https://arabic.nojumi.org/api/prayertimes?apiKey="+encodeURIComponent(apiKey)+"&lat="+lat+"&lon="+lon, headers:{"X-Api-Key":apiKey, apiKey:apiKey}},
-      {label:"6 - بلا lat/lon - بس apiKey", url:"https://arabic.nojumi.org/api/prayertimes?apiKey="+encodeURIComponent(apiKey), headers:null}
-    ];
-    var success = null;
-    for(var i=0;i<tries.length;i++){
-      try{
-        var r = await fetchBridge(tries[i].url, ctrl.signal, tries[i].headers);
-        var txt = r.html;
-        out += "--- "+tries[i].label+" ---\n";
-        out += "طول الرد: "+txt.length+"\n";
-        out += "الرد:\n"+txt.slice(0,2000)+"\n";
-        var tms = txt.match(/\d{1,2}:\d{2}/g)||[];
-        out += "عدد أوقات بالرد: "+tms.length+" - "+tms.slice(0,15).join(" ، ")+"\n\n";
-        if(txt.indexOf("Failed")===-1 && txt.indexOf("Invalid")!==-1){ out += "لسا Invalid ❌\n\n"; }
-        else if(txt.indexOf("Failed")===-1 && tms.length>=4){ success = {txt:txt, label:tries[i].label}; out += "✅ نجحت هالطريقة!\n\n"; }
-        else if(txt.indexOf("Failed")!==-1){ out += "Failed ❌\n\n"; }
-      }catch(e){ out += "--- "+tries[i].label+" فشل: "+(e instanceof Error?e.message:String(e))+"\n\n"; }
-    }
-    if(success){
-      out += "=== ✅ لقينا الطريقة الصح: "+success.label+" ===\n";
-      try{
-        var j = JSON.parse(success.txt);
-        out += "JSON مفكوك:\n"+JSON.stringify(j,null,2).slice(0,3000)+"\n";
-        // حاول نعرض الأوقات بالجدول إذا لقيناها
-        var flat = JSON.stringify(j);
-        // دور على حقول معروفة
-        var fields = ["fajr","Fajr","sunrise","Sunrise","dhuhr","Dhuhr","asr","Asr","maghrib","Maghrib","isha","Isha","imsak","Imsak"];
-        fields.forEach(function(f){ var mm = flat.match(new RegExp('"'+f+'"\s*:\s*"([^"]+)"')); if(mm) out += f+" = "+mm[1]+"\n"; });
-      }catch(e){ out += "الرد مش JSON صافي، بس فيه أوقات.\n"; }
+    const txt=await res.text();
+    let j=null; try{ j=JSON.parse(txt); }catch(e){ j={__text:txt}; }
+    let d = (j && j.d!==undefined) ? j.d : j;
+    const cleaned=cleanD(d);
+    logEl.textContent+='\n[POST الداخلي] status='+res.status+' طول الرد='+txt.length+'\nمفاتيح cleaned: '+(cleaned && typeof cleaned==='object' ? Object.keys(cleaned).join(', ') : String(cleaned).slice(0,500))+'\n';
+    if(cleaned && !cleaned.error && (cleaned.data || cleaned.fajr || cleaned.Fajr)){
+      const r=showTimes(cleaned);
+      statusEl.innerHTML='<span class="ok">نجح — POST الداخلي</span> — لقى '+r.found+' أوقات';
+      logEl.textContent+='\nنجح POST الداخلي. data keys: '+Object.keys(r.src||{}).join(', ');
+      return;
     } else {
-      out += "=== لسا ما نجحت ولا طريقة - بعتلي هالسكرين شوت ===\n";
-      out += "إذا ولا طريقة نجحت، معناتا المفتاح بينبعت بطريقة تانية - منشوفها من نداءات API اللي فوق بصفحة prayertimes.\n";
+      logEl.textContent+='\nPOST الداخلي ما رجع data، error='+(cleaned && cleaned.error ? JSON.stringify(cleaned.error) : 'لا يوجد data')+'\nبيجرّب البديل المباشر...';
     }
-    diag.textContent = out;
-    log("خلص تجربة API مع المفتاح - المفتاح: "+apiKey);
   }catch(e){
-    diag.textContent += "\nفشل: "+(e instanceof Error?e.message:String(e));
+    logEl.textContent+='\n[POST الداخلي] فشل: '+e+'\nملاحظة: إذا فتحت الملف من file:// المتصفح ممكن يمنع CORS. افتحو من رابط السيرفر أو من APK بـ CapacitorHttp.\nبيجرّب البديل المباشر...';
   }
-};
 
-document.getElementById("btn-stop").onclick=function(){ stopped=true; if(ctrl) ctrl.abort(); document.getElementById("status").textContent="انقطع"; log("كبسة قطع - عم نوقف الجسر"); };
-document.getElementById("btn-clear").onclick=function(){ stopped=true; if(ctrl) ctrl.abort(); document.getElementById("hijri").textContent="--"; document.getElementById("miladi").textContent="--"; document.getElementById("shamsi").textContent="--"; document.getElementById("device").textContent="--"; document.getElementById("diff").textContent="--"; document.getElementById("method").textContent="--"; document.getElementById("err").textContent=""; document.getElementById("status").textContent="انمسحت النتيجة - فيك تبلّش من جديد"; setPrayers(Object.fromEntries(Ti.map(function(e){return [e.id,"--"];}))); document.getElementById("log").textContent="—"; document.getElementById("bayan-card").style.display="none"; };
-try{ var saved=localStorage.getItem("nojumi_last_bayan_bridge"); if(saved){ var f=JSON.parse(saved); if(f && f.paragraphs && f.paragraphs.length){ document.getElementById("bayan-card").style.display="block"; document.getElementById("bayan-title").textContent=f.title; document.getElementById("bayan-date").textContent=f.dateText||""; document.getElementById("bayan-source").innerHTML='المصدر - جسر مباشر: <a href="'+f.source+'" target="_blank" rel="noopener">'+f.source+'</a>'; var b=document.getElementById("bayan-body"); b.innerHTML=""; f.paragraphs.forEach(function(p){ var el=document.createElement("p"); el.textContent=p; b.appendChild(el); }); log("انفتح آخر بيان محفوظ من الجسر - رقم "+f.id); } } }catch(e){}
+  // 2) البديل: API مباشر بـ Latitude/Longitude + apiKey بالرابط
+  try{
+    const url='https://arabic.nojumi.org/api/prayertimes?apiKey=NJ5M14WSIA8PI&Latitude='+encodeURIComponent(lat)+'&Longitude='+encodeURIComponent(lng)+'&date='+encodeURIComponent(date);
+    logEl.textContent+='\n[بديل] GET '+url+'\n';
+    const res2=await fetch(url);
+    const txt2=await res2.text();
+    logEl.textContent+='[بديل] status='+res2.status+' طول='+txt2.length+' رد='+txt2.slice(0,1000)+'\n';
+    let j2=null; try{ j2=JSON.parse(txt2); }catch(e){}
+    if(j2){
+      const cleaned2=cleanD(j2.d!==undefined?j2.d:j2);
+      if(cleaned2 && !cleaned2.error && (cleaned2.data || cleaned2.fajr)){
+        const r=showTimes(cleaned2);
+        statusEl.innerHTML='<span class="ok">نجح — البديل المباشر</span>';
+        return;
+      }
+    }
+    statusEl.innerHTML='<span class="err">ما نجح ولا طريقة. شوف التشخيص.</span>';
+  }catch(e){
+    statusEl.innerHTML='<span class="err">فشل البديل: '+e+'</span>';
+    logEl.textContent+='\n[بديل] فشل: '+e;
+  }
+}
 </script>
 </body>
 </html>
