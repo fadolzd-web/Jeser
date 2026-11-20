@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>جسر النجومي - مش بروكسي</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,Tahoma,Arial,sans-serif;background:#0b1512;color:#eef2ef}header{position:sticky;top:0;background:#0b1512;border-bottom:2px solid #d4af37;padding:14px 16px}h1{margin:0;font-size:22px;color:#e8c85a}.sub{color:#a8b5ad;font-size:13px;margin-top:4px}.badge{display:inline-block;background:#1a5c2e;color:#fff;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:900;margin-top:8px}.note{margin:12px 16px;background:#14251f;border:1px solid #2a3a32;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.7}main{max-width:760px;margin:0 auto;padding:12px 16px 40px}.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}button{min-height:52px;border-radius:14px;border:1px solid #d4af37;background:#d4af37;color:#071f16;font-weight:900;font-size:15px;cursor:pointer}button.ghost{background:#14251f;color:#e8c85a}button.plain{background:#1a2e26;color:#eef2ef;border-color:#2a3a32}.card{background:#14251f;border:1px solid #2a3a32;border-radius:16px;padding:14px;margin-top:12px}.card h2{margin:0 0 8px;color:#e8c85a;font-size:17px}.row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed #2a3a32;font-size:15px}.row:last-child{border-bottom:0}.row span:first-child{color:#a8b5ad}.row span:last-child{font-weight:800}table{width:100%;border-collapse:collapse}td{padding:8px;border-bottom:1px solid #2a3a32}td:last-child{font-weight:900;text-align:left}.err{color:#ff9a9a;font-weight:800}.log{background:#07100d;border:1px solid #2a3a32;border-radius:12px;padding:10px;font-family:monospace;font-size:12px;white-space:pre-wrap;max-height:220px;overflow:auto;direction:ltr;text-align:left}.bayan p{line-height:1.9;margin:10px 0}a{color:#e8c85a;word-break:break-all}
+</style>
+<header><h1>🌙 جسر النجومي - مش بروكسي</h1><div class="sub">اتصال مباشر مع arabic.nojumi.org - من دون أي وسيط</div><span class="badge">✅ جسر مباشر - بلا بروكسي - بلا وسيط - بلا سيرفر بالنص</span></header>
+<div class="note"><b>شو يعني جسر مش بروكسي؟</b><br>بروكسي = سيرفر بالنص بيجيب الصفحة عنك وبيرجعلك ياها.<br><b>جسر = التطبيق بيحكي مع موقع النجومي دغري، بلا أي سيرفر بالنص.</b> هيدا الملف ما فيه أي رابط بروكسي، ولا بيبعت طلب لأي سيرفر تاني. الطلب بيروح دغري على <b>arabic.nojumi.org</b> وبس.</div>
+<main>
+<div class="btns">
+<button id="btn-live">جلب من الجسر - النجومي</button>
+<button id="btn-bayan" class="ghost">جلب آخر بيان استهلال - جسر</button>
+<button id="btn-stop" class="plain">قطع</button>
+<button id="btn-clear" class="plain">مسح</button>
+</div>
+<div class="card"><h2>النتيجة - من الجسر</h2>
+<div class="row"><span>نوع الاتصال</span><span>جسر مباشر - مش بروكسي</span></div>
+<div class="row"><span>الوسيط</span><span>لا يوجد - بلا بروكسي</span></div>
+<div class="row"><span>الحالة</span><span id="status">بعد ما بلّشنا - كبوس جلب من الجسر</span></div>
+<div class="row"><span>الطريقة</span><span id="method">--</span></div>
+<div class="row"><span>المصدر</span><span><a id="source" href="https://arabic.nojumi.org/" target="_blank" rel="noopener">arabic.nojumi.org - مباشر</a></span></div>
+<div class="row"><span>الهجري (قمري)</span><span id="hijri">--</span></div>
+<div class="row"><span>الميلادي</span><span id="miladi">--</span></div>
+<div class="row"><span>الشمسي</span><span id="shamsi">--</span></div>
+<div class="row"><span>تاريخ جهازك</span><span id="device">--</span></div>
+<div class="row"><span>الفرق</span><span id="diff">--</span></div>
+<div id="err" class="err" style="margin-top:8px"></div>
+</div>
+<div class="card"><h2>🕌 أوقات الصلاة - من الجسر</h2><p style="color:#a8b5ad;font-size:13px;margin:0 0 8px">من صفحة الموقع بس. إذا ما لقينا وقت، منبيّن -- وما منخترع وقت.</p>
+<table id="prayers"><tbody></tbody></table></div>
+<div class="card" id="bayan-card" style="display:none"><h2>📜 آخر بيان استهلال - من الجسر</h2><div id="bayan-title" style="font-weight:900"></div><div id="bayan-date" style="color:#a8b5ad;font-size:13px;margin-top:4px"></div><div id="bayan-source" style="font-size:12px;margin-top:4px"></div><div class="bayan" id="bayan-body"></div></div>
+<div class="card"><h2>السجل - الجسر</h2><div class="log" id="log">—</div><div style="margin-top:8px;font-size:12px;color:#a8b5ad">طول آخر HTML: <span id="html-len">0</span></div></div>
+</main>
+<script>
+// ===== جسر النجومي - مش بروكسي - اتصال مباشر فقط =====
+// لا يوجد أي رابط بروكسي بهيدا الملف. الطلب بيروح دغري على arabic.nojumi.org
+// CapacitorHttp = اتصال مباشر من داخل الـ APK نفسه، مش سيرفر وسيط
+// fetch = اتصال مباشر من المتصفح، مش سيرفر وسيط
+var ET="https://arabic.nojumi.org/";
+var Pc=function(id){return "https://arabic.nojumi.org/news/"+id+"/";};
+var Ti=[{id:"fajr",label:"الفجر",aliases:["الفجر"]},{id:"sunrise",label:"الشروق",aliases:["الشروق"]},{id:"dhuhr",label:"الظهر",aliases:["الظهر"]},{id:"asr",label:"العصر",aliases:["العصر"]},{id:"maghrib",label:"المغرب",aliases:["المغرب"]},{id:"isha",label:"العشاء",aliases:["العشاء"]},{id:"imsak",label:"الإمساك",aliases:["الإمساك","الامساك","إمساك","امساك"]},{id:"midnight",label:"منتصف الليل",aliases:["منتصف الليل"]},{id:"sahar",label:"السحر",aliases:["السحر"]}];
+var Tc=["ذو الحجة","ذو القعدة","ربيع الآخر","ربيع الأول","جمادى الآخرة","جمادى الأولى","محرم","صفر","رجب","شعبان","رمضان","شوال"];
+var bl={"تشرين الثاني":11,"تشرين الاول":10,"تشرين الأول":10,"كانون الثاني":1,"كانون الاول":12,"كانون الأول":12,"شباط":2,"آذار":3,"اذار":3,"نيسان":4,"أيار":5,"ايار":5,"حزيران":6,"تموز":7,"آب":8,"اب":8,"أيلول":9,"ايلول":9,"يناير":1,"فبراير":2,"مارس":3,"أبريل":4,"ابريل":4,"مايو":5,"يونيو":6,"يوليو":7,"أغسطس":8,"اغسطس":8,"سبتمبر":9,"أكتوبر":10,"اكتوبر":10,"نوفمبر":11,"ديسمبر":12,january:1,february:2,march:3,april:4,may:5,june:6,july:7,august:8,september:9,october:10,november:11,december:12};
+var hv=["كانون الثاني","شباط","آذار","نيسان","أيار","حزيران","تموز","آب","أيلول","تشرين الأول","تشرين الثاني","كانون الأول"];
+function Fi(e){return String(e||"").replace(/[٠-٩]/g,function(n){return String("٠١٢٣٤٥٦٧٨٩".indexOf(n));}).replace(/[۰-۹]/g,function(n){return String("۰۱۲۳۴۵۶۷۸۹".indexOf(n));});}
+function Fc(e){return String(e||"").replace(/<script[\s\S]*?<\/script>/gi," ").replace(/<style[\s\S]*?<\/style>/gi," ").replace(/<[^>]+>/g," ").replace(/&nbsp;|&#160;/g," ").replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim();}
+function mv(e){return String(e||"").replace(/[\u064B-\u0652\u0670\u0640]/g,"");}
+function yv(e){return mv(e).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه");}
+function xi(e){return Fc(Fi(e)).replace(/\s+/g," ").trim();}
+function zi(e,n){var t=new RegExp('id=["\']'+n+'["\'][^>]*>([\\s\\S]*?)<',"i"),r=e.match(t);return r?xi(r[1]):"";}
+function Oc(e){return Fi(Fc(e));}
+function gv(e){
+  var raw=String(e||""); var l=Oc(e);
+  var hijriMonths=["","محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
+  var hDay=null,hMonth=null,hYear=null;
+  var mD=raw.match(/headerHijriDay\s*:\s*(\d{1,2})/i); var mM=raw.match(/headerHijriMonth\s*:\s*(\d{1,2})/i); var mY=raw.match(/headerHijriYear\s*:\s*(\d{3,4})/i);
+  if(mD) hDay=parseInt(mD[1],10); if(mM) hMonth=parseInt(mM[1],10); if(mY) hYear=parseInt(mY[1],10);
+  var n="",t="",r="";
+  if(hDay && hMonth && hYear && hijriMonths[hMonth]) t=hDay+" "+hijriMonths[hMonth]+" "+hYear;
+  var combined=l.match(/(\d{1,2}\s+جمادى الآخرة\s+144\d)\s*-\s*(202\d\/\d{1,2}\/\d{1,2})/);
+  if(!combined) combined=raw.match(/(\d{1,2}\s+جمادى الآخرة\s+144\d)\s*-\s*(202\d\/\d{1,2}\/\d{1,2})/);
+  if(combined){ if(!t) t=combined[1].replace(/\s+/g," ").trim(); r=combined[2].trim(); }
+  if(!r){ var anyDate=raw.match(/(202\d\/\d{1,2}\/\d{1,2})/); if(anyDate) r=anyDate[1]; else { var anyDate2=l.match(/(202\d\/\d{1,2}\/\d{1,2})/); if(anyDate2) r=anyDate2[1]; } }
+  if(!t) t=zi(e,"ctl00_lblQamariDate");
+  if(!r) r=zi(e,"ctl00_lblMiladiDate");
+  if(!n) n=zi(e,"ctl00_lblShamsiDate");
+  if(!t){ var o=l.match(new RegExp("(\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4})")); if(o) t=o[1].replace(/\s+/g," ").trim(); }
+  if(!r){ var o2=Object.keys(bl).sort(function(s,f){return f.length-s.length;}), i=l.match(new RegExp("(\\d{1,2}\\s*(?:"+o2.join("|")+")\\s*\\d{4})","i")); if(i) r=i[1].replace(/\s+/g," ").trim(); }
+  if(!n){ var o3=l.match(/(\d{1,2}\s*(?:فروردين|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)\s*\d{4})/); if(o3) n=o3[1].trim(); }
+  var u={};for(var k=0;k<Ti.length;k++){var o4=Ti[k];var val="--";for(var a=0;a<o4.aliases.length;a++){var s=o4.aliases[a];var f=l.indexOf(s);if(f===-1)continue;var h=l.slice(f,f+160).match(/(\d{1,2}:\d{2})/);if(h){val=h[1];break;}var g=l.slice(Math.max(0,f-40),f+s.length).match(/(\d{1,2}:\d{2})/);if(g){val=g[1];break;}}u[o4.id]=val;}
+  return{shamsi:n,qamari:t,miladi:r,prayers:u};}
+function wv(e){ var s=String(e||"").trim(); var ymd=s.match(/(202\d)[\/-](\d{1,2})[\/-](\d{1,2})/); if(ymd) return new Date(Number(ymd[1]),Number(ymd[2])-1,Number(ymd[3])); var n=Fi(s),t=Object.keys(bl).sort(function(l,u){return u.length-l.length;}); for(var k=0;k<t.length;k++){var l=t[k];var u=bl[l];var o=new RegExp("(\\d{1,2})\\s*"+l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{4})","i");var i=n.match(o);if(i)return new Date(Number(i[2]),u-1,Number(i[1]));var s2=new RegExp(l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{1,2})\\s*,?\\s*(\\d{4})","i");var f=n.match(s2);if(f)return new Date(Number(f[2]),u-1,Number(f[1]));} var r=n.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/); if(r) return new Date(Number(r[3]),Number(r[2])-1,Number(r[1])); return null; }
+function Nc(e){return e.getDate()+" "+hv[e.getMonth()]+" "+e.getFullYear();}
+function kv(e){var n=e.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i),t=n?xi(n[1]):"",r=Oc(e),l="",u=r.match(/\d{4}[\/-]\d{1,2}[\/-]\d{1,2}/),o=Object.keys(bl).sort(function(p,g){return g.length-p.length;}),i=r.match(new RegExp("\\d{1,2}\\s*(?:"+o.join("|")+")\\s*\\d{4}","i")),s=r.match(new RegExp("\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4}"));if(i)l=i[0].trim();else if(s)l=s[0].trim();else if(u)l=u[0];var f=Array.from(e.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)).map(function(p){return xi(p[1]);}).filter(function(p){return p.length>25;});var v=yv(r),h=v.includes("اعلن مكتب")&&v.includes("السيستاني");return{title:t,dateText:l,paragraphs:f,hasSistani:h};}
+var ctrl=null, stopped=false;
+function log(m){var el=document.getElementById("log");var t=new Date().toLocaleTimeString("en-GB");var line=t+" — "+m;el.textContent = el.textContent==="—" ? line : el.textContent+"\n"+line; el.scrollTop=el.scrollHeight;}
+function setPrayers(p){var tb=document.querySelector("#prayers tbody");tb.innerHTML="";for(var i=0;i<Ti.length;i++){var tr=document.createElement("tr");var td1=document.createElement("td");td1.textContent=Ti[i].label;var td2=document.createElement("td");td2.textContent=p[Ti[i].id]||"--";tr.appendChild(td1);tr.appendChild(td2);tb.appendChild(tr);}}
+setPrayers(Object.fromEntries(Ti.map(function(e){return [e.id,"--"];})));
+async function fetchBridge(url, signal){
+  // جسر مباشر فقط: CapacitorHttp هو اتصال التطبيق نفسه، مش سيرفر وسيط
+  var cap = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp;
+  if(cap){ try{ log("جسر مباشر - CapacitorHttp - "+url); var res=await cap.get({url:url,headers:{Accept:"text/html"},connectTimeout:20000,readTimeout:20000,responseType:"text"}); return {html: typeof res.data==="string"?res.data:JSON.stringify(res.data||""), method:"جسر مباشر - CapacitorHttp"}; }catch(e){ var msg=e instanceof Error?e.message:String(e); log("CapacitorHttp فشل: "+msg+" - عم جرّب جسر مباشر fetch"); } }
+  // جسر مباشر فقط: fetch من المتصفح دغري على الموقع
+  log("جسر مباشر - fetch - "+url); var r=await fetch(url,{cache:"no-store",signal:signal}); var t=await r.text(); if(!r.ok) throw new Error("HTTP "+r.status); return {html:t, method:"جسر مباشر - fetch"}; 
+}
+document.getElementById("btn-live").onclick=async function(){
+  stopped=false; ctrl=new AbortController();
+  document.getElementById("err").textContent=""; document.getElementById("status").textContent="عم نجيب من الجسر…";
+  log("— بلّش جلب من الجسر — بلا بروكسي —");
+  try{
+    var res=await fetchBridge(ET, ctrl.signal);
+    document.getElementById("html-len").textContent=res.html.length;
+    document.getElementById("method").textContent=res.method;
+    log("وصل HTML من الجسر - الطول "+res.html.length+" - الطريقة "+res.method);
+    if(res.html.length<500) throw new Error("HTML قصير كتير ("+res.html.length+")");
+    var o=gv(res.html); setPrayers(o.prayers);
+    if(!o.qamari || !o.miladi){ document.getElementById("err").textContent="❌ بلا ميلادي - ما تم الفحص | الجسر: "+ET; document.getElementById("status").textContent="ما انقرا الميلادي - ما تحدّثنا"; log("ناقص: هجري="+(o.qamari||"—")+" | ميلادي="+(o.miladi||"—")); return; }
+    var now=new Date(); var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    var parsed=wv(o.miladi);
+    if(!parsed){ document.getElementById("err").textContent="❌ بلا ميلادي - ما تم الفحص | الجسر: "+ET; document.getElementById("status").textContent="تاريخ الجسر ما انقرا صح"; return; }
+    var diffDays=Math.round((parsed.getTime()-today.getTime())/86400000);
+    var diffText= diffDays===0 ? "✅ مطابق - نفس اليوم" : diffDays>0 ? "متقدم "+diffDays+" يوم" : "متأخر "+Math.abs(diffDays)+" يوم";
+    document.getElementById("hijri").textContent=o.qamari;
+    document.getElementById("miladi").textContent=o.miladi;
+    document.getElementById("shamsi").textContent=o.shamsi||"--";
+    document.getElementById("device").textContent=Nc(today);
+    document.getElementById("diff").textContent=diffText;
+    document.getElementById("status").textContent= diffDays===0 ? "✅ مطابق - نفس اليوم" : "الفرق "+diffDays+" يوم";
+    log("نتيجة الجسر: الموقع "+o.miladi+" | جهازك "+Nc(today)+" | الفرق "+diffDays);
+  }catch(e){
+    if(stopped){ document.getElementById("status").textContent="انقطع الجلب"; log("انقطع الجلب من زر قطع"); }
+    else{ var m=e instanceof Error?e.message:String(e); document.getElementById("status").textContent="فشل الجسر - ما وصلنا للموقع"; document.getElementById("err").textContent="فشل الجسر: "+m; log("فشل الجسر: "+m); }
+  }
+};
+document.getElementById("btn-bayan").onclick=async function(){
+  stopped=false; ctrl=new AbortController();
+  document.getElementById("status").textContent="عم نبلّش الفحص من الجسر…"; log("— بلّش جلب آخر بيان استهلال من الجسر - بلا بروكسي —");
+  var found=null;
+  try{
+    for(var id=1050; id>=998; id--){
+      if(stopped){ log("انقطع فحص البيانات"); break; }
+      document.getElementById("status").textContent="فحص البيان رقم "+id+" - جسر"; log("فحص البيان رقم "+id+" - جسر");
+      try{
+        var res=await fetchBridge(Pc(id), ctrl.signal);
+        document.getElementById("html-len").textContent=res.html.length;
+        document.getElementById("method").textContent=res.method;
+        if(res.html.length<500){ log("بيان "+id+": HTML قصير - منكمّل"); continue; }
+        var j=kv(res.html);
+        if(!j.hasSistani){ log("بيان "+id+": مش بيان استهلال السيستاني - منكمّل"); continue; }
+        found={id:id,title:j.title||("بيان استهلال رقم "+id),dateText:j.dateText,paragraphs:j.paragraphs,source:Pc(id)};
+        document.getElementById("status").textContent="لقينا البيان رقم "+id+" - جسر";
+        log("لقينا البيان رقم "+id+" - "+(j.title||"بلا عنوان")+" - "+res.method);
+        break;
+      }catch(e){ if(stopped) break; log("بيان "+id+" فشل: "+(e instanceof Error?e.message:String(e))+" - منكمّل"); continue; }
+    }
+    if(found){
+      document.getElementById("bayan-card").style.display="block";
+      document.getElementById("bayan-title").textContent=found.title;
+      document.getElementById("bayan-date").textContent=found.dateText||"";
+      document.getElementById("bayan-source").innerHTML='المصدر - جسر مباشر: <a href="'+found.source+'" target="_blank" rel="noopener">'+found.source+'</a>';
+      var body=document.getElementById("bayan-body"); body.innerHTML="";
+      found.paragraphs.forEach(function(p){ var el=document.createElement("p"); el.textContent=p; body.appendChild(el); });
+      try{ localStorage.setItem("nojumi_last_bayan_bridge", JSON.stringify(found)); }catch(e){}
+    } else if(!stopped){ document.getElementById("status").textContent="خلّص الفحص من 1050 لـ 998 - جسر"; log("لم يعثر على بيان - جسر"); }
+  }catch(e){ if(!stopped) log("فشل فحص البيان - جسر: "+(e instanceof Error?e.message:String(e))); }
+};
+document.getElementById("btn-stop").onclick=function(){ stopped=true; if(ctrl) ctrl.abort(); document.getElementById("status").textContent="انقطع"; log("كبسة قطع - عم نوقف الجسر"); };
+document.getElementById("btn-clear").onclick=function(){ stopped=true; if(ctrl) ctrl.abort(); document.getElementById("hijri").textContent="--"; document.getElementById("miladi").textContent="--"; document.getElementById("shamsi").textContent="--"; document.getElementById("device").textContent="--"; document.getElementById("diff").textContent="--"; document.getElementById("method").textContent="--"; document.getElementById("err").textContent=""; document.getElementById("status").textContent="انمسحت النتيجة - فيك تبلّش من جديد"; setPrayers(Object.fromEntries(Ti.map(function(e){return [e.id,"--"];}))); document.getElementById("log").textContent="—"; document.getElementById("bayan-card").style.display="none"; };
+try{ var saved=localStorage.getItem("nojumi_last_bayan_bridge"); if(saved){ var f=JSON.parse(saved); if(f && f.paragraphs && f.paragraphs.length){ document.getElementById("bayan-card").style.display="block"; document.getElementById("bayan-title").textContent=f.title; document.getElementById("bayan-date").textContent=f.dateText||""; document.getElementById("bayan-source").innerHTML='المصدر - جسر مباشر: <a href="'+f.source+'" target="_blank" rel="noopener">'+f.source+'</a>'; var b=document.getElementById("bayan-body"); b.innerHTML=""; f.paragraphs.forEach(function(p){ var el=document.createElement("p"); el.textContent=p; b.appendChild(el); }); log("انفتح آخر بيان محفوظ من الجسر - رقم "+f.id); } } }catch(e){}
+</script>
+</body>
+</html>
