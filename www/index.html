@@ -44,6 +44,9 @@ th{background:#f7f3e6}
 .pill{background:#f7f3e6;border-radius:10px;padding:8px}
 .pill b{display:block;font-size:12px;color:#555}
 .logbox{background:#f7f3e6;border-radius:10px;padding:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#111}
+.nj-res{border:1px solid #eee;border-radius:12px;padding:10px;margin:8px 0;background:#fbfbf8}
+.nj-res b{font-size:14px;line-height:1.7}
+.nj-res button{margin-top:6px;background:#0b2e1f;color:#fff}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 </head>
@@ -63,6 +66,13 @@ th{background:#f7f3e6}
 <div class="card">
 <h2>المدينة — الدبوس على الخريطة، مش اسم المدينة</h2>
 <div class="row" id="nj_cities"></div>
+<div style="margin-top:12px;border-top:1px solid #eee;padding-top:12px">
+<label>بحث عن اسم المدينة أو القرية — بيعطي الإحداثيات، وبعدين نجومي بيعطي الأوقات</label>
+<input id="nj_searchInput" placeholder="مثال: عكار ، بنت جبيل ، النبطية ، عكار لبنان" onkeydown="if(event.key==='Enter'){nj_searchCity();}">
+<div class="row" style="margin-top:8px"><button onclick="nj_searchCity()">بحث عن الإحداثيات</button><span class="mut">المصدر: Nominatim / OpenStreetMap — مش نجومي. نجومي بياخد بس lat / lng.</span></div>
+<p id="nj_searchStatus" style="font-size:13px;color:#666"></p>
+<div id="nj_searchResults"></div>
+</div>
 <p style="font-size:14px;color:#444">الدبوس الحالي: <b id="nj_pin">—</b></p>
 <label>التاريخ الميلادي (سنة/شهر/يوم)</label>
 <input id="nj_dateInput" value="2026/11/20">
@@ -169,6 +179,52 @@ function nj_renderCities(){
   nj_pinEl.textContent = nj_cur.name+' — '+nj_cur.lat+' , '+nj_cur.lng;
 }
 nj_renderCities();
+
+let nj_searchResults=[];
+function nj_esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function nj_searchCity(){
+  const inp=document.getElementById('nj_searchInput');
+  const q=(inp?inp.value:'').trim();
+  const st=document.getElementById('nj_searchStatus');
+  const box=document.getElementById('nj_searchResults');
+  if(!q){ st.innerHTML='<span class="err">اكتب اسم المدينة أو القرية أولاً</span>'; return; }
+  st.textContent='عم ينده لـ Nominatim ...';
+  box.innerHTML='';
+  try{
+    const url='https://nominatim.openstreetmap.org/search?format=json&limit=8&accept-language=ar&q='+encodeURIComponent(q);
+    const res=await fetch(url,{headers:{'Accept':'application/json'}});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const arr=await res.json();
+    nj_searchResults=Array.isArray(arr)?arr:[];
+    if(nj_searchResults.length===0){
+      st.innerHTML='<span class="err">ما لقى ولا نتيجة لـ &quot;'+nj_esc(q)+'&quot; — جرّب اسم تاني أو ضيف البلد، مثل: عكار لبنان</span>';
+      nj_logEl.textContent='بحث إحداثيات: Nominatim رجع 0 نتيجة لـ '+q+'\nURL: '+url;
+      return;
+    }
+    st.innerHTML='<span class="ok">لقى '+nj_searchResults.length+' نتيجة من Nominatim — انقر على الصح لتصير هي الدبوس</span>';
+    box.innerHTML=nj_searchResults.map((r,i)=>{
+      const lat=parseFloat(r.lat), lng=parseFloat(r.lon);
+      const typ=r.type||r.class||'';
+      return '<div class="nj-res"><b>'+nj_esc(r.display_name||'')+'</b><br><span class="mut">'+nj_esc(typ)+' — '+lat+' , '+lng+'</span><br><button onclick="nj_pickSearchResult('+i+')">اختار هيدي</button></div>';
+    }).join('');
+    nj_logEl.textContent='بحث إحداثيات: Nominatim\nURL: '+url+'\nعدد: '+nj_searchResults.length+'\nأول نتيجة: '+nj_searchResults[0].display_name+' — '+nj_searchResults[0].lat+' , '+nj_searchResults[0].lon;
+  }catch(e){
+    st.innerHTML='<span class="err">فشل بحث الإحداثيات: '+nj_esc(e.message||String(e))+'</span>';
+    nj_logEl.textContent='بحث إحداثيات فشل: '+e;
+  }
+}
+function nj_pickSearchResult(i){
+  const r=nj_searchResults[i];
+  if(!r) return;
+  const lat=parseFloat(r.lat), lng=parseFloat(r.lon);
+  if(!isFinite(lat)||!isFinite(lng)) return;
+  nj_cur={name:r.display_name, lat:lat, lng:lng};
+  nj_renderCities();
+  nj_pinEl.textContent=nj_cur.name+' — '+nj_cur.lat+' , '+nj_cur.lng+' (من بحث Nominatim)';
+  const st=document.getElementById('nj_searchStatus');
+  if(st) st.innerHTML='<span class="ok">صار الدبوس: '+nj_esc(r.display_name)+' — '+lat+' , '+lng+' — هلأ اكبس جلب أوقات الصلاة</span>';
+  nj_logEl.textContent='اختار من بحث Nominatim: '+r.display_name+'\nlat='+lat+' lng='+lng+'\nهلأ نجومي رح ينده بـ lat / lng هول.';
+}
 
 function nj_cleanD(d){
   if(typeof d==='object' && d!==null) return d;
