@@ -219,29 +219,36 @@ async function fetchIstihlal(){
   const log=document.getElementById('istihlalLog');
   const st=document.getElementById('istihlalStatus');
   box.textContent='عم ينده...';
-  log.textContent='عم ينده للرئيسية للاقي رابط الاستهلال...';
+  log.textContent='عم ينده للرئيسية...';
   try{
     const res=await fetch('https://arabic.nojumi.org/');
     const html=await res.text();
     log.textContent='الرئيسية status='+res.status+' طول='+html.length+'\n';
-    // لاقي روابط فيها istihlal أو استهلال
-    const linkRe=/<a[^>]+href="([^"]+)"[^>]*>([\s\S]{0,300}?)<\/a>/gi;
-    let found=[];
-    let m;
-    while((m=linkRe.exec(html))!==null){
-      const href=m[1], inner=stripTags(m[2]);
-      if(/istihlal|استهلال/i.test(href) || /استهلال/i.test(inner)){
-        found.push({href, inner});
-      }
+    const text=stripTags(html);
+    // الحل الجديد: الموقع ما حاطط الاستهلال كروابط <a>، حاططو كنص بالصفحة.
+    // لهيك منقص النص على كلمة رقم: ومنلقط كل بيان فيه يوم ... هو الأول من شهر ... لعام ...
+    const parts=text.split('رقم:');
+    const statements=[];
+    for(let i=1;i<parts.length;i++){
+      const part=parts[i];
+      const mNum=part.match(/^\s*(\d+)/);
+      if(!mNum) continue;
+      const num=parseInt(mNum[1],10);
+      const chunk=part.slice(0,1500);
+      if(!/وضعية الهلال|هو الأول/.test(chunk)) continue;
+      const mDay=chunk.match(/يوم\s+(السبت|الأحد|الاثنين|الثلاثاء|الأربعاء|الخميس|الجمعة)\s+هو الأول من شهر\s+(.+?)\s+لعام\s+(\d+)\s+للهجرة/);
+      if(!mDay) continue;
+      const mDate=chunk.match(/14\d\d\/\d{1,2}\/\d{1,2}/);
+      statements.push({num:num, day:mDay[1], month:mDay[2].trim(), year:mDay[3], date:mDate?mDate[0]:''});
     }
-    log.textContent+='روابط استهلال لقيتها: '+found.length+'\n'+found.slice(0,5).map(f=>f.href+' — '+f.inner).join('\n')+'\n';
-    if(found.length===0){
-      // جرّب نص الصفحة حول استهلال
-      const text=stripTags(html);
+    statements.sort((a,b)=>b.num-a.num);
+    log.textContent+='بيانات استهلال لقيتها بالنص: '+statements.length+'\n';
+    log.textContent+='أرقامها: '+statements.slice(0,8).map(s=>s.num).join(' ، ')+'\n';
+    if(statements.length===0){
       const idx=text.indexOf('استهلال');
       if(idx>=0){
         box.textContent=text.slice(Math.max(0,idx-200), idx+1200);
-        st.textContent='ما لقيت رابط، عرضت مقطع من الرئيسية حول استهلال.';
+        st.textContent='ما لقيت بيان بصيغة يوم ... هو الأول، عرضت مقطع من الرئيسية.';
         log.textContent+='مقطع: '+box.textContent;
       } else {
         box.textContent='ما لقيت أي ذكر لاستهلال بالرئيسية.';
@@ -249,18 +256,11 @@ async function fetchIstihlal(){
       }
       return;
     }
-    let url=found[0].href;
-    if(url.startsWith('/')) url='https://arabic.nojumi.org'+url;
-    else if(!url.startsWith('http')) url='https://arabic.nojumi.org/'+url;
-    log.textContent+='عم ينده لآخر بيان: '+url+'\n';
-    const r2=await fetch(url);
-    const h2=await r2.text();
-    log.textContent+='بيان status='+r2.status+' طول='+h2.length+'\n';
-    const t2=stripTags(h2);
-    // اعرض أول 2000 حرف من نص البيان، بلا اختراع
-    box.textContent=t2.slice(0,2000);
-    st.textContent='نجح — من '+url;
-    log.textContent+='أول 500 حرف: '+t2.slice(0,500);
+    const latest=statements[0];
+    // عرض بيان واحد مرتب، مش مقطع صفحة كاملة
+    box.textContent='بيان رقم '+latest.num+' — مكتب سماحة السيد السيستاني (دام ظلّه): يوم '+latest.day+' هو الأول من شهر '+latest.month+' لعام '+latest.year+' للهجرة.'+(latest.date? ' (تاريخ البيان بالموقع: '+latest.date+')':'');
+    st.textContent='نجح — آخر بيان من الصفحة الرئيسية للموقع.';
+    log.textContent+='آخر بيان: رقم '+latest.num+' | '+latest.day+' | '+latest.month+' | '+latest.year+' | '+latest.date;
   }catch(e){
     box.textContent='فشل: '+e;
     log.textContent+='فشل: '+e;
