@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -29,6 +29,7 @@
 <div class="card"><h2>🕌 أوقات الصلاة</h2><p style="color:#a8b5ad;font-size:13px;margin:0 0 8px">منقرا الأوقات من صفحة الموقع بس. إذا ما لقينا وقت، منبيّن -- وما منخترع وقت.</p>
 <table id="prayers"><tbody></tbody></table></div>
 <div class="card" id="bayan-card" style="display:none"><h2>📜 آخر بيان استهلال</h2><div id="bayan-title" style="font-weight:900"></div><div id="bayan-date" style="color:#a8b5ad;font-size:13px;margin-top:4px"></div><div id="bayan-source" style="font-size:12px;margin-top:4px"></div><div class="bayan" id="bayan-body"></div></div>
+<div class="card" id="debug-card" style="display:none"><h2>🔍 شو وصل من الموقع (للمطور)</h2><p style="color:#a8b5ad;font-size:13px">هيدا النص اللي انقرا من الموقع بعد ما شلنا التاغات. إذا كان فاضي أو ما فيه تاريخ، معناتا الموقع غيّر شكلو.</p><div id="debug-text" style="background:#07100d;border:1px solid #2a3a32;border-radius:10px;padding:10px;font-size:12px;white-space:pre-wrap;max-height:300px;overflow:auto;direction:rtl"></div><p style="font-size:12px;color:#a8b5ad;margin-top:8px">أول 3000 حرف من HTML الخام: <span id="debug-raw-len"></span></p><div id="debug-raw" style="background:#07100d;border:1px solid #2a3a32;border-radius:10px;padding:10px;font-size:11px;white-space:pre-wrap;max-height:200px;overflow:auto;direction:ltr;text-align:left"></div></div>
 <div class="card"><h2>السجل</h2><div class="log" id="log">—</div><div style="margin-top:8px;font-size:12px;color:#a8b5ad">طول آخر HTML: <span id="html-len">0</span> | آخر خطأ: <span id="last-err">--</span></div></div>
 </main>
 <script>
@@ -46,7 +47,29 @@ function yv(e){return mv(e).replace(/[أإآ]/g,"ا").replace(/ة/g,"ه");}
 function xi(e){return Fc(Fi(e)).replace(/\s+/g," ").trim();}
 function zi(e,n){var t=new RegExp('id=["\']'+n+'["\'][^>]*>([\\s\\S]*?)<',"i"),r=e.match(t);return r?xi(r[1]):"";}
 function Oc(e){return Fi(Fc(e));}
-function gv(e){var n=zi(e,"ctl00_lblShamsiDate"),t=zi(e,"ctl00_lblQamariDate"),r=zi(e,"ctl00_lblMiladiDate"),l=Oc(e);if(!t){var o=l.match(new RegExp("(\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4})"));if(o)t=o[1].replace(/\s+/g," ").trim();}if(!r){var o2=Object.keys(bl).sort(function(s,f){return f.length-s.length;}),i=l.match(new RegExp("(\\d{1,2}\\s*(?:"+o2.join("|")+")\\s*\\d{4})","i"));if(i)r=i[1].replace(/\s+/g," ").trim();}if(!n){var o3=l.match(/(\d{1,2}\s*(?:فروردين|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)\s*\d{4})/);if(o3)n=o3[1].trim();}var u={};for(var k=0;k<Ti.length;k++){var o4=Ti[k];var val="--";for(var a=0;a<o4.aliases.length;a++){var s=o4.aliases[a];var f=l.indexOf(s);if(f===-1)continue;var h=l.slice(f,f+160).match(/(\d{1,2}:\d{2})/);if(h){val=h[1];break;}var g=l.slice(Math.max(0,f-40),f+s.length).match(/(\d{1,2}:\d{2})/);if(g){val=g[1];break;}}u[o4.id]=val;}return{shamsi:n,qamari:t,miladi:r,prayers:u};}
+function gv(e){
+  var n=zi(e,"ctl00_lblShamsiDate"),t=zi(e,"ctl00_lblQamariDate"),r=zi(e,"ctl00_lblMiladiDate"),l=Oc(e);
+  // --- طبقة 2: نص منظف ---
+  if(!t){var o=l.match(new RegExp("(\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4})"));if(o)t=o[1].replace(/\s+/g," ").trim();}
+  if(!r){var o2=Object.keys(bl).sort(function(s,f){return f.length-s.length;}),i=l.match(new RegExp("(\\d{1,2}\\s*(?:"+o2.join("|")+")\\s*\\d{4})","i"));if(i)r=i[1].replace(/\s+/g," ").trim();}
+  if(!n){var o3=l.match(/(\d{1,2}\s*(?:فروردين|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)\s*\d{4})/);if(o3)n=o3[1].trim();}
+  // --- طبقة 3 جديدة: HTML الخام - لأن الموقع صار يحط التواريخ ب JSON داخل <script> و Fc() بيمسحها ---
+  if(!t || !r){
+    var raw = String(e||"");
+    // شيل بس التاغات بدون ما تمسح السكربت
+    var rawText = Fi(raw.replace(/<[^>]+>/g," ").replace(/&nbsp;|&#160;/g," ").replace(/&quot;/g,'"').replace(/&#39;|&apos;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/\s+/g," ").trim());
+    if(!t){ var m1=rawText.match(/(\d{1,2}\s*(?:جمادى الأولى|جمادى الآخرة|جمادى الاولى|جمادى الاخرة|ربيع الأول|ربيع الآخر|ربيع الاول|ربيع الاخر|ذو الحجة|ذو القعدة|محرم|صفر|رجب|شعبان|رمضان|شوال)\s*144\d)/); if(m1) t=m1[1]; else { var m1b=rawText.match(/144\d\s*\/\s*\d{1,2}\s*\/\s*\d{1,2}/); if(m1b) t=m1b[0]; } }
+    if(!r){ var m2=rawText.match(/(\d{1,2}\s*(?:تشرين الثاني|تشرين الأول|تشرين الاول|كانون الثاني|كانون الأول|كانون الاول|شباط|آذار|اذار|نيسان|أيار|ايار|حزيران|تموز|آب|اب|أيلول|ايلول|يناير|فبراير|مارس|أبريل|ابريل|مايو|يونيو|يوليو|أغسطس|اغسطس|سبتمبر|أكتوبر|اكتوبر|نوفمبر|ديسمبر|January|February|March|April|May|June|July|August|September|October|November|December)\s*202\d)/i); if(m2) r=m2[1]; else { var m2b=rawText.match(/(\d{1,2}[\/-]\d{1,2}[\/-]202\d)/); if(m2b) r=m2b[1]; else { var m2c=rawText.match(/(202\d[\/-]\d{1,2}[\/-]\d{1,2})/); if(m2c) r=m2c[1]; } } }
+    if(!n){ var m3=rawText.match(/(\d{1,2}\s*(?:فروردين|اردیبهشت|خرداد|تیر|مرداد|شهریور|مهر|آبان|آذر|دی|بهمن|اسفند)\s*\d{4})/); if(m3) n=m3[1]; }
+    // خزن النص الخام للديباغ
+    window._lastRawText = rawText;
+    window._lastCleanText = l;
+  } else { window._lastRawText = ""; window._lastCleanText = l; }
+  var u={};for(var k=0;k<Ti.length;k++){var o4=Ti[k];var val="--";for(var a=0;a<o4.aliases.length;a++){var s=o4.aliases[a];var f=l.indexOf(s);if(f===-1)continue;var h=l.slice(f,f+160).match(/(\d{1,2}:\d{2})/);if(h){val=h[1];break;}var g=l.slice(Math.max(0,f-40),f+s.length).match(/(\d{1,2}:\d{2})/);if(g){val=g[1];break;}}u[o4.id]=val;}
+  // إذا أوقات الصلاة كلها -- جرب بالنص الخام
+  var allEmpty = true; for(var kk in u){ if(u[kk]!=="--") allEmpty=false; }
+  if(allEmpty && window._lastRawText){ var rt=window._lastRawText; for(var k2=0;k2<Ti.length;k2++){ var o5=Ti[k2]; for(var a2=0;a2<o5.aliases.length;a2++){ var idx=rt.indexOf(o5.aliases[a2]); if(idx===-1) continue; var hm=rt.slice(idx,idx+200).match(/(\d{1,2}:\d{2})/); if(hm){ u[o5.id]=hm[1]; break; } } } }
+  return{shamsi:n,qamari:t,miladi:r,prayers:u};}
 function wv(e){var n=Fi(e),t=Object.keys(bl).sort(function(l,u){return u.length-l.length;});for(var k=0;k<t.length;k++){var l=t[k];var u=bl[l];var o=new RegExp("(\\d{1,2})\\s*"+l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{4})","i");var i=n.match(o);if(i)return new Date(Number(i[2]),u-1,Number(i[1]));var s=new RegExp(l.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(\\d{1,2})\\s*,?\\s*(\\d{4})","i");var f=n.match(s);if(f)return new Date(Number(f[2]),u-1,Number(f[1]));}var r=n.match(/(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);if(r)return new Date(Number(r[3]),Number(r[2])-1,Number(r[1]));return null;}
 function Nc(e){return e.getDate()+" "+hv[e.getMonth()]+" "+e.getFullYear();}
 function kv(e){var n=e.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i),t=n?xi(n[1]):"",r=Oc(e),l="",u=r.match(/\d{4}[\/-]\d{1,2}[\/-]\d{1,2}/),o=Object.keys(bl).sort(function(p,g){return g.length-p.length;}),i=r.match(new RegExp("\\d{1,2}\\s*(?:"+o.join("|")+")\\s*\\d{4}","i")),s=r.match(new RegExp("\\d{1,2}\\s*(?:"+Tc.join("|")+")\\s*\\d{3,4}"));if(i)l=i[0].trim();else if(s)l=s[0].trim();else if(u)l=u[0];var f=Array.from(e.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)).map(function(p){return xi(p[1]);}).filter(function(p){return p.length>25;});var v=yv(r),h=v.includes("اعلن مكتب")&&v.includes("السيستاني");return{title:t,dateText:l,paragraphs:f,hasSistani:h};}
@@ -66,9 +89,12 @@ document.getElementById("btn-live").onclick=async function(){
   try{
     var res=await fetchNojumi(ET, ctrl.signal);
     document.getElementById("html-len").textContent=res.html.length;
+    try{ var dbg=document.getElementById("debug-card"); if(dbg) dbg.style.display="block"; var dt=document.getElementById("debug-text"); if(dt) dt.textContent=(window._lastCleanText||"").slice(0,3000) || "(نص منظف فاضي)"; var dr=document.getElementById("debug-raw"); if(dr) dr.textContent=String(res.html||"").slice(0,3000); var drl=document.getElementById("debug-raw-len"); if(drl) drl.textContent=String(res.html||"").length; }catch(e){}
     document.getElementById("method").textContent=res.method;
     log("وصل HTML — الطول "+res.html.length+" — الطريقة "+res.method);
     if(res.html.length<500) throw new Error("HTML قصير كتير ("+res.html.length+")");
+    // حتى لو التحليل فشل، فرجي النص للديباغ
+    try{ var _dbg=document.getElementById("debug-card"); if(_dbg) _dbg.style.display="block"; var _dt=document.getElementById("debug-text"); if(_dt) _dt.textContent=(window._lastCleanText||window._lastRawText||"").slice(0,3000); }catch(e){}
     var o=gv(res.html); setPrayers(o.prayers);
     if(!o.qamari || !o.miladi){ document.getElementById("err").textContent="❌ بلا ميلادي - ما تم الفحص | المصدر: "+ET; document.getElementById("status").textContent="ما انقرا الميلادي — ما تحدّثنا"; log("ناقص: هجري="+(o.qamari||"—")+" | ميلادي="+(o.miladi||"—")); return; }
     var now=new Date(); var today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
@@ -93,12 +119,13 @@ document.getElementById("btn-bayan").onclick=async function(){
   document.getElementById("status").textContent="عم نبلّش الفحص…"; log("— بلّش جلب آخر بيان استهلال —");
   var found=null;
   try{
-    for(var id=1015; id>=998; id--){
+    for(var id=1050; id>=998; id--){
       if(stopped){ log("انقطع فحص البيانات"); break; }
       document.getElementById("status").textContent="فحص البيان رقم "+id; log("فحص البيان رقم "+id);
       try{
         var res=await fetchNojumi(Pc(id), ctrl.signal);
         document.getElementById("html-len").textContent=res.html.length;
+    try{ var dbg=document.getElementById("debug-card"); if(dbg) dbg.style.display="block"; var dt=document.getElementById("debug-text"); if(dt) dt.textContent=(window._lastCleanText||"").slice(0,3000) || "(نص منظف فاضي)"; var dr=document.getElementById("debug-raw"); if(dr) dr.textContent=String(res.html||"").slice(0,3000); var drl=document.getElementById("debug-raw-len"); if(drl) drl.textContent=String(res.html||"").length; }catch(e){}
         document.getElementById("method").textContent=res.method;
         if(res.html.length<500){ log("بيان "+id+": HTML قصير ("+res.html.length+") — منكمّل"); continue; }
         var j=kv(res.html);
@@ -118,7 +145,7 @@ document.getElementById("btn-bayan").onclick=async function(){
       found.paragraphs.forEach(function(p){ var el=document.createElement("p"); el.textContent=p; body.appendChild(el); });
       // حفظ محلي - بلا خادم
       try{ localStorage.setItem("nojumi_last_bayan", JSON.stringify(found)); }catch(e){}
-    } else if(!stopped){ document.getElementById("status").textContent="خلّص الفحص من 1015 لـ 998"; log("لم يعثر على بيان"); }
+    } else if(!stopped){ document.getElementById("status").textContent="خلّص الفحص من 1050 لـ 998"; log("لم يعثر على بيان"); }
   }catch(e){ if(!stopped) log("فشل فحص البيان: "+(e instanceof Error?e.message:String(e))); }
 };
 document.getElementById("btn-stop").onclick=function(){ stopped=true; if(ctrl) ctrl.abort(); document.getElementById("status").textContent="انقطع"; log("كبسة قطع — عم نوقف الجلب"); };
