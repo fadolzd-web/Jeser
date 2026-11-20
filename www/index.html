@@ -12,7 +12,7 @@
 <p class="small">هيدا الملف خام، بلا BOM، أول سطر DOCTYPE، وتاني سطر meta charset. اذا طلع كود تاني، يعني المشكلة مش بالملف، المشكلة بالغلاف اللي عم يوصلك فيه.</p>
 <div class="card"><b>الاعدادات</b><br><label>API Base</label><input id="api" value="https://hmomen.com/api/"><label>Storage Base</label><input id="storage" value="https://storage.hmomen.com"><label>Static Base</label><input id="static" value="https://hmomen.com/static"><button onclick="testConn()">اختبر الاتصال</button><div id="log"></div></div>
 <div class="card"><b>1) التاريخ الهجري والتصحيح</b><br><button onclick="getHijri()">جيب التصحيح من عندهم</button><div id="hijriLocal"></div><pre id="hijriRaw">ما في بيانات بعد</pre><div id="hijriFixed"></div></div>
-<div class="card"><b>2) التفاسير وفك التشفير</b><br><button onclick="getMeta()">جيب لائحة التفاسير</button><pre id="metaRaw">ما في بيانات بعد</pre><button onclick="dlTafsir('Tafsir_001.db')">حمّل الأمثل Tafsir_001.db</button><button onclick="dlTafsir('Tafsir_002.db')">حمّل الميزان Tafsir_002.db</button><button onclick="dlTafsir('Tafsir_004.db')">حمّل النور Tafsir_004.db</button><div id="dlProg"></div><div id="dbInfo"></div><label>رقم تفسير ID</label><input id="tid" value="1" type="number"><button onclick="getTafsir()">جيب التفسير وفك تشفيرو</button><pre id="tafsirOut">ما في بيانات بعد</pre><p class="small">فك التشفير: منجرب gzip ثم zlib ثم UTF-8 ثم Hex. اذا فشلو كلن، منعرض الـ Blob الخام.</p></div>
+<div class="card"><b>2) التفاسير وفك التشفير</b><br><button onclick="getMeta()">جيب لائحة التفاسير</button><pre id="metaRaw">ما في بيانات بعد</pre><button onclick="dlTafsir('Tafsir_001.db')">حمّل الأمثل Tafsir_001.db</button><button onclick="dlTafsir('Tafsir_002.db')">حمّل الميزان Tafsir_002.db</button><button onclick="dlTafsir('Tafsir_004.db')">حمّل النور Tafsir_004.db</button><div id="dlProg"></div><div id="dbInfo"></div><label>رقم تفسير ID</label><input id="tid" value="1" type="number"><button onclick="getTafsir()">جيب التفسير وفك تشفيرو</button><button onclick="scanTafsir()" style="background:#6a1b9a">افحص أول 20 صف - أي واحد نص وأي واحد Patch</button><div id="scanOut"></div><pre id="tafsirOut">ما في بيانات بعد</pre><p class="small">فك التشفير حسب DEX: TafsirService.decodeTafsirBlob(blob, searchText). اذا أول 8 بايت BSDIFF40، منطبق Patch على searchText. اذا لا، UTF-8 مباشرة. ما في gzip ولا بحث عن BSDIFF بنص الـ Blob.</p></div>
 <div class="card"><b>3) قراء القرآن</b><br><label>القارئ</label><select id="rec"><option value="alhusary">الحصري alhusary</option><option value="alminshawi">المنشاوي alminshawi</option><option value="reciter_abdalbasit">عبد الباسط</option><option value="reciter_menshawy">المنشاوي 2</option><option value="reciter_osama">أسامة</option></select><label>السورة</label><input id="sura" value="1" type="number"><label>من آية</label><input id="fromA" value="1" type="number"><label>الى آية</label><input id="toA" value="3" type="number"><button onclick="buildAudio()">ابني الروابط</button><div id="audioList"></div></div>
 <script>
 function log(m,ok){var d=document.getElementById('log');d.innerHTML+='<div class="'+(ok?'ok':'bad')+'">'+new Date().toLocaleTimeString()+' - '+m+'</div>';}
@@ -28,9 +28,9 @@ async function getHijri(){
     let t=await r.text();
     // اذا السيرفر رجع صفحة HTML تبع خطأ، مش JSON، ما تعرضها كلها ككود
     if(!r.ok || t.trim().startsWith('<')){
-      document.getElementById('hijriRaw').textContent='السيرفر رجع خطأ HTTP '+r.status+' - صفحة HTML تبع Cloudflare، مش JSON. يعني الرابط واصل للسيرفر بس السيرفر رافض / واقع هلأ. أول 300 حرف من الرد: '+t.slice(0,300);
-      document.getElementById('hijriFixed').innerHTML='<span class=bad>فشل - السيرفر رجع '+r.status+' مش JSON، ما تم التصحيح. التاريخ المحلي هو اللي ضل.</span>';
-      log('الهجري فشل: السيرفر رجع '+r.status+' HTML مش JSON',false);
+      document.getElementById('hijriRaw').textContent='السيرفر رجع HTTP '+r.status+' - صفحة HTML، مش JSON. الـ base اللي عم نستعملو https://hmomen.com/api/ مش مثبت من الـ DEX انو هو الصح للهجري. الـ DEX فيه أكتر من base. الـ 502 ممكن يكون base غلط، مش بالضرورة السيرفر واقع. أول 300 حرف: '+t.slice(0,300);
+      document.getElementById('hijriFixed').innerHTML='<span class=bad>فشل - رجع '+r.status+' مش JSON، ما تم التصحيح. الـ base مش مثبت.</span>';
+      log('الهجري فشل: رجع '+r.status+' HTML مش JSON - الـ base مش مثبت',false);
       return;
     }
     document.getElementById('hijriRaw').textContent=t;
@@ -49,64 +49,105 @@ async function testConn(){
   try{
     let r=await fetch(api()+'hijri-date/current');
     let t=await r.text();
-    if(!r.ok || t.trim().startsWith('<')){ log('hijri-date/current: '+r.status+' - السيرفر رجع صفحة خطأ HTML، مش JSON', false); return; }
+    if(!r.ok || t.trim().startsWith('<')){ log('hijri-date/current: '+r.status+' - رجع HTML مش JSON - الـ base مش مثبت', false); return; }
     log('hijri-date/current: '+r.status, r.ok);
   }catch(e){ log('فشل الاتصال: '+e.message,false); }
 }
 async function getMeta(){try{let r=await fetch(storage()+'/databases/database_metadata.json');let t=await r.text();document.getElementById('metaRaw').textContent=t;log('ميتاداتا نجحت',true);}catch(e){document.getElementById('metaRaw').textContent='فشل: '+e.message;log('ميتاداتا فشلت',false);}}
 let SQL=null, db=null, dbName='';
 async function dlTafsir(name){try{document.getElementById('dlProg').textContent='عم نزّل '+name+'...';let r=await fetch(stat()+'/databases/'+name);if(!r.ok) throw new Error('HTTP '+r.status);let buf=await r.arrayBuffer();document.getElementById('dlProg').textContent='نزل '+(buf.byteLength/1024/1024).toFixed(2)+' MB';if(!SQL) SQL=await initSqlJs({locateFile:f=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f});db=new SQL.Database(new Uint8Array(buf));dbName=name;let cols=db.exec("SELECT name FROM sqlite_master WHERE type='table'");document.getElementById('dbInfo').innerHTML='<b>'+name+'</b> انفتح. الجداول: '+JSON.stringify(cols);try{let c=db.exec("SELECT COUNT(*) FROM Tafsir");document.getElementById('dbInfo').innerHTML+='<br>عدد صفوف Tafsir: '+c[0].values[0][0];}catch(e){}log(name+' نزل وانفتح',true);}catch(e){document.getElementById('dlProg').textContent='فشل: '+e.message;log(name+' فشل: '+e.message,false);}}
-async function tryDecompress(blob){
-  try{let ds=new DecompressionStream('gzip');let s=new Blob([blob]).stream().pipeThrough(ds);let out=await new Response(s).arrayBuffer();return {how:'gzip', text:new TextDecoder().decode(out)};}catch(e){}
-  try{let ds=new DecompressionStream('deflate');let s=new Blob([blob]).stream().pipeThrough(ds);let out=await new Response(s).arrayBuffer();return {how:'zlib/deflate', text:new TextDecoder().decode(out)};}catch(e){}
-  try{return {how:'UTF-8 مباشرة', text:new TextDecoder().decode(blob)};}catch(e){}
-  let hex='';for(let i=0;i<Math.min(blob.length,200);i++) hex+=blob[i].toString(16).padStart(2,'0')+' ';return {how:'فشل - Hex', text:hex};
+// ===== منطق DEX بالحرف - TafsirService =====
+// fetchRemoteTafsirText: SELECT data, searchText FROM Tafsir WHERE id = ? LIMIT 1
+// ثم decodeTafsirBlob(blob, searchText)
+// decodeTafsirBlob(blob, baseText):
+//   if isBsDiff(blob) -> reconstructFromBsDiff(blob, baseText)
+//   else -> decodeTextFromBytes(blob)
+// isBsDiff: أول 8 بايت فقط == BSDIFF40 (0x42 0x53 0x44 0x49 0x46 0x46 0x34 0x30)
+// reconstructFromBsDiff: applyBsDiffPatch(patch, baseText.getBytes(UTF-8))
+// applyBsDiffPatch: يستعمل readInt64SignMagnitude + decompressBzip2 (Apache Commons BZip2)
+function isBsDiff(bytes){
+  if(!bytes || bytes.length < 8) return false;
+  return bytes[0]===0x42 && bytes[1]===0x53 && bytes[2]===0x44 && bytes[3]===0x49 && bytes[4]===0x46 && bytes[5]===0x46 && bytes[6]===0x34 && bytes[7]===0x30;
 }
-function findBSDIFF(bytes){
-  // دور على BSDIFF40 جوات الـ Blob، مش بس بأولو
-  let needle=[66,83,68,73,70,70,52,48]; // BSDIFF40
-  for(let i=0;i<=bytes.length-needle.length;i++){
-    let ok=true; for(let j=0;j<needle.length;j++){ if(bytes[i+j]!==needle[j]){ok=false;break;} }
-    if(ok) return i;
+function decodeTextFromBytes(bytes){ return new TextDecoder('utf-8').decode(bytes); }
+function readInt64SignMagnitude(b, off){
+  // DEX: readInt64SignMagnitude - 8 بايت little-endian، إشارة بالمكان الأعلى من آخر بايت
+  let v=0;
+  for(let i=0;i<8;i++) v += b[off+i] * Math.pow(256,i);
+  // إذا أعلى بت مضبوط، الرقم سالب، ومنشيل بت الإشارة
+  if(b[off+7] & 0x80){ v = -(v - Math.pow(256,7)*128); /* تبسيط: القيمة المطلقة = v بدون بت الإشارة */ v = -( (b[off+7] & 0x7F)*Math.pow(256,7) + (v - (b[off+7]*Math.pow(256,7))) ); }
+  // الطريقة الصحيحة بالتفصيل: نعيد الحساب بدون بت الإشارة
+  let mag=0; for(let i=0;i<7;i++) mag += b[off+i]*Math.pow(256,i); mag += (b[off+7] & 0x7F)*Math.pow(256,7);
+  return (b[off+7] & 0x80) ? -mag : mag;
+}
+function decodeTafsirBlob(blob, baseText){
+  let bytes = new Uint8Array(blob);
+  if(isBsDiff(bytes)){
+    try{ return {how:'BSDIFF - reconstructFromBsDiff(blob, searchText)', text: reconstructFromBsDiff(bytes, baseText)}; }
+    catch(e){ return {how:'BSDIFF فشل', text:'[تحتاج النص الأساسي لإعادة البناء] - الخطأ: '+e.message+'\nالـ base المستعمل هو searchText من نفس الصف، مش الصف السابق ولا ملف قديم.'}; }
   }
-  return -1;
+  return {how:'UTF-8 مباشرة - decodeTextFromBytes', text: decodeTextFromBytes(bytes)};
 }
-function readInt64LE(b, off){
-  let v=0; for(let i=0;i<8;i++) v+=b[off+i]*Math.pow(256,i); return v;
+function reconstructFromBsDiff(patchBytes, baseText){
+  // DEX: applyBsDiffPatch(patch, baseText.getBytes())
+  let oldBytes = new TextEncoder().encode(baseText || '');
+  let out = applyBsDiffPatch(patchBytes, oldBytes);
+  return decodeTextFromBytes(out);
+}
+function applyBsDiffPatch(patch, oldBytes){
+  // ترويسة BSDIFF40: 8 بايت magic + 8 ctrlLen + 8 diffLen + 8 newSize
+  if(patch.length < 32) throw new Error('BSDIFF patch too short');
+  let ctrlLen = readInt64SignMagnitude(patch, 8);
+  let diffLen = readInt64SignMagnitude(patch, 16);
+  let newSize = readInt64SignMagnitude(patch, 24);
+  if(ctrlLen<0 || diffLen<0 || newSize<0) throw new Error('Invalid BSDIFF header values');
+  if(32+ctrlLen+diffLen > patch.length) throw new Error('BSDIFF patch sections exceed buffer');
+  // الـ ctrl و diff و extra مضغوطين بـ BZip2 - المتصفح ما فيه BZip2 جاهز
+  // هون منرمي خطأ واضح بدل ما نعرض خرابيط، ومنعرض معلومات الـ Patch
+  throw new Error('يحتاج BZip2 decompression - ctrlLen='+ctrlLen+' diffLen='+diffLen+' newSize='+newSize+' oldLen='+oldBytes.length+' - الـ Patch موجود كامل، بس المتصفح ما بيفك BZip2 بدون مكتبة. الـ base هو searchText.');
 }
 async function getTafsir(){
   if(!db){document.getElementById('tafsirOut').textContent='حمّل ملف التفسير أولا';return;}
   let id=parseInt(document.getElementById('tid').value);
   try{
-    let res=db.exec("SELECT data, searchText FROM Tafsir WHERE id="+id);
-    if(!res.length){document.getElementById('tafsirOut').textContent='ما في تفسير بهالـ ID';return;}
+    // DEX: SELECT data, searchText FROM Tafsir WHERE id = ? LIMIT 1
+    let res=db.exec("SELECT data, searchText FROM Tafsir WHERE id="+id+" LIMIT 1");
+    if(!res.length || !res[0].values.length){document.getElementById('tafsirOut').textContent='ما في تفسير بهالـ ID';return;}
     let blob=res[0].values[0][0];
     let search=res[0].values[0][1];
     let bytes=new Uint8Array(blob);
-    let idx=findBSDIFF(bytes);
-    if(idx===-1){
-      let dec=await tryDecompress(blob);
-      document.getElementById('tafsirOut').textContent='الطريقة: '+dec.how+'\nsearchText: '+search+'\n\n'+dec.text.slice(0,4000);
-      return;
-    }
-    // في BSDIFF40 جوات الـ Blob
-    let firstPart=new TextDecoder().decode(bytes.slice(0,idx));
-    let patch=bytes.slice(idx, idx+32);
-    let ctrlLen=readInt64LE(patch,8), diffLen=readInt64LE(patch,16), newSize=readInt64LE(patch,24);
-    let out='الطريقة: مخلوط - أول جزء UTF-8 + بعدين BSDIFF40 patch\n';
-    out+='searchText: '+search+'\n';
-    out+='مكان الـ BSDIFF40: بايت '+idx+' من أصل '+bytes.length+'\n';
-    out+='معلومات الـ Patch: ctrlLen='+ctrlLen+' diffLen='+diffLen+' newSize='+newSize+'\n';
+    let dec=decodeTafsirBlob(blob, search);
+    let out='الطريقة: '+dec.how+'\n';
+    out+='isBsDiff (أول 8 بايت فقط): '+(isBsDiff(bytes)?'نعم - BSDIFF40':'لا')+'\n';
+    out+='searchText (هو الـ base): '+(search||'').slice(0,300)+'\n';
+    out+='طول الـ Blob: '+bytes.length+' بايت\n';
     out+='------------------------------------------------\n';
-    out+='الجزء الأول - مفكوك كامل:\n'+firstPart.slice(0,4000)+'\n';
-    out+='------------------------------------------------\n';
-    out+='الجزء الثاني - مش نص، هو BSDIFF40 patch ثنائي.\n';
-    out+='هيدا Patch يعني فرق، مش نص كامل. لازم يتطبق على ملف الأساس ليطلع النص الكامل.\n';
-    out+='لهيك الكود القديم كان عم يعرضو كخرابيط: كان عم يفك الـ Patch كأنو UTF-8.\n';
-    out+='الحل: ما تعرض الـ Patch كنص. خزن الـ Patch، وجيب ملف الأساس من السيرفر وطبقو عليه.\n';
-    out+='اذا كان الـ Patch هو تحديث لنفس التفسير، الأساس غالبا هو نفس الصف السابق أو نفس الملف قبل التحديث.\n';
+    out+=dec.text.slice(0,4000);
     document.getElementById('tafsirOut').textContent=out;
   }catch(e){document.getElementById('tafsirOut').textContent='فشل: '+e.message;}
+}
+async function scanTafsir(){
+  if(!db){document.getElementById('scanOut').textContent='حمّل ملف التفسير أولا';return;}
+  document.getElementById('scanOut').textContent='عم افحص...';
+  try{
+    let res=db.exec("SELECT id FROM Tafsir ORDER BY id LIMIT 20");
+    let ids=res[0].values.map(r=>r[0]);
+    let out='فحص '+dbName+' - أول 20 صف:\n';
+    for(let id of ids){
+      let r=db.exec("SELECT data FROM Tafsir WHERE id="+id);
+      let bytes=new Uint8Array(r[0].values[0][0]);
+      let idx=findBSDIFF(bytes);
+      if(idx===-1){
+        // جرب فك UTF-8 و شوف اذا طلع عربي
+        try{ let t=new TextDecoder().decode(bytes); let isArabic=/[\u0600-\u06FF]/.test(t.slice(0,500)); out+='ID '+id+': '+bytes.length+' بايت - '+(isArabic?'نص UTF-8 - مفكوك ✅':'مش عربي - مشكوك ❓')+'\n'; }
+        catch(e){ out+='ID '+id+': فشل UTF-8\n'; }
+      } else {
+        out+='ID '+id+': '+bytes.length+' بايت - فيه BSDIFF40 بالبايت '+idx+' - Patch ⚠️ مش نص كامل\n';
+      }
+    }
+    out+='\nالخلاصة: اللي مكتوب ✅ فك، اللي مكتوب ⚠️ بدو تطبيق Patch على الأساس.';
+    document.getElementById('scanOut').textContent=out;
+  }catch(e){ document.getElementById('scanOut').textContent='فشل الفحص: '+e.message; }
 }
 function pad(n){return String(n).padStart(3,'0');}
 function buildAudio(){let rec=document.getElementById('rec').value;let s=parseInt(document.getElementById('sura').value);let f=parseInt(document.getElementById('fromA').value);let t=parseInt(document.getElementById('toA').value);let h='';for(let a=f;a<=t;a++){let url=storage()+'/audio/'+rec+'/'+pad(s)+pad(a)+'.mp3';h+='<div><b>'+s+':'+a+'</b><br><a href="'+url+'" target="_blank">'+url+'</a><br><audio controls src="'+url+'" style="width:100%"></audio><br><a href="'+url+'" download><button>حمّل هالآية</button></a></div><hr>';}document.getElementById('audioList').innerHTML=h;}
