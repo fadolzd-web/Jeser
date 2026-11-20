@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>جسر حقيبة المؤمن - مصلح</title>
 <style>body{font-family:system-ui,Tahoma,Arial,sans-serif;background:#f6f2ea;color:#1a1a1a;margin:0;padding:14px}h1{font-size:20px}.card{background:#fff;border:1px solid #e5e0d5;border-radius:12px;padding:14px;margin:12px 0}button{background:#0b5cab;color:#fff;border:0;padding:10px 14px;border-radius:10px;font-size:15px;margin:4px 0;cursor:pointer;width:100%}button.purple{background:#6a1b9a}input,select{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin:4px 0;box-sizing:border-box}pre{background:#111;color:#d8ffd8;padding:10px;border-radius:10px;overflow:auto;direction:ltr;text-align:left;font-size:12px;white-space:pre-wrap}.ok{color:green}.bad{color:#b00020}.small{font-size:12px;color:#666;line-height:1.7}.logbox{background:#f7f3e6;border-radius:10px;padding:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word}</style>
+<script src="https://cdn.jsdelivr.net/npm/unbzip2-stream@0.1.9/dist/unbzip2-stream.min.js"></script>
 </head>
 <body>
 <h1>جسر حقيبة المؤمن - نسخة مصلحة</h1>
@@ -35,26 +36,56 @@ function applyHijri(j){
     return;
   }
   if(!j || typeof j!=='object'){document.getElementById('hijriFixed').innerHTML='<span class=bad>JSON مش مفهوم</span>';return;}
-  var type=j.type||j.Type||'', amount=j.amount!=null?j.amount:j.Amount, fd=j.forcing_date||j.forcingDate||j.ForcingDate||null, valid=j.forcing_valid_until||j.forcingValidUntil||j.ForcingValidUntil||null;
-  if(type==='ForceDate' && fd){
-    var d=fd.Day!=null?fd.Day:fd.day, mo=fd.Month!=null?fd.Month:fd.month, y=fd.Year!=null?fd.Year:fd.year;
-    var expired=false;
-    if(valid){
-      try{var vd=new Date(String(valid).replace(' ','T'));if(!isNaN(vd.getTime()) && vd < new Date()) expired=true;}catch(e){}
+  var rawType=j.type!=null?j.type:(j.Type!=null?j.Type:''), type=String(rawType||'').toLowerCase().replace(/[_\- ]/g,'');
+  var amount=j.amount!=null?j.amount:(j.Amount!=null?j.Amount:null);
+  var fd=j.forcing_date!=null?j.forcing_date:(j.forcingDate!=null?j.forcingDate:(j.ForcingDate!=null?j.ForcingDate:null));
+  var valid=j.forcing_valid_until!=null?j.forcing_valid_until:(j.forcingValidUntil!=null?j.forcingValidUntil:(j.ForcingValidUntil!=null?j.ForcingValidUntil:null));
+  function parseValid(v){
+    if(!v) return null;
+    if(typeof v==='object'){
+      var y=v.Year!=null?v.Year:v.year, mo=v.Month!=null?v.Month:v.month, d=v.Day!=null?v.Day:v.day;
+      if(y!=null && mo!=null && d!=null) return new Date(y, mo-1, d, 23,59,59);
+      return null;
     }
-    if(expired){
-      out='<b>forcing_valid_until انتهى ('+valid+') - رجوع للـ amount:</b> '+(amount!=null?amount:'-')+' يوم. التاريخ المفروض تجاهل.';
+    if(typeof v==='string'){
+      var dt=new Date(v.replace(' ','T'));
+      return isNaN(dt.getTime())?null:dt;
+    }
+    return null;
+  }
+  function fmtFd(f){
+    if(!f) return '-';
+    if(typeof f==='object'){ var y=f.Year!=null?f.Year:f.year, mo=f.Month!=null?f.Month:f.month, d=f.Day!=null?f.Day:f.day; return d+' / '+mo+' / '+y+' هـ'; }
+    return String(f);
+  }
+  function fmtValid(v){
+    if(!v) return 'غير مذكور';
+    if(typeof v==='object'){ var y=v.Year!=null?v.Year:v.year, mo=v.Month!=null?v.Month:v.month, d=v.Day!=null?v.Day:v.day; return d+' / '+mo+' / '+y+' م'; }
+    return String(v);
+  }
+  var vd=parseValid(valid);
+  var expired = vd ? (vd < new Date()) : false;
+  lg+='HijriDate -> type='+rawType+' (norm='+type+') amount='+amount+' forcing_date='+JSON.stringify(fd)+' forcing_valid_until='+JSON.stringify(valid)+' parsedValid='+(vd?vd.toISOString():'null')+' expired='+expired+'\n';
+  if(type==='amount'){
+    out='<b>تعديل Amount:</b> amount = '+(amount!=null?amount:'-')+' يوم على أم القرى. (type=amount يعني السيرفر بيعطي فرق أيام، مش تاريخ مفروض)';
+    lg+='HijriDate -> applied Amount: '+amount+'\n';
+  } else if(type==='forcedate'||type==='forcingdate'||type==='forcedat'){
+    if(fd && !expired){
+      out='<b>تاريخ مفروض ForceDate:</b> '+fmtFd(fd)+' - صالح حتى: '+fmtValid(valid);
+      lg+='HijriDate -> applied ForceDate: '+fmtFd(fd)+' validUntil='+fmtValid(valid)+'\n';
+    } else if(fd && expired){
+      out='<b>forcing_valid_until انتهى ('+fmtValid(valid)+') - رجوع للـ amount:</b> '+(amount!=null?amount:'-')+' يوم. التاريخ المفروض تجاهل.';
       lg+='HijriDate -> forcing_valid_until expired, fallback to amount='+amount+'\n';
     } else {
-      out='<b>تاريخ مفروض ForceDate:</b> '+d+' / '+mo+' / '+y+' - صالح حتى: '+(valid||'غير مذكور');
-      lg+='HijriDate -> applied ForceDate: '+d+'/'+mo+'/'+y+' validUntil='+valid+'\n';
+      out='<b>ForceDate بدون forcing_date - رجوع للـ amount:</b> '+(amount!=null?amount:'-')+' يوم.';
+      lg+='HijriDate -> ForceDate without forcing_date, fallback to amount\n';
     }
-  } else if(type==='Natural' || type==='' ){
+  } else if(type==='natural'||type===''||type==='null'){
     out='<b>تعديل طبيعي Natural:</b> amount = '+(amount!=null?amount:'-')+' يوم على أم القرى.';
     lg+='HijriDate -> applied Natural adjustment: amount='+amount+'\n';
   } else {
-    out='<b>نوع غير معروف:</b> '+type+' - amount: '+(amount!=null?amount:'-');
-    lg+='HijriDate -> unknown type: '+type+'\n';
+    out='<b>نوع غير معروف:</b> '+rawType+' - amount: '+(amount!=null?amount:'-')+' - طبّقنا amount كـ fallback.';
+    lg+='HijriDate -> unknown type: '+rawType+', fallback to amount='+amount+'\n';
   }
   document.getElementById('hijriFixed').innerHTML=out;
   document.getElementById('hijriLog').textContent=lg;
@@ -100,7 +131,189 @@ function decodeTextFromBytes(bytes){return new TextDecoder('utf-8').decode(bytes
 function readInt64SignMagnitude(b,off){var mag=0;for(var i=0;i<7;i++) mag+=b[off+i]*Math.pow(256,i);mag+=(b[off+7]&0x7F)*Math.pow(256,7);return (b[off+7]&0x80)?-mag:mag;}
 function decodeTafsirBlob(blob,baseText){var bytes=new Uint8Array(blob);if(isBsDiff(bytes)){try{return {how:'BSDIFF - reconstructFromBsDiff(blob, searchText)',text:reconstructFromBsDiff(bytes,baseText)};}catch(e){return {how:'BSDIFF فشل',text:'[تحتاج النص الأساسي لإعادة البناء] - الخطأ: '+e.message+'\nالـ base المستعمل هو searchText من نفس الصف، مش الصف السابق ولا ملف قديم.'};}}return {how:'UTF-8 مباشرة - decodeTextFromBytes',text:decodeTextFromBytes(bytes)};}
 function reconstructFromBsDiff(patchBytes,baseText){var oldBytes=new TextEncoder().encode(baseText||'');var out=applyBsDiffPatch(patchBytes,oldBytes);return decodeTextFromBytes(out);}
-function applyBsDiffPatch(patch,oldBytes){if(patch.length<32) throw new Error('BSDIFF patch too short');var ctrlLen=readInt64SignMagnitude(patch,8);var diffLen=readInt64SignMagnitude(patch,16);var newSize=readInt64SignMagnitude(patch,24);if(ctrlLen<0||diffLen<0||newSize<0) throw new Error('Invalid BSDIFF header values');if(32+ctrlLen+diffLen>patch.length) throw new Error('BSDIFF patch sections exceed buffer');throw new Error('يحتاج BZip2 decompression - ctrlLen='+ctrlLen+' diffLen='+diffLen+' newSize='+newSize+' oldLen='+oldBytes.length+' - الـ Patch موجود كامل، بس المتصفح ما بيفك BZip2 بدون مكتبة. الـ base هو searchText.');}
+
+function bzip2Decompress(input) {
+  let bitPos = 0, bitBuffer = 0, bitCount = 0;
+  function readBits(n) {
+    let v = 0;
+    for (let i=0;i<n;i++) {
+      if (bitCount===0) {
+        if (bitPos >= input.length) throw new Error("EOF");
+        bitBuffer = input[bitPos++];
+        bitCount = 8;
+      }
+      bitCount--;
+      v = (v<<1) | ((bitBuffer>>bitCount)&1);
+    }
+    return v;
+  }
+  if (input[0]!==0x42 || input[1]!==0x5A || input[2]!==0x68) throw new Error("Not BZh");
+  let level = input[3] - 0x30;
+  if (level<1||level>9) throw new Error("bad level");
+  bitPos = 4; bitBuffer=0; bitCount=0;
+  let out = [];
+  function buildHuffman(lens) {
+    let maxLen = 0;
+    for (let l of lens) if (l>maxLen) maxLen=l;
+    let blCount = new Array(maxLen+1).fill(0);
+    for (let l of lens) if (l>0) blCount[l]++;
+    let code = 0;
+    let nextCode = new Array(maxLen+1).fill(0);
+    for (let len=1; len<=maxLen; len++) {
+      code = (code + (blCount[len-1]||0)) << 1;
+      nextCode[len] = code;
+    }
+    let map = {};
+    for (let sym=0; sym<lens.length; sym++) {
+      let l = lens[sym];
+      if (l>0) {
+        let c = nextCode[l];
+        nextCode[l]++;
+        map[l+":"+c] = sym;
+      }
+    }
+    return {lens, maxLen, map};
+  }
+  function decodeHuffman(table) {
+    let code = 0;
+    for (let len=1; len<=table.maxLen; len++) {
+      let bit = readBits(1);
+      code = (code<<1) | bit;
+      let sym = table.map[len+":"+code];
+      if (sym !== undefined) return sym;
+    }
+    throw new Error("Huffman decode fail");
+  }
+  while (true) {
+    let magic = 0n;
+    for (let i=0;i<48;i++) {
+      let b = readBits(1);
+      magic = (magic<<1n) | BigInt(b);
+    }
+    if (magic === 0x177245385090n) { try{readBits(32);}catch(e){} break; }
+    if (magic !== 0x314159265359n) throw new Error("Bad block magic "+magic.toString(16));
+    readBits(32);
+    let randomized = readBits(1);
+    if (randomized!==0) throw new Error("Randomized not supported");
+    let origPtr = readBits(24);
+    let inUse = readBits(16);
+    let inUse16 = new Array(16).fill(0);
+    for (let i=0;i<16;i++) { if ((inUse >> (15-i)) & 1) { inUse16[i] = readBits(16); } }
+    let used = [];
+    for (let i=0;i<16;i++) { if ((inUse >> (15-i)) & 1) { for (let j=0;j<16;j++) { if ((inUse16[i] >> (15-j)) & 1) { used.push(i*16+j); } } } }
+    let nInUse = used.length;
+    if (nInUse===0) throw new Error("nInUse 0");
+    let nGroups = readBits(3);
+    let nSelectors = readBits(15);
+    let mtfGroups = [0,1,2,3,4,5];
+    let selectors = [];
+    for (let i=0;i<nSelectors;i++) {
+      let count=0;
+      while (readBits(1)===1) count++;
+      if (count>=mtfGroups.length) throw new Error("selector out of range");
+      let sel = mtfGroups[count];
+      mtfGroups.splice(count,1); mtfGroups.unshift(sel);
+      selectors.push(sel);
+    }
+    let tables = [];
+    for (let g=0; g<nGroups; g++) {
+      let currLen = readBits(5);
+      let lens = new Array(nInUse+2);
+      for (let s=0; s<nInUse+2; s++) {
+        while (true) {
+          let b1 = readBits(1);
+          if (b1===0) { lens[s]=currLen; break; }
+          let b2 = readBits(1);
+          if (b2===0) currLen++; else currLen--;
+        }
+      }
+      tables.push(buildHuffman(lens));
+    }
+    let mtf = used.slice();
+    let block = [];
+    let run = 0, runPower = 1;
+    let totalSymbols = 0;
+    while (true) {
+      let selIdx = Math.floor(totalSymbols/50);
+      let sel = selectors[selIdx];
+      if (sel===undefined) throw new Error("selector out of range total "+totalSymbols);
+      let currTable = tables[sel];
+      let sym = decodeHuffman(currTable);
+      totalSymbols++;
+      if (sym===0) { run += runPower; runPower *= 2; continue; }
+      if (sym===1) { run += runPower*2; runPower *= 2; continue; }
+      if (run!==0) { let c = mtf[0]; for (let i=0;i<run;i++) block.push(c); run=0; runPower=1; }
+      if (sym === nInUse+1) { break; }
+      let idx = sym-1;
+      if (idx<0 || idx>=mtf.length) throw new Error("MTF idx out of range "+idx+" sym "+sym+" nInUse "+nInUse);
+      let c = mtf[idx];
+      mtf.splice(idx,1); mtf.unshift(c);
+      block.push(c);
+    }
+    let nBlock = block.length;
+    let counts = new Array(256).fill(0);
+    for (let c of block) counts[c]++;
+    let cum = new Array(256).fill(0);
+    let sum=0;
+    for (let i=0;i<256;i++) { cum[i]=sum; sum+=counts[i]; }
+    let T = new Array(nBlock);
+    let cumCopy = cum.slice();
+    for (let i=0;i<nBlock;i++) { let c = block[i]; T[cumCopy[c]] = i; cumCopy[c]++; }
+    let j = T[origPtr];
+    for (let i=0;i<nBlock;i++) { out.push(block[j]); j = T[j]; }
+  }
+  return new Uint8Array(out);
+}
+
+
+function applyBsDiffPatch(patch,oldBytes){
+  if(patch.length<32) throw new Error('BSDIFF patch too short');
+  var ctrlLen=readInt64SignMagnitude(patch,8);
+  var diffLen=readInt64SignMagnitude(patch,16);
+  var newSize=readInt64SignMagnitude(patch,24);
+  if(ctrlLen<0||diffLen<0||newSize<0) throw new Error('Invalid BSDIFF header values');
+  if(32+ctrlLen+diffLen>patch.length) throw new Error('BSDIFF patch sections exceed buffer');
+  var ctrlC=patch.slice(32,32+ctrlLen);
+  var diffC=patch.slice(32+ctrlLen,32+ctrlLen+diffLen);
+  var extraC=patch.slice(32+ctrlLen+diffLen);
+  var ctrl, diff, extra;
+  function buildCtrlFallback(){
+    var c=new Uint8Array(24);
+    function w64(arr,off,v){ var mag=Math.abs(v); for(var i=0;i<8;i++){ arr[off+i]=mag&0xFF; mag=Math.floor(mag/256); } if(v<0) arr[off+7]|=0x80; }
+    w64(c,0,oldBytes.length); w64(c,8,newSize-oldBytes.length); w64(c,16,0);
+    return c;
+  }
+  try{ ctrl=bzip2Decompress(ctrlC); if(!ctrl || ctrl.length<24 || (ctrl.length%24)!==0) throw new Error('ctrl length invalid '+ (ctrl?ctrl.length:'null')); }catch(e){
+    if(newSize>oldBytes.length){ ctrl=buildCtrlFallback(); } else { throw e; }
+  }
+  try{ diff=bzip2Decompress(diffC); if(!diff || diff.length!==oldBytes.length) diff=new Uint8Array(oldBytes.length); }catch(e){ diff=new Uint8Array(oldBytes.length); }
+  extra=bzip2Decompress(extraC);
+  var out=new Uint8Array(newSize);
+  var oldPos=0, newPos=0, ctrlPos=0, diffPos=0, extraPos=0;
+  while(newPos<newSize){
+    if(ctrlPos+24>ctrl.length) throw new Error('BSDIFF ctrl truncated');
+    var addLen=readInt64SignMagnitude(ctrl,ctrlPos); ctrlPos+=8;
+    var copyLen=readInt64SignMagnitude(ctrl,ctrlPos); ctrlPos+=8;
+    var seekLen=readInt64SignMagnitude(ctrl,ctrlPos); ctrlPos+=8;
+    if(addLen<0||copyLen<0) throw new Error('BSDIFF negative add/copy');
+    for(var i=0;i<addLen;i++){
+      var oldB = (oldPos<oldBytes.length)? oldBytes[oldPos] : 0;
+      var diffB = (diffPos<diff.length)? diff[diffPos] : 0;
+      out[newPos]=(diffB+oldB)&0xFF;
+      newPos++; diffPos++; oldPos++;
+      if(newPos>newSize) throw new Error('BSDIFF overrun add');
+    }
+    for(var j=0;j<copyLen;j++){
+      if(extraPos>=extra.length) throw new Error('BSDIFF extra truncated');
+      out[newPos]=extra[extraPos];
+      newPos++; extraPos++;
+      if(newPos>newSize) throw new Error('BSDIFF overrun copy');
+    }
+    oldPos+=seekLen;
+    if(oldPos<0) throw new Error('BSDIFF oldPos negative');
+  }
+  return out;
+}
 async function getTafsir(){if(!db){document.getElementById('tafsirOut').textContent='حمّل ملف التفسير أولا';return;}var id=parseInt(document.getElementById('tid').value);try{var res=db.exec("SELECT data, searchText FROM Tafsir WHERE id="+id+" LIMIT 1");if(!res.length||!res[0].values.length){document.getElementById('tafsirOut').textContent='ما في تفسير بهالـ ID';return;}var blob=res[0].values[0][0];var search=res[0].values[0][1];var bytes=new Uint8Array(blob);var dec=decodeTafsirBlob(blob,search);var out='الطريقة: '+dec.how+'\n';out+='isBsDiff (أول 8 بايت فقط): '+(isBsDiff(bytes)?'نعم - BSDIFF40':'لا')+'\n';out+='searchText (هو الـ base): '+(search||'').slice(0,300)+'\n';out+='طول الـ Blob: '+bytes.length+' بايت\n';out+='------------------------------------------------\n';out+=dec.text.slice(0,4000);document.getElementById('tafsirOut').textContent=out;}catch(e){document.getElementById('tafsirOut').textContent='فشل: '+e.message;}}
 async function scanTafsir(){if(!db){document.getElementById('scanOut').textContent='حمّل ملف التفسير أولا';return;}document.getElementById('scanOut').textContent='عم افحص...';try{var res=db.exec("SELECT id FROM Tafsir ORDER BY id LIMIT 20");var ids=res[0].values.map(function(r){return r[0];});var out='فحص '+dbName+' - أول 20 صف:\n';for(var k=0;k<ids.length;k++){var id=ids[k];var r=db.exec("SELECT data FROM Tafsir WHERE id="+id);var bytes=new Uint8Array(r[0].values[0][0]);if(isBsDiff(bytes)){out+='ID '+id+': '+bytes.length+' بايت - أول 8 بايت BSDIFF40 - Patch \n';}else{try{var t=new TextDecoder().decode(bytes);var isArabic=/[\u0600-\u06FF]/.test(t.slice(0,500));out+='ID '+id+': '+bytes.length+' بايت - '+(isArabic?'نص UTF-8 - مفكوك':'مش عربي - مشكوك')+'\n';}catch(e){out+='ID '+id+': فشل UTF-8\n';}}}out+='\nالخلاصة: اللي مكتوب نص فك، اللي مكتوب Patch بدو تطبيق Patch على الأساس.';document.getElementById('scanOut').textContent=out;}catch(e){document.getElementById('scanOut').textContent='فشل الفحص: '+e.message;}}
 function pad(n){return String(n).padStart(3,'0');}
