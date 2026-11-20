@@ -45,6 +45,7 @@ th{background:#f7f3e6}
 .pill b{display:block;font-size:12px;color:#555}
 .logbox{background:#f7f3e6;border-radius:10px;padding:10px;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#111}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
 </head>
 <body>
 <h1>الجسر الموحد</h1>
@@ -405,11 +406,29 @@ function sg_renderDay(){if(!SG_CUR) {sg_$('sg_viewDay').innerHTML='<div class="m
 function sg_findDay(month,day){let mm=(SG_CITY.months||[]).find(x=>x.month===month); if(!mm) return null; return mm.days.find(x=>x.day===day)||null;}
 function sg_prevDay(){if(!SG_CUR) return; let dt=new Date(2026,SG_CURMONTH-1,SG_CUR.day); dt.setDate(dt.getDate()-1); SG_CUR=sg_findDay(dt.getMonth()+1,dt.getDate()); SG_CURMONTH=dt.getMonth()+1; sg_renderDay();}
 function sg_nextDay(){if(!SG_CUR) return; let dt=new Date(2026,SG_CURMONTH-1,SG_CUR.day); dt.setDate(dt.getDate()+1); SG_CUR=sg_findDay(dt.getMonth()+1,dt.getDate()); SG_CURMONTH=dt.getMonth()+1; sg_renderDay();}
-function sg_renderMonth(){if(!SG_CITY){sg_$('sg_viewMonth').innerHTML='اجلب مدينة أولاً'; return;} let sel=sg_$('sg_monthSel')?parseInt(sg_$('sg_monthSel').value,10):SG_CURMONTH; let mm=(SG_CITY.months||[]).find(x=>x.month===sel); if(!mm){sg_$('sg_viewMonth').innerHTML='لا يوجد شهر '+sel; return;} let opts=(SG_CITY.months||[]).map(x=>'<option value="'+x.month+'" '+(x.month===sel?'selected':'')+'>'+x.month+' - '+(x.days[0]?x.days[0].monthNameAr:'')+'</option>').join(''); sg_$('sg_viewMonth').innerHTML='<h2>إمساكية الشهر - '+sg_esc(mm.days[0].monthNameAr)+' 2026</h2><select id="monthSel" onchange="sg_renderMonth()">'+opts+'</select><div style="overflow:auto"><table><tr><th>اليوم</th><th>التاريخ</th><th>هجري</th><th>إمساك</th><th>صبح</th><th>شروق</th><th>ظهر</th><th>عصر 1</th><th>مغرب</th><th>عشاء</th></tr>'+mm.days.map(d=>'<tr><td>'+sg_num(d.day)+'</td><td>'+sg_num(d.date)+'</td><td>'+sg_num(d.hijriDate)+'</td><td>'+sg_num(d.imsakTime)+'</td><td>'+sg_num(d.subhTime)+'</td><td>'+sg_num(d.sunriseTime)+'</td><td>'+sg_num(d.dhuhrTime)+'</td><td>'+sg_num(d.asrTime_1)+'</td><td>'+sg_num(d.maghrebTime)+'</td><td>'+sg_num(d.ishaTime)+'</td></tr>').join('')+'</table></div>';}
-function sg_renderYear(){if(!SG_CITY){sg_$('sg_viewYear').innerHTML='اجلب مدينة أولاً'; return;} sg_$('sg_viewYear').innerHTML='<h2>تقويم السنة - 2026</h2><div class="grid">'+(SG_CITY.months||[]).map(mm=>{let f=mm.days[0],l=mm.days[mm.days.length-1]; return '<div class="pill" style="cursor:pointer" onclick="document.getElementById(\'monthSel\').value='+mm.month+';sg_show(\'month\')"><b>'+sg_esc(f.monthNameAr)+' - شهر '+sg_num(mm.month)+'</b><span>'+mm.days.length+' يوم</span><div class="mut">من '+sg_esc(f.hijriDate)+' إلى '+sg_esc(l.hijriDate)+'</div></div>'}).join('')+'</div>';}
-async function sg_loadExtra(kind){let box=sg_$('sg_extraBox'); box.innerHTML='جارٍ الجلب...'; try{let url='',d; let cityEn=SG_CITY?SG_CITY.city:SG_CITY; let countryEn=SG_CITY?SG_CITY.country_en:''; if(kind==='events'){url='https://api.sayeghcalendar.com/events/'+countryEn; d=await sg_get(url);} else if(kind==='crescent'){url='https://api.sayeghcalendar.com/crescent/'+cityEn+'/'+SG_CURMONTH; d=await sg_get(url);} else if(kind==='tide'){url='https://api.sayeghcalendar.com/tidewave/'+countryEn; d=await sg_get(url);} else if(kind==='moon'){let w=sg_$('sg_moonWhich').value; url='https://api.sayeghcalendar.com/moon/'+w; d=await sg_get(url);} else if(kind==='hijri'){url='https://api.sayeghcalendar.com/hijri-calendar/2026'; d=await sg_get(url);} box.innerHTML='<div class="mut">المصدر: '+sg_esc(url)+'</div><div style="margin-top:8px">'+sg_renderObj(d)+'</div>';}catch(e){box.innerHTML='<div class="err">غير متوفر من السيرفر: '+sg_esc(e.message)+'</div>';}}
+function sg_renderMonth(){if(!SG_CITY){sg_$('sg_viewMonth').innerHTML='اجلب مدينة أولاً'; return;} let sel=sg_$('sg_monthSel')?parseInt(sg_$('sg_monthSel').value,10):SG_CURMONTH; let mm=(SG_CITY.months||[]).find(x=>x.month===sel); if(!mm){sg_$('sg_viewMonth').innerHTML='لا يوجد شهر '+sel; return;} let opts=(SG_CITY.months||[]).map(x=>'<option value="'+x.month+'" '+(x.month===sel?'selected':'')+'>'+x.month+' - '+(x.days[0]?x.days[0].monthNameAr:'')+'</option>').join(''); sg_$('sg_viewMonth').innerHTML='<h2>إمساكية الشهر - '+sg_esc(mm.days[0].monthNameAr)+' 2026</h2><select id="sg_monthSel" onchange="sg_renderMonth()">'+opts+'</select><div style="overflow:auto"><table><tr><th>اليوم</th><th>التاريخ</th><th>هجري</th><th>إمساك</th><th>صبح</th><th>شروق</th><th>ظهر</th><th>عصر 1</th><th>مغرب</th><th>عشاء</th></tr>'+mm.days.map(d=>'<tr><td>'+sg_num(d.day)+'</td><td>'+sg_num(d.date)+'</td><td>'+sg_num(d.hijriDate)+'</td><td>'+sg_num(d.imsakTime)+'</td><td>'+sg_num(d.subhTime)+'</td><td>'+sg_num(d.sunriseTime)+'</td><td>'+sg_num(d.dhuhrTime)+'</td><td>'+sg_num(d.asrTime_1)+'</td><td>'+sg_num(d.maghrebTime)+'</td><td>'+sg_num(d.ishaTime)+'</td></tr>').join('')+'</table></div>';}
+function sg_renderYear(){if(!SG_CITY){sg_$('sg_viewYear').innerHTML='اجلب مدينة أولاً'; return;} sg_$('sg_viewYear').innerHTML='<h2>تقويم السنة - 2026</h2><div class="grid">'+(SG_CITY.months||[]).map(mm=>{let f=mm.days[0],l=mm.days[mm.days.length-1]; return '<div class="pill" style="cursor:pointer" onclick="document.getElementById(\'sg_monthSel\').value='+mm.month+';sg_show(\'month\')"><b>'+sg_esc(f.monthNameAr)+' - شهر '+sg_num(mm.month)+'</b><span>'+mm.days.length+' يوم</span><div class="mut">من '+sg_esc(f.hijriDate)+' إلى '+sg_esc(l.hijriDate)+'</div></div>'}).join('')+'</div>';}
+async function sg_loadExtra(kind){
+  let box=document.getElementById('sg_extraBox');
+  if(!box) box=document.getElementById('sg_viewExtra');
+  if(box) box.innerHTML='جارٍ الجلب...';
+  try{
+    if(!SG_CITY){ if(box) box.innerHTML='<div class="err">اجلب مدينة أولاً - الإضافات تحتاج مدينة. اكبس جلب من السيرفر فوق.</div>'; return; }
+    let url='',d;
+    let cityEn=SG_CITY?SG_CITY.city:'';
+    let countryEn=SG_CITY?SG_CITY.country_en:'';
+    if(kind==='events'){url='https://api.sayeghcalendar.com/events/'+countryEn; d=await sg_get(url);}
+    else if(kind==='crescent'){url='https://api.sayeghcalendar.com/crescent/'+cityEn+'/'+SG_CURMONTH; d=await sg_get(url);}
+    else if(kind==='tide'){url='https://api.sayeghcalendar.com/tidewave/'+countryEn; d=await sg_get(url);}
+    else if(kind==='moon'){let mw=document.getElementById('sg_moonWhich'); let w=mw?mw.value:'zod'; url='https://api.sayeghcalendar.com/moon/'+w; d=await sg_get(url);}
+    else if(kind==='hijri'){url='https://api.sayeghcalendar.com/hijri-calendar/2026'; d=await sg_get(url);}
+    if(box) box.innerHTML='<div class="mut">المصدر: '+sg_esc(url)+'</div><div style="margin-top:8px">'+sg_renderObj(d)+'</div>';
+  }catch(e){
+    if(box) box.innerHTML='<div class="err">غير متوفر من السيرفر: '+sg_esc(e.message)+'</div><div class="mut">السيرفر قال فشل، ما في داتا مخترعة. جرب زر تاني، أو ارجع لتبويب اليوم وتأكد إنو المدينة انجلت.</div>';
+  }
+}
 function sg_renderObj(o){if(o==null) return '<span class="mut">-</span>'; if(Array.isArray(o)){if(o.length===0) return '<span class="mut">لا يوجد</span>'; if(o.every(x=>x==null||typeof x!=='object')) return o.map(x=>'<span class="badge" style="margin:2px">'+sg_esc(x)+'</span>').join(' '); return '<div class="mut">'+o.length+' عنصر</div>'+o.slice(0,30).map(x=>'<div style="border:1px solid #eee;border-radius:10px;padding:8px;margin:6px 0">'+sg_renderObj(x)+'</div>').join('');} if(typeof o==='object'){return '<table>'+Object.keys(o).map(k=>{let v=o[k]; let cell; if(v==null) cell='<span class="mut">-</span>'; else if(typeof v==='object') cell=sg_renderObj(v); else cell=sg_num(v); return '<tr><td style="font-weight:700;width:35%">'+sg_esc(k)+'</td><td>'+cell+'</td></tr>';}).join('')+'</table>';} return '<span class="num">'+sg_esc(o)+'</span>';}
-sg_$('sg_viewExtra').innerHTML='<h2>إضافات - من السيرفر فقط</h2><div class="row"><button onclick="sg_loadExtra(\'events\')">المناسبات</button><button class="off" onclick="sg_loadExtra(\'crescent\')">الهلال</button><button class="off" onclick="sg_loadExtra(\'tide\')">المد والجزر</button><button class="off" onclick="sg_loadExtra(\'hijri\')">التقويم الهجري</button><select id="moonWhich"><option value="man">القمر - منازل man</option><option value="zod">القمر - أبراج zod</option><option value="true">القمر - حقيقي true</option></select><button class="off" onclick="sg_loadExtra(\'moon\')">القمر</button></div><div id="extraBox" style="margin-top:10px"></div>';
+sg_$('sg_viewExtra').innerHTML='<h2>إضافات - من السيرفر فقط</h2><div class="row"><button onclick="sg_loadExtra(\'events\')">المناسبات</button><button class="off" onclick="sg_loadExtra(\'crescent\')">الهلال</button><button class="off" onclick="sg_loadExtra(\'tide\')">المد والجزر</button><button class="off" onclick="sg_loadExtra(\'hijri\')">التقويم الهجري</button><select id="sg_moonWhich"><option value="man">القمر - منازل man</option><option value="zod">القمر - أبراج zod</option><option value="true">القمر - حقيقي true</option></select><button class="off" onclick="sg_loadExtra(\'moon\')">القمر</button></div><div id="sg_extraBox" style="margin-top:10px"></div>';
 sg_loadCity();
 </script>
 <script>
@@ -491,9 +510,61 @@ async function hq_testConn(){
     hq_log('hijri-date/current: '+r.status,true);
   }catch(e){hq_log('فشل الاتصال: '+e.message,false);}
 }
-async function hq_getMeta(){try{var r=await fetch(hq_storage()+'/databases/database_metadata.json');var t=await r.text();document.getElementById('hq_metaRaw').textContent=t;hq_log('ميتاداتا نجحت',true);}catch(e){document.getElementById('hq_metaRaw').textContent='فشل: '+e.message;hq_log('ميتاداتا فشلت',false);}}
+async function hq_getMeta(){
+  var box=document.getElementById('hq_metaRaw');
+  var urls=[hq_storage()+'/databases/database_metadata.json', hq_stat()+'/databases/database_metadata.json'];
+  var lastErr='';
+  for(var i=0;i<urls.length;i++){
+    try{
+      var r=await fetch(urls[i]);
+      if(!r.ok){ lastErr='HTTP '+r.status+' من '+urls[i]; continue; }
+      var t=await r.text();
+      box.textContent='من: '+urls[i]+'\n'+t;
+      hq_log('ميتاداتا نجحت من '+urls[i],true);
+      return;
+    }catch(e){ lastErr=e.message+' من '+urls[i]; }
+  }
+  box.textContent='فشل الجلب المباشر من المتصفح (CORS غالباً): '+lastErr+'\n\nجرب افتح الرابط مباشرة بالكروم:\n'+urls.join('\n');
+  hq_log('ميتاداتا فشلت: '+lastErr,false);
+}
 var HQ_SQL=null, db=null, hq_dbName='';
-async function hq_dlTafsir(name){try{document.getElementById('hq_dlProg').textContent='عم نزّل '+name+'...';var r=await fetch(hq_stat()+'/databases/'+name);if(!r.ok) throw new Error('HTTP '+r.status);var buf=await r.arrayBuffer();document.getElementById('hq_dlProg').textContent='نزل '+(buf.byteLength/1024/1024).toFixed(2)+' MB';if(!HQ_SQL) HQ_SQL=await initSqlJs({locateFile:function(f){return 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f;}});db=new HQ_SQL.Database(new Uint8Array(buf));hq_dbName=name;var cols=db.exec("SELECT name FROM sqlite_master WHERE type='table'");document.getElementById('hq_dbInfo').innerHTML='<b>'+name+'</b> انفتح. الجداول: '+JSON.stringify(cols);try{var c=db.exec("SELECT COUNT(*) FROM Tafsir");document.getElementById('hq_dbInfo').innerHTML+='<br>عدد صفوف Tafsir: '+c[0].values[0][0];}catch(e){}hq_log(name+' نزل وانفتح',true);}catch(e){document.getElementById('hq_dlProg').textContent='فشل: '+e.message;hq_log(name+' فشل: '+e.message,false);}}
+async function hq_dlTafsir(name){
+  var prog=document.getElementById('hq_dlProg');
+  var info=document.getElementById('hq_dbInfo');
+  prog.textContent='عم نزّل '+name+'...';
+  var urls=[hq_storage()+'/databases/'+name, hq_stat()+'/databases/'+name];
+  var buf=null, usedUrl='', lastErr='';
+  for(var i=0;i<urls.length;i++){
+    try{
+      prog.textContent='عم يجرب: '+urls[i]+' ...';
+      var r=await fetch(urls[i]);
+      if(!r.ok){ lastErr='HTTP '+r.status+' من '+urls[i]; continue; }
+      buf=await r.arrayBuffer();
+      usedUrl=urls[i];
+      break;
+    }catch(e){ lastErr=e.message+' من '+urls[i]; }
+  }
+  if(!buf){
+    prog.textContent='فشل الجلب المباشر: '+lastErr;
+    info.innerHTML='المتصفح منع الجلب المباشر (CORS) من file:// - هيدا منع من المتصفح، مش من السيرفر.<br>افتح الرابط مباشرة بالكروم لتنزيل الملف، وبعدين ارجع لهون:<br><a href="'+urls[0]+'" target="_blank">'+urls[0]+'</a><br><a href="'+urls[1]+'" target="_blank">'+urls[1]+'</a>';
+    hq_log(name+' فشل: '+lastErr,false);
+    return;
+  }
+  try{
+    prog.textContent='نزل '+(buf.byteLength/1024/1024).toFixed(2)+' MB من '+usedUrl;
+    if(typeof initSqlJs==='undefined'){ prog.textContent+=' - مكتبة sql.js ما تحملت. افتح الصفحة أونلاين أو حدّث الصفحة.'; info.innerHTML='مكتبة sql.js ما تحملت.<br><a href="'+usedUrl+'" target="_blank">رابط الملف المباشر</a>'; return; }
+    if(!HQ_SQL) HQ_SQL=await initSqlJs({locateFile:function(f){return 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f;}});
+    db=new HQ_SQL.Database(new Uint8Array(buf));
+    hq_dbName=name;
+    var cols=db.exec("SELECT name FROM sqlite_master WHERE type='table'");
+    info.innerHTML='<b>'+name+'</b> انفتح من '+usedUrl+'. الجداول: '+JSON.stringify(cols);
+    try{var c=db.exec("SELECT COUNT(*) FROM Tafsir"); info.innerHTML+='<br>عدد صفوف Tafsir: '+c[0].values[0][0];}catch(e){}
+    hq_log(name+' نزل وانفتح من '+usedUrl,true);
+  }catch(e){
+    prog.textContent='فشل فتح قاعدة البيانات: '+e.message;
+    hq_log(name+' فشل فتح: '+e.message,false);
+  }
+}
 function hq_isBsDiff(bytes){if(!bytes||bytes.length<8) return false;return bytes[0]===0x42&&bytes[1]===0x53&&bytes[2]===0x44&&bytes[3]===0x49&&bytes[4]===0x46&&bytes[5]===0x46&&bytes[6]===0x34&&bytes[7]===0x30;}
 function hq_decodeTextFromBytes(bytes){return new TextDecoder('utf-8').decode(bytes);}
 function hq_readInt64(b,off){var mag=0;for(var i=0;i<7;i++) mag+=b[off+i]*Math.pow(256,i);mag+=(b[off+7]&0x7F)*Math.pow(256,7);return (b[off+7]&0x80)?-mag:mag;}
