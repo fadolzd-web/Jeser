@@ -43,6 +43,23 @@ label{font-size:14px;color:#555}
 </div>
 
 <div class="card">
+<h2>التاريخ الهجري والميلادي — من الموقع نفسه</h2>
+<p>ميلادي من الموقع: <b id="miladiSite">—</b></p>
+<p>هجري من الموقع: <b id="hijriSite">—</b></p>
+<p id="hijriStatus" style="font-size:13px;color:#666"></p>
+<button class="main" style="background:#0b2e1f;color:#fff" onclick="fetchHijriMiladi()">جلب التاريخ الهجري والميلادي</button>
+<pre id="hijriLog" style="margin-top:10px">بانتظار الجلب...</pre>
+</div>
+
+<div class="card">
+<h2>آخر بيان استهلال — من الموقع نفسه</h2>
+<div id="istihlalBox" style="font-size:15px;line-height:1.9">بانتظار الجلب...</div>
+<p id="istihlalStatus" style="font-size:13px;color:#666"></p>
+<button class="main" style="background:#0b2e1f;color:#fff" onclick="fetchIstihlal()">جلب آخر بيان استهلال</button>
+<pre id="istihlalLog" style="margin-top:10px">بانتظار الجلب...</pre>
+</div>
+
+<div class="card">
 <h2>مواقيت الصلاة</h2>
 <div class="times" id="times"></div>
 <p id="extra" style="font-size:14px;color:#333;line-height:1.8"></p>
@@ -105,13 +122,12 @@ function showTimes(data){
   if(src && typeof src==='object' && src.prayerTimes){
     const pt = src.prayerTimes;
     if(Array.isArray(pt)){
-      // إذا prayerTimes مصفوفة، حوّلها لـ object: كل عنصر فيه name/time أو key/value
+      // الحالة المثبتة بالصورة: prayerTimes = [{prayerDate, fajr, sunrise, dhuhr, sunset, maghreb, midnight, astronomicalMidnight}]
+      // يعني العنصر نفسه فيه الأوقات، مش name/time، لهيك ندمج مفاتيح العنصر كله
       const merged = {...src};
-      pt.forEach((item,idx)=>{
+      pt.forEach((item)=>{
         if(item && typeof item==='object'){
-          const k = item.name || item.key || item.title || item.label || ('item'+idx);
-          const v = item.time || item.value || item.Time || item.Value;
-          if(k && v) merged[String(k)] = v;
+          Object.keys(item).forEach(k=>{ merged[k]=item[k]; });
         }
       });
       src = merged;
@@ -153,6 +169,102 @@ function showTimes(data){
     timesEl.innerHTML='<p style="grid-column:1/-1">ما رجع ولا وقت. شوف التشخيص تحت — مفاتيح data مطبوعة حرفيا.</p>';
   }
   return {found, src};
+}
+
+
+function stripTags(s){ return String(s||'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); }
+
+async function fetchHijriMiladi(){
+  const log=document.getElementById('hijriLog');
+  const st=document.getElementById('hijriStatus');
+  log.textContent='عم ينده لـ https://arabic.nojumi.org/ ...';
+  st.textContent='';
+  try{
+    const res=await fetch('https://arabic.nojumi.org/');
+    const html=await res.text();
+    log.textContent='status='+res.status+' طول='+html.length+'\n';
+    const text=stripTags(html);
+    // ميلادي: دور على صيغة 2026/11/20 أو 20 نوفمبر 2026
+    let miladi='—';
+    let m=text.match(/20\d\d\/\d{1,2}\/\d{1,2}/);
+    if(m) miladi=m[0];
+    else { let m2=text.match(/\d{1,2}\s+(يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر|كانون الثاني|شباط|آذار|نيسان|أيار|حزيران|تموز|آب|أيلول|تشرين الأول|تشرين الثاني|كانون الأول)\s+20\d\d/); if(m2) miladi=m2[0]; }
+    // هجري: دور على شهر هجري + سنة 14xx
+    let hijri='—';
+    const hijriMonths='محرم|صفر|ربيع الأول|ربيع الآخر|جمادى الأولى|جمادى الآخرة|رجب|شعبان|رمضان|شوال|ذو القعدة|ذو الحجة';
+    let h=text.match(new RegExp('\\d{1,2}\\s+('+hijriMonths+')\\s+14\\d\\d','i'));
+    if(h) hijri=h[0];
+    else { let h2=text.match(new RegExp('14\\d\\d\\s*[/\\-\\s]\\s*\\d{1,2}\\s*[/\\-\\s]\\s*\\d{1,2}')); if(h2) hijri=h2[0]; }
+    // إذا ما لقينا، اعرض مقطع حول كلمة هجري
+    let snippet='';
+    const idx=text.toLowerCase().indexOf('هجري');
+    if(idx>=0) snippet=text.slice(Math.max(0,idx-200), idx+300);
+    document.getElementById('miladiSite').textContent=miladi;
+    document.getElementById('hijriSite').textContent=hijri;
+    if(hijri==='—' && miladi==='—'){
+      st.textContent='ما لقيت التاريخ بالصفحة الرئيسية بهالصيغ، شوف المقطع بالتشخيص.';
+      log.textContent+='مقطع حول هجري: '+snippet+'\n\nأول 1500 حرف من النص: '+text.slice(0,1500);
+    } else {
+      st.textContent='نجح — من الصفحة الرئيسية للموقع.';
+      log.textContent+='ميلادي: '+miladi+'\nهجري: '+hijri+'\nمقطع: '+snippet;
+    }
+  }catch(e){
+    log.textContent='فشل: '+e+'\nإذا فتحت الملف من file:// المتصفح ممكن يمنع CORS.';
+    st.textContent='فشل الجلب.';
+  }
+}
+
+async function fetchIstihlal(){
+  const box=document.getElementById('istihlalBox');
+  const log=document.getElementById('istihlalLog');
+  const st=document.getElementById('istihlalStatus');
+  box.textContent='عم ينده...';
+  log.textContent='عم ينده للرئيسية للاقي رابط الاستهلال...';
+  try{
+    const res=await fetch('https://arabic.nojumi.org/');
+    const html=await res.text();
+    log.textContent='الرئيسية status='+res.status+' طول='+html.length+'\n';
+    // لاقي روابط فيها istihlal أو استهلال
+    const linkRe=/<a[^>]+href="([^"]+)"[^>]*>([\s\S]{0,300}?)<\/a>/gi;
+    let found=[];
+    let m;
+    while((m=linkRe.exec(html))!==null){
+      const href=m[1], inner=stripTags(m[2]);
+      if(/istihlal|استهلال/i.test(href) || /استهلال/i.test(inner)){
+        found.push({href, inner});
+      }
+    }
+    log.textContent+='روابط استهلال لقيتها: '+found.length+'\n'+found.slice(0,5).map(f=>f.href+' — '+f.inner).join('\n')+'\n';
+    if(found.length===0){
+      // جرّب نص الصفحة حول استهلال
+      const text=stripTags(html);
+      const idx=text.indexOf('استهلال');
+      if(idx>=0){
+        box.textContent=text.slice(Math.max(0,idx-200), idx+1200);
+        st.textContent='ما لقيت رابط، عرضت مقطع من الرئيسية حول استهلال.';
+        log.textContent+='مقطع: '+box.textContent;
+      } else {
+        box.textContent='ما لقيت أي ذكر لاستهلال بالرئيسية.';
+        st.textContent='ما لقيت.';
+      }
+      return;
+    }
+    let url=found[0].href;
+    if(url.startsWith('/')) url='https://arabic.nojumi.org'+url;
+    else if(!url.startsWith('http')) url='https://arabic.nojumi.org/'+url;
+    log.textContent+='عم ينده لآخر بيان: '+url+'\n';
+    const r2=await fetch(url);
+    const h2=await r2.text();
+    log.textContent+='بيان status='+r2.status+' طول='+h2.length+'\n';
+    const t2=stripTags(h2);
+    // اعرض أول 2000 حرف من نص البيان، بلا اختراع
+    box.textContent=t2.slice(0,2000);
+    st.textContent='نجح — من '+url;
+    log.textContent+='أول 500 حرف: '+t2.slice(0,500);
+  }catch(e){
+    box.textContent='فشل: '+e;
+    log.textContent+='فشل: '+e;
+  }
 }
 
 async function getTimes(){
@@ -206,6 +318,7 @@ async function getTimes(){
     logEl.textContent+='\n[بديل] فشل: '+e;
   }
 }
+window.addEventListener('load', ()=>{ fetchHijriMiladi(); fetchIstihlal(); });
 </script>
 </body>
 </html>
