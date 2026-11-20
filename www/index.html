@@ -1,4 +1,4 @@
-﻿﻿﻿<!DOCTYPE html>
+﻿﻿﻿﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -33,6 +33,7 @@
 <div class="card"><h2>🔍 تشخيص أوقات الصلاة - من الجسر</h2>
 <p style="color:#a8b5ad;font-size:13px;margin:0 0 8px">هيدا التشخيص بيفرجيك شو عم يوصل من الموقع بالضبط. كبوس زر التشخيص وابعتلي سكرين شوت.</p>
 <button id="btn-diag" class="ghost" style="width:100%">تشخيص أوقات الصلاة - فحص عميق من الجسر</button>
+<button id="btn-js" class="ghost" style="width:100%;margin-top:8px">فحص ملفات JS - وين مخباية الأوقات؟</button>
 <div id="diag" style="margin-top:10px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-all"></div>
 <div style="margin-top:8px"><b>المدينة للصلاة:</b> <span style="font-size:12px;color:#a8b5ad">الموقع بيعرض النجف افتراضيا. اختار مدينتك هون، والجسر رح يجرب يجيب أوقاتها:</span></div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
@@ -274,6 +275,71 @@ document.getElementById("btn-diag").onclick = async function(){
     log("خلص تشخيص أوقات الصلاة - عدد الأوقات بالرئيسية: "+times.length);
   }catch(e){
     diag.textContent += "\nفشل التشخيص: "+(e instanceof Error?e.message:String(e));
+  }
+};
+
+
+document.getElementById("btn-js").onclick = async function(){
+  var diag = document.getElementById("diag");
+  diag.textContent = "عم نفحص ملفات JS من الجسر...\n";
+  stopped = false; ctrl = new AbortController();
+  try{
+    var res = await fetchBridge(ET, ctrl.signal);
+    var html = res.html;
+    var out = "";
+    out += "=== طول HTML الرئيسي: " + html.length + " ===\n\n";
+    // 1. كل ملفات script src
+    var scripts = Array.from(html.matchAll(/<script[^>]*src=["']([^"']+)["']/gi)).map(function(m){return m[1];});
+    out += "عدد ملفات script: " + scripts.length + "\n";
+    scripts.forEach(function(s,i){ out += "  JS["+i+"]: " + s + "\n"; });
+    out += "\n";
+    // 2. كل ملفات CSS link
+    var links = Array.from(html.matchAll(/<link[^>]*href=["']([^"']+)["']/gi)).map(function(m){return m[1];});
+    out += "عدد ملفات CSS: " + links.length + "\n";
+    links.slice(0,20).forEach(function(s,i){ out += "  CSS["+i+"]: " + s + "\n"; });
+    out += "\n";
+    // 3. كل الروابط اللي فيها api / asmx / ashx / Service / Oghat / Pray
+    var allUrls = Array.from(html.matchAll(/["']([^"']*(api|asmx|ashx|Service|Oghat|Pray|pray|oghat)[^"']*)["']/gi)).map(function(m){return m[1];});
+    var uniqUrls = Array.from(new Set(allUrls));
+    out += "روابط فيها api/asmx/ashx/Service/Oghat/Pray: " + uniqUrls.length + "\n";
+    uniqUrls.slice(0,40).forEach(function(u){ out += "  - " + u + "\n"; });
+    out += "\n";
+    // 4. كل الـ __doPostBack / WebMethod / PageMethods
+    var postbacks = Array.from(html.matchAll(/__doPostBack\(['"]([^'"]+)['"]/gi)).map(function(m){return m[1];});
+    out += "__doPostBack targets: " + (postbacks.length? postbacks.join(" ، ") : "ما فيه") + "\n";
+    var pageMethods = Array.from(html.matchAll(/PageMethods\.(\w+)/gi)).map(function(m){return m[1];});
+    out += "PageMethods: " + (pageMethods.length? pageMethods.join(" ، ") : "ما فيه") + "\n\n";
+    // 5. جرب جيب كل ملف JS ودور فيه على كلمات الأوقات
+    for(var i=0;i<scripts.length;i++){
+      var jsUrl = scripts[i];
+      if(jsUrl.indexOf("http")!==0){
+        if(jsUrl.indexOf("//")===0) jsUrl = "https:" + jsUrl;
+        else if(jsUrl.charAt(0)==="/") jsUrl = "https://arabic.nojumi.org" + jsUrl;
+        else jsUrl = "https://arabic.nojumi.org/" + jsUrl;
+      }
+      try{
+        var jr = await fetchBridge(jsUrl, ctrl.signal);
+        var jt = jr.html;
+        var hasPray = jt.indexOf("Pray")!==-1 || jt.indexOf("Oghat")!==-1 || jt.indexOf("Fajr")!==-1 || jt.indexOf("Maghrib")!==-1 || jt.indexOf("الفجر")!==-1 || jt.indexOf("getTimes")!==-1 || jt.indexOf("api")!==-1;
+        out += "JS["+i+"] " + jsUrl + " - طول " + jt.length + " - " + (hasPray? "فيه كلمات أوقات ✅" : "ما فيه أوقات") + "\n";
+        if(hasPray){
+          // طلع مقتطفات حول الكلمات
+          ["Pray","Oghat","Fajr","Maghrib","getTimes","api","asmx","ashx"].forEach(function(k){
+            var idx = jt.indexOf(k);
+            if(idx!==-1){
+              var sn = jt.slice(Math.max(0,idx-80), idx+180).replace(/\s+/g," ").slice(0,260);
+              out += "    ["+k+"] ... " + sn + " ...\n";
+            }
+          });
+        }
+      }catch(e){ out += "JS["+i+"] " + jsUrl + " - فشل: " + (e instanceof Error?e.message:String(e)) + "\n"; }
+    }
+    out += "\n=== خلص فحص JS ===\n";
+    out += "إذا ما لقينا API بالـ JS، معناتا الأوقات بتنحسب بـ JS محلي بنفس الصفحة - وساعتها منجيب طريقة الحساب تبع الموقع نفسها، مش من API تاني.\n";
+    diag.textContent = out;
+    log("خلص فحص JS - عدد ملفات JS: " + scripts.length);
+  }catch(e){
+    diag.textContent += "\nفشل فحص JS: " + (e instanceof Error?e.message:String(e));
   }
 };
 
