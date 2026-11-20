@@ -98,8 +98,29 @@ function pick(obj, keys){
   return null;
 }
 function showTimes(data){
-  // data هو الحقل data من الرد
-  const src = (data && data.data) ? data.data : data;
+  // data هو الحقل data من الرد - الصورة أثبتت أن data فيها location و localDateTimeNow و prayerTimes
+  // الأوقات جوّا prayerTimes، مش على سطح data، لهيك لازم نفتحها
+  let src = (data && data.data) ? data.data : data;
+  // إذا src فيها prayerTimes، افتحها وادمجها مع src حتى يلاقيها pick
+  if(src && typeof src==='object' && src.prayerTimes){
+    const pt = src.prayerTimes;
+    if(Array.isArray(pt)){
+      // إذا prayerTimes مصفوفة، حوّلها لـ object: كل عنصر فيه name/time أو key/value
+      const merged = {...src};
+      pt.forEach((item,idx)=>{
+        if(item && typeof item==='object'){
+          const k = item.name || item.key || item.title || item.label || ('item'+idx);
+          const v = item.time || item.value || item.Time || item.Value;
+          if(k && v) merged[String(k)] = v;
+        }
+      });
+      src = merged;
+      src._prayerTimesRaw = pt;
+    } else if(typeof pt==='object'){
+      src = {...src, ...pt};
+      src._prayerTimesRaw = pt;
+    }
+  }
   const get = (keys)=>pick(src, keys);
   const rows=[
     ['اذان الفجر', ['fajr','fajr_time','azan_fajr']],
@@ -121,8 +142,10 @@ function showTimes(data){
       timesEl.appendChild(d);
     }
   });
-  const qibla=get(['qibla','qiblaangle','qibla_angle','zawia','angle']);
-  const dist=get(['distance','dist','distance_km','masafa']);
+  let qibla=get(['qibla','qiblaangle','qibla_angle','zawia','angle','qiblaDirection','qibla_degree']);
+  if(!qibla && src && src.location && typeof src.location==='object') qibla = pick(src.location, ['qibla','qiblaangle','qibla_angle','angle','direction']);
+  let dist=get(['distance','dist','distance_km','masafa','distanceToKaaba','distance_from_kaaba']);
+  if(!dist && src && src.location && typeof src.location==='object') dist = pick(src.location, ['distance','dist','distance_km']);
   extraEl.innerHTML='';
   if(qibla) extraEl.innerHTML+='زاوية الانحراف عن القبلة: <b>'+qibla+'</b><br>';
   if(dist) extraEl.innerHTML+='المسافة عن الكعبة: <b>'+dist+'</b><br>';
@@ -152,7 +175,7 @@ async function getTimes(){
     if(cleaned && !cleaned.error && (cleaned.data || cleaned.fajr || cleaned.Fajr)){
       const r=showTimes(cleaned);
       statusEl.innerHTML='<span class="ok">نجح — POST الداخلي</span> — لقى '+r.found+' أوقات';
-      logEl.textContent+='\nنجح POST الداخلي. data keys: '+Object.keys(r.src||{}).join(', ');
+      logEl.textContent+='\nنجح POST الداخلي. data keys: '+Object.keys(r.src||{}).join(', ')+' | prayerTimes keys: '+((r.src && r.src._prayerTimesRaw && typeof r.src._prayerTimesRaw==='object' && !Array.isArray(r.src._prayerTimesRaw)) ? Object.keys(r.src._prayerTimesRaw).join(', ') : JSON.stringify(r.src && r.src._prayerTimesRaw ? r.src._prayerTimesRaw : '').slice(0,800));
       return;
     } else {
       logEl.textContent+='\nPOST الداخلي ما رجع data، error='+(cleaned && cleaned.error ? JSON.stringify(cleaned.error) : 'لا يوجد data')+'\nبيجرّب البديل المباشر...';
