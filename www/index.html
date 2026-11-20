@@ -62,7 +62,52 @@ async function tryDecompress(blob){
   try{return {how:'UTF-8 مباشرة', text:new TextDecoder().decode(blob)};}catch(e){}
   let hex='';for(let i=0;i<Math.min(blob.length,200);i++) hex+=blob[i].toString(16).padStart(2,'0')+' ';return {how:'فشل - Hex', text:hex};
 }
-async function getTafsir(){if(!db){document.getElementById('tafsirOut').textContent='حمّل ملف التفسير أولا';return;}let id=parseInt(document.getElementById('tid').value);try{let res=db.exec("SELECT data, searchText FROM Tafsir WHERE id="+id);if(!res.length){document.getElementById('tafsirOut').textContent='ما في تفسير بهالـ ID';return;}let blob=res[0].values[0][0];let search=res[0].values[0][1];let dec=await tryDecompress(blob);document.getElementById('tafsirOut').textContent='الطريقة: '+dec.how+'\nsearchText: '+search+'\n\n'+dec.text.slice(0,3000);}catch(e){document.getElementById('tafsirOut').textContent='فشل: '+e.message;}}
+function findBSDIFF(bytes){
+  // دور على BSDIFF40 جوات الـ Blob، مش بس بأولو
+  let needle=[66,83,68,73,70,70,52,48]; // BSDIFF40
+  for(let i=0;i<=bytes.length-needle.length;i++){
+    let ok=true; for(let j=0;j<needle.length;j++){ if(bytes[i+j]!==needle[j]){ok=false;break;} }
+    if(ok) return i;
+  }
+  return -1;
+}
+function readInt64LE(b, off){
+  let v=0; for(let i=0;i<8;i++) v+=b[off+i]*Math.pow(256,i); return v;
+}
+async function getTafsir(){
+  if(!db){document.getElementById('tafsirOut').textContent='حمّل ملف التفسير أولا';return;}
+  let id=parseInt(document.getElementById('tid').value);
+  try{
+    let res=db.exec("SELECT data, searchText FROM Tafsir WHERE id="+id);
+    if(!res.length){document.getElementById('tafsirOut').textContent='ما في تفسير بهالـ ID';return;}
+    let blob=res[0].values[0][0];
+    let search=res[0].values[0][1];
+    let bytes=new Uint8Array(blob);
+    let idx=findBSDIFF(bytes);
+    if(idx===-1){
+      let dec=await tryDecompress(blob);
+      document.getElementById('tafsirOut').textContent='الطريقة: '+dec.how+'\nsearchText: '+search+'\n\n'+dec.text.slice(0,4000);
+      return;
+    }
+    // في BSDIFF40 جوات الـ Blob
+    let firstPart=new TextDecoder().decode(bytes.slice(0,idx));
+    let patch=bytes.slice(idx, idx+32);
+    let ctrlLen=readInt64LE(patch,8), diffLen=readInt64LE(patch,16), newSize=readInt64LE(patch,24);
+    let out='الطريقة: مخلوط - أول جزء UTF-8 + بعدين BSDIFF40 patch\n';
+    out+='searchText: '+search+'\n';
+    out+='مكان الـ BSDIFF40: بايت '+idx+' من أصل '+bytes.length+'\n';
+    out+='معلومات الـ Patch: ctrlLen='+ctrlLen+' diffLen='+diffLen+' newSize='+newSize+'\n';
+    out+='------------------------------------------------\n';
+    out+='الجزء الأول - مفكوك كامل:\n'+firstPart.slice(0,4000)+'\n';
+    out+='------------------------------------------------\n';
+    out+='الجزء الثاني - مش نص، هو BSDIFF40 patch ثنائي.\n';
+    out+='هيدا Patch يعني فرق، مش نص كامل. لازم يتطبق على ملف الأساس ليطلع النص الكامل.\n';
+    out+='لهيك الكود القديم كان عم يعرضو كخرابيط: كان عم يفك الـ Patch كأنو UTF-8.\n';
+    out+='الحل: ما تعرض الـ Patch كنص. خزن الـ Patch، وجيب ملف الأساس من السيرفر وطبقو عليه.\n';
+    out+='اذا كان الـ Patch هو تحديث لنفس التفسير، الأساس غالبا هو نفس الصف السابق أو نفس الملف قبل التحديث.\n';
+    document.getElementById('tafsirOut').textContent=out;
+  }catch(e){document.getElementById('tafsirOut').textContent='فشل: '+e.message;}
+}
 function pad(n){return String(n).padStart(3,'0');}
 function buildAudio(){let rec=document.getElementById('rec').value;let s=parseInt(document.getElementById('sura').value);let f=parseInt(document.getElementById('fromA').value);let t=parseInt(document.getElementById('toA').value);let h='';for(let a=f;a<=t;a++){let url=storage()+'/audio/'+rec+'/'+pad(s)+pad(a)+'.mp3';h+='<div><b>'+s+':'+a+'</b><br><a href="'+url+'" target="_blank">'+url+'</a><br><audio controls src="'+url+'" style="width:100%"></audio><br><a href="'+url+'" download><button>حمّل هالآية</button></a></div><hr>';}document.getElementById('audioList').innerHTML=h;}
 </script>
