@@ -110,7 +110,7 @@ async function getMoon(){
     var d = new Date(dtVal);
     var utc = d.toISOString().slice(0,16).replace('T',' ');
     // Horizons needs YYYY-MM-DD HH:MM
-    var url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='301'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='" + lon + "," + lat + "," + alt + "'&START_TIME='" + utc + "'&STOP_TIME='" + utc + "'&STEP_SIZE='1m'&QUANTITIES='2,4,9,10,20,24'&CSV_FORMAT='YES'&CAL_FORMAT='BOTH'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";
+    var url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='301'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='" + lon + "," + lat + "," + alt + "'&START_TIME='" + utc + "'&STOP_TIME='" + utc + "'&STEP_SIZE='1m'&QUANTITIES='4,10,20,24'&CSV_FORMAT='YES'&CAL_FORMAT='CAL'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";
     document.getElementById('link').href = url;
     document.getElementById('meta').textContent = 'الوقت المستعمل UTC: ' + utc + ' | الإحداثيات: ' + lon + ', ' + lat + ', ' + alt;
     var res = await fetch(url);
@@ -126,9 +126,13 @@ async function getMoon(){
     var lines = block.split('\n').filter(function(l){return l.trim().length>0});
     if(lines.length===0){ throw new Error('ما في سطر بيانات من ناسا'); }
     var parts = lines[0].split(',').map(function(x){return x.trim()});
-    // Expected: date, RA, Dec, AZ, EL, Vmag, Sbright, Illum, Range, RangeRate, S-O-T
-    if(parts.length < 11){ throw new Error('عدد الأعمدة ناقص من ناسا: ' + parts.length); }
-    var ra = parts[1], dec = parts[2], az = parseFloat(parts[3]), el = parseFloat(parts[4]), mag = parts[5], ill = parts[7], range = parts[8], sot = parts[10];
+    // مع CAL و QUANTITIES 4,10,20,24 المتوقع: date, AZ, EL, Illum, Range, RangeRate, S-O-T = 7 أعمدة
+    // لا نشدد: إذا ناسا رجعت أعمدة زيادة، مناخد من الآخر
+    if(parts.length < 7){ throw new Error('عدد الأعمدة ناقص من ناسا: ' + parts.length + ' | السطر: ' + lines[0]); }
+    // إذا كان في عمودين للتاريخ، منزح
+    var off = parts.length - 7;
+    var az = parseFloat(parts[1+off]), el = parseFloat(parts[2+off]), ill = parts[3+off], range = parts[4+off], sot = parts[6+off];
+    var ra = '-', dec = '-', mag = 'غير متوفر من ناسا';
     if(isNaN(az) || isNaN(el)){ throw new Error('أرقام غير صالحة من ناسا'); }
     document.getElementById('v_el').textContent = el.toFixed(4) + '°';
     document.getElementById('v_el_note').textContent = el > 0 ? 'فوق الأفق' : 'تحت الأفق';
