@@ -1,29 +1,155 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>اتحاد الأفق - نفس تفاصيل النجومي</title>
-<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
-<style>body{margin:0;font-family:Tahoma,Arial,sans-serif;background:#0f2418;color:#f5f0e0;padding:14px}h1{color:#d4af37;font-size:22px}h2{color:#d4af37;font-size:17px}.card{background:#132a1a;border:1px solid rgba(212,175,55,.3);border-radius:14px;padding:12px;margin:12px 0}label{display:block;margin:8px 0 4px;font-size:14px}select,input{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(212,175,55,.4);background:#1a3a28;color:#fff;font-size:15px;box-sizing:border-box}button{padding:12px 18px;border-radius:12px;background:#d4af37;color:#0f2418;font-weight:800;border:none;font-size:16px;cursor:pointer;width:100%}table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}th,td{border:1px solid rgba(255,255,255,.2);padding:8px 4px;text-align:center}th{background:#0f2418;color:#d4af37}td{background:#162e21}.ok{background:#14532d;border:2px solid #22c55e;border-radius:14px;padding:14px;font-size:16px;line-height:1.8}.no{background:#7f1d1d;border:2px solid #ef4444;border-radius:14px;padding:14px;font-size:16px;line-height:1.8}.small{font-size:12px;color:#cbd5e1;line-height:1.7}.red{color:#fca5a5;font-weight:800}.green{color:#86efac;font-weight:800}.nojumi{background:#0b2a4a;border:1px solid #38bdf8;border-radius:12px;padding:10px;margin-top:10px}</style>
+<title>موقع القمر - ناسا مباشرة</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial;background:#0b1220;color:#fff;padding:16px}
+h1{font-size:20px;margin:0 0 4px} p.sub{color:#9aa7bd;font-size:13px;margin:0 0 16px}
+.card{background:#151f33;border:1px solid #26324f;border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:13px;color:#cbd5e1;margin:10px 0 6px}
+select,input{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:15px}
+.row{display:flex;gap:10px} .row>div{flex:1}
+button{width:100%;padding:14px;border:0;border-radius:12px;background:#22c55e;color:#000;font-weight:800;font-size:16px;cursor:pointer;margin-top:14px}
+button:disabled{opacity:.6}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.box{background:#1e293b;border-radius:12px;padding:12px} .box small{color:#94a3b8;display:block;font-size:12px} .box b{font-size:20px}
+.err{background:#7f1d1d;border:1px solid #ef4444;border-radius:12px;padding:12px;display:none;margin-top:12px}
+.ok{background:#0f2a1a;border:1px solid #22c55e;border-radius:12px;padding:12px;display:none;margin-top:12px}
+pre{background:#020617;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:300px;overflow:auto;display:none}
+a{color:#7dd3fc;word-break:break-all;font-size:12px}
+.muted{color:#94a3b8;font-size:12px}
+</style>
 </head>
 <body>
-<h1>اتحاد الأفق - نفس تفاصيل النجومي</h1>
-<p style="font-size:14px;line-height:1.8">هيدي الواجهة بتطلع نفس تفاصيل النجومي بصفحة وضعية الهلال: الارتفاع، الموقع، اكتساب النور، البعد الزاوي، الاقتران، العمر، غروب الشمس، غروب الهلال، مدة البقاء. وبعدين بتقارنها مع منشور النجومي لنفس التاريخ، إذا كان موجود. الحساب من مكتبة Astronomy Engine الدقيقة - نفس تقويم NASA / USNO - مش SunCalc المختصر يلي كان يغلط 2.6 درجة.</p>
-<div class="card"><h2>1 - بلد الرؤية الشرعية</h2><label>اختر مدينة:</label><select id="sightCity"><option value="32.026,44.346">النجف - 32.026 , 44.346</option><option value="33.889,35.494">بيروت - 33.889 , 35.494</option><option value="33.11666667,35.43333333">بنت جبيل - 33.116 , 35.433</option><option value="32.616,44.024">كربلاء - 32.616 , 44.024</option><option value="33.315,44.366">بغداد - 33.315 , 44.366</option><option value="33.513,36.292">دمشق - 33.513 , 36.292</option><option value="34.641,50.875">قم - 34.641 , 50.875</option><option value="35.689,51.389">طهران - 35.689 , 51.389</option></select><label>او lat يدوي:</label><input id="sightLat" type="number" step="0.0001" placeholder="32.026"><label>lng يدوي:</label><input id="sightLng" type="number" step="0.0001" placeholder="44.346"></div>
-<div class="card"><h2>2 - مكانك</h2><label>اختر مدينة:</label><select id="myCity"><option value="33.11666667,35.43333333">بنت جبيل - 33.116 , 35.433</option><option value="33.889,35.494">بيروت - 33.889 , 35.494</option><option value="32.026,44.346">النجف - 32.026 , 44.346</option><option value="32.616,44.024">كربلاء - 32.616 , 44.024</option><option value="33.315,44.366">بغداد - 33.315 , 44.366</option><option value="33.513,36.292">دمشق - 33.513 , 36.292</option><option value="34.641,50.875">قم - 34.641 , 50.875</option><option value="35.689,51.389">طهران - 35.689 , 51.389</option></select><label>او lat يدوي:</label><input id="myLat" type="number" step="0.0001" placeholder="33.116"><label>lng يدوي:</label><input id="myLng" type="number" step="0.0001" placeholder="35.433"><button onclick="useGPS()" style="background:#1a3a28;color:#fff;margin-top:8px;border:1px solid #d4af37">استعمل موقعي GPS</button></div>
-<div class="card"><h2>3 - التاريخ - ليلة الرؤية</h2><label>التاريخ الميلادي:</label><input id="dateInput" type="date" value="2026-02-18"><p class="small">الافتراضي 2026-02-18 - ليلة تحري رمضان 1447 - النجف عند النجومي: ارتفاع 11 درجة و 51 دقيقة، نور 1.26%، عمر 26 ساعة و 52 دقيقة.</p><button onclick="compare()">قارن - نفس تفاصيل النجومي</button></div>
-<div id="result"></div>
-<div class="card"><h2>مرجع النجومي المحفوظ للمقارنة</h2><p class="small">18 شباط 2026 - النجف - النجومي: ارتفاع 11 درجة و 51 دقيقة (11.85 درجة)، نور 1.26%، عمر 26 ساعة و 52 دقيقة، يبقى بعد الغروب 1 ساعة و 3 دقائق، غروب الشمس 17:51. 11 تشرين الثاني 2026 - النجف - جمادى الآخرة 1448: ارتفاع 11 درجة و 10 دقائق (11.17 درجة)، نور 5.12%، عمر 55 ساعة و 4 دقائق. الواجهة بتقارن حسابها مع هالمرجع إذا اخترت نفس التاريخ والنجف.</p></div>
+<h1>🌙 موقع القمر - من ناسا مباشرة DE441</h1>
+<p class="sub">ما في بيانات وهمية. إذا فشل الاتصال، بيقول فشلت وما بيعرض شي.</p>
+
+<div class="card">
+<label>المدينة</label>
+<select id="city"></select>
+<div class="row">
+<div><label>خط الطول Lon</label><input id="lon" value="35.5"></div>
+<div><label>خط العرض Lat</label><input id="lat" value="33.9"></div>
+<div><label>الارتفاع m</label><input id="alt" value="0"></div>
+</div>
+<label>التاريخ والوقت</label>
+<input type="datetime-local" id="dt">
+<button id="btn" onclick="getMoon()">جيب بيانات القمر من ناسا</button>
+<div id="loading" class="muted" style="display:none;margin-top:10px">عم جيب من ناسا...</div>
+<div id="err" class="err"></div>
+<div id="ok" class="ok"></div>
+</div>
+
+<div id="results" style="display:none">
+<div class="grid">
+<div class="box"><small>الارتفاع EL</small><b id="v_el">-</b><small id="v_el_note"></small></div>
+<div class="box"><small>السمت AZ / الاتجاه</small><b id="v_az">-</b><small id="v_az_dir"></small></div>
+<div class="box"><small>الإضاءة Illumination</small><b id="v_ill">-</b></div>
+<div class="box"><small>المسافة Range</small><b id="v_range">-</b></div>
+<div class="box"><small>القدر الظاهري Magnitude</small><b id="v_mag">-</b></div>
+<div class="box"><small>الاستطالة S-O-T</small><b id="v_sot">-</b></div>
+<div class="box"><small>RA الظاهري</small><b id="v_ra">-</b></div>
+<div class="box"><small>Dec الظاهري</small><b id="v_dec">-</b></div>
+</div>
+<div class="card" style="margin-top:12px">
+<div class="muted" id="meta"></div>
+<div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل - اضغط لتتأكد بنفسك</a></div>
+<button onclick="toggleRaw()" style="background:#334155;color:#fff">عرض الناتج الخام من ناسا</button>
+<pre id="raw"></pre>
+</div>
+</div>
+
 <script>
-function fmtDeg(d){var sign=d<0?"-":"";var a=Math.abs(d);var deg=Math.floor(a);var min=Math.round((a-deg)*60);if(min===60){deg+=1;min=0}return sign+deg+" درجة و "+min+" دقيقة ("+a.toFixed(2)+"°)"}
-function fmtTime(date){if(!date) return "-";var d=new Date(date);return String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0")+" UTC / "+String((d.getUTCHours()+3)%24).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0")+" بتوقيت النجف +3"}
-function getLatLng(sel,latIn,lngIn){var la=parseFloat(latIn.value);var lo=parseFloat(lngIn.value);if(!isNaN(la)&&!isNaN(lo))return{lat:la,lon:lo};var p=sel.value.split(",");return{lat:parseFloat(p[0]),lon:parseFloat(p[1])}}
-function useGPS(){if(!navigator.geolocation){alert("GPS غير متوفر");return}navigator.geolocation.getCurrentPosition(function(pos){document.getElementById("myLat").value=pos.coords.latitude.toFixed(4);document.getElementById("myLng").value=pos.coords.longitude.toFixed(4);alert("تم اخذ موقعك")},function(){alert("فشل GPS")})}
-function getSpecs(lat,lon,dateStr){var parts=dateStr.split("-");var base=new Date(Date.UTC(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]),12,0,0));var obs=new Astronomy.Observer(lat,lon,0);var sunset=Astronomy.SearchSunset(base,obs,1);var sunTime=sunset?sunset.date:null;var moonset=Astronomy.SearchMoonset(base,obs,1);var moonsetTime=moonset?moonset.date:null;var conj=Astronomy.SearchMoonPhase(0,base,-5);var conjTime=conj?conj.date:null;var ageH=conjTime&&sunTime?(sunTime-conjTime)/3600000:0;var ill=Astronomy.MoonPhase(sunTime||base);var elong=Astronomy.Elongation("Moon",sunTime||base);var eq=Astronomy.Equator("Moon",sunTime||base,obs,true,true);var hor=Astronomy.Horizon(sunTime||base,obs,eq.ra,eq.dec,"normal");var stay=moonsetTime&&sunTime?Math.round((moonsetTime-sunTime)/60000):0;return{sunset:sunTime,moonset:moonsetTime,conj:conjTime,ageH:ageH,illum:ill*100,elong:elong,alt:hor.altitude,az:hor.azimuth,stay:stay}}
-function card(title,s){return "<h2>"+title+"</h2><table><tr><th>التفصيل - مثل النجومي</th><th>القيمة</th></tr><tr><td>ارتفاع الهلال عن الأفق</td><td>"+fmtDeg(s.alt)+"</td></tr><tr><td>موقع الهلال (السمت)</td><td>"+fmtDeg(s.az)+"</td></tr><tr><td>اكتساب الهلال للنور</td><td>"+s.illum.toFixed(2)+"%</td></tr><tr><td>البعد الزاوي عن الشمس</td><td>"+s.elong.toFixed(2)+"°</td></tr><tr><td>الاقتران المركزي</td><td>"+(s.conj?new Date(s.conj).toISOString().slice(0,16)+" UTC":"-")+"</td></tr><tr><td>عمر الهلال عند الغروب</td><td>"+Math.floor(s.ageH)+" ساعة و "+Math.round((s.ageH-Math.floor(s.ageH))*60)+" دقيقة</td></tr><tr><td>غروب الشمس</td><td>"+fmtTime(s.sunset)+"</td></tr><tr><td>غروب الهلال</td><td>"+fmtTime(s.moonset)+"</td></tr><tr><td>مدة البقاء بعد الغروب</td><td>"+s.stay+" دقيقة</td></tr></table>"}
-function compare(){if(typeof Astronomy==="undefined"){alert("مكتبة Astronomy Engine ما تحملت - لازم انترنت اول مرة");return}var sight=getLatLng(document.getElementById("sightCity"),document.getElementById("sightLat"),document.getElementById("sightLng"));var mine=getLatLng(document.getElementById("myCity"),document.getElementById("myLat"),document.getElementById("myLng"));var dateStr=document.getElementById("dateInput").value;if(!dateStr){alert("اختر التاريخ");return}var s=getSpecs(sight.lat,sight.lon,dateStr);var m=getSpecs(mine.lat,mine.lon,dateStr);var dIll=m.illum-s.illum;var dAlt=m.alt-s.alt;var dElong=m.elong-s.elong;var ok=(dIll>=-0.05&&dAlt>=-0.1&&dElong>=-0.1);var cls=ok?"ok":"no";var title=ok?"أنت وبلد الرؤية في اتحاد بالأفق":"ليس اتحاد بالأفق";var sub=ok?"مواصفاتك ما بتقل عن بلد الرؤية بالثلاثة - فيك تتبع الرؤية، لولا الغيوم":"مواصفاتك أقل بواحدة أو أكثر - ما فيك تتبع الرؤية";var html="<div class=\""+cls+"\"><b>"+title+"</b><br>"+sub+"</div><table><tr><th>المعيار</th><th>بلد الرؤية</th><th>مكانك</th><th>الفرق</th></tr><tr><td>الحجم المنار %</td><td>"+s.illum.toFixed(2)+"%</td><td>"+m.illum.toFixed(2)+"%</td><td class=\""+(dIll>=-0.05?"green":"red")+"\">"+(dIll>=0?"+":"")+dIll.toFixed(2)+"</td></tr><tr><td>الارتفاع</td><td>"+s.alt.toFixed(2)+"°</td><td>"+m.alt.toFixed(2)+"°</td><td class=\""+(dAlt>=-0.1?"green":"red")+"\">"+(dAlt>=0?"+":"")+dAlt.toFixed(2)+"°</td></tr><tr><td>البعد الزاوي</td><td>"+s.elong.toFixed(2)+"°</td><td>"+m.elong.toFixed(2)+"°</td><td class=\""+(dElong>=-0.1?"green":"red")+"\">"+(dElong>=0?"+":"")+dElong.toFixed(2)+"°</td></tr></table>";html+="<div class=card>"+card("تفاصيل بلد الرؤية - مثل النجومي",s)+"</div>";html+="<div class=card>"+card("تفاصيل مكانك - مثل النجومي",m)+"</div>";if(dateStr==="2026-02-18"&&Math.abs(sight.lat-32.026)<0.1&&Math.abs(sight.lon-44.346)<0.1){var refAlt=11.85;var refIll=1.26;var refAge=26+52/60;html+="<div class=card style=border-color:#38bdf8><h2>مقارنة مع منشور النجومي - النجف 18 شباط 2026</h2><table><tr><th>التفصيل</th><th>النجومي</th><th>حساب الواجهة</th><th>الفرق</th></tr><tr><td>الارتفاع</td><td>11.85°</td><td>"+s.alt.toFixed(2)+"°</td><td>"+(s.alt-refAlt).toFixed(2)+"°</td></tr><tr><td>النور</td><td>1.26%</td><td>"+s.illum.toFixed(2)+"%</td><td>"+(s.illum-refIll).toFixed(2)+"%</td></tr><tr><td>العمر</td><td>26h 52m</td><td>"+Math.floor(s.ageH)+"h "+Math.round((s.ageH-Math.floor(s.ageH))*60)+"m</td><td>"+(s.ageH-refAge).toFixed(2)+"h</td></tr></table><p class=small>إذا الفرق أقل من 0.2 درجة و 0.1%، الحساب مطابق للنجومي. إذا أكبر، معناتها في غلط بالحساب.</p></div>"}document.getElementById("result").innerHTML=html}
+var cities = [
+["بيروت",35.5,33.9],["دمشق",36.29,33.51],["بغداد",44.36,33.31],["النجف",44.33,32.0],["كربلاء",44.02,32.61],["مكة",39.82,21.42],["المدينة",39.61,24.46],["قم",50.88,34.64],["طهران",51.39,35.69],["القاهرة",31.23,30.04],["عمان",35.93,31.95],["القدس",35.21,31.76],["إسطنبول",28.97,41.0],["دبي",55.30,25.20],["جاكرتا",106.84,-6.20],["كوالالمبور",101.68,3.13],["لندن",-0.12,51.50],["باريس",2.35,48.85],["نيويورك",-74.0,40.71]
+];
+var sel = document.getElementById('city');
+cities.forEach(function(c,i){
+  var o = document.createElement('option');
+  o.value = i; o.textContent = c[0];
+  sel.appendChild(o);
+});
+sel.onchange = function(){
+  var c = cities[parseInt(sel.value)];
+  document.getElementById('lon').value = c[1];
+  document.getElementById('lat').value = c[2];
+};
+// default datetime now
+(function(){
+  var d = new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
+  document.getElementById('dt').value = d.toISOString().slice(0,16);
+})();
+function dirFromAz(az){
+  var dirs = ["شمال","شمال شرق","شرق","جنوب شرق","جنوب","جنوب غرب","غرب","شمال غرب"];
+  return dirs[Math.round(az/45)%8];
+}
+function toggleRaw(){
+  var r = document.getElementById('raw');
+  r.style.display = (r.style.display==='block'?'none':'block');
+}
+function showFail(msg){
+  var e = document.getElementById('err');
+  e.style.display='block'; e.textContent = 'فشلت - ' + msg;
+  document.getElementById('results').style.display='none';
+  document.getElementById('ok').style.display='none';
+}
+async function getMoon(){
+  document.getElementById('err').style.display='none';
+  document.getElementById('results').style.display='none';
+  document.getElementById('ok').style.display='none';
+  document.getElementById('loading').style.display='block';
+  document.getElementById('btn').disabled=true;
+  try{
+    var lon = document.getElementById('lon').value.trim();
+    var lat = document.getElementById('lat').value.trim();
+    var alt = document.getElementById('alt').value.trim() || '0';
+    var dtVal = document.getElementById('dt').value;
+    if(!dtVal){ throw new Error('اختار التاريخ والوقت'); }
+    var d = new Date(dtVal);
+    var utc = d.toISOString().slice(0,16).replace('T',' ');
+    // Horizons needs YYYY-MM-DD HH:MM
+    var url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='301'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='" + lon + "," + lat + "," + alt + "'&START_TIME='" + utc + "'&STOP_TIME='" + utc + "'&STEP_SIZE='1m'&QUANTITIES='2,4,9,10,20,24'&CSV_FORMAT='YES'&CAL_FORMAT='BOTH'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";
+    document.getElementById('link').href = url;
+    document.getElementById('meta').textContent = 'الوقت المستعمل UTC: ' + utc + ' | الإحداثيات: ' + lon + ', ' + lat + ', ' + alt;
+    var res = await fetch(url);
+    if(!res.ok){ throw new Error('ناسا ما ردت - كود ' + res.status); }
+    var j = await res.json();
+    if(j.signature && j.signature.error){ throw new Error(j.signature.error); }
+    var txt = j.result || '';
+    document.getElementById('raw').textContent = txt;
+    var s = txt.indexOf('$$SOE');
+    var e = txt.indexOf('$$EOE');
+    if(s===-1 || e===-1 || e<=s){ throw new Error('ناسا رجعت جواب ناقص'); }
+    var block = txt.slice(s+5, e).trim();
+    var lines = block.split('\n').filter(function(l){return l.trim().length>0});
+    if(lines.length===0){ throw new Error('ما في سطر بيانات من ناسا'); }
+    var parts = lines[0].split(',').map(function(x){return x.trim()});
+    // Expected: date, RA, Dec, AZ, EL, Vmag, Sbright, Illum, Range, RangeRate, S-O-T
+    if(parts.length < 11){ throw new Error('عدد الأعمدة ناقص من ناسا: ' + parts.length); }
+    var ra = parts[1], dec = parts[2], az = parseFloat(parts[3]), el = parseFloat(parts[4]), mag = parts[5], ill = parts[7], range = parts[8], sot = parts[10];
+    if(isNaN(az) || isNaN(el)){ throw new Error('أرقام غير صالحة من ناسا'); }
+    document.getElementById('v_el').textContent = el.toFixed(4) + '°';
+    document.getElementById('v_el_note').textContent = el > 0 ? 'فوق الأفق' : 'تحت الأفق';
+    document.getElementById('v_az').textContent = az.toFixed(4) + '°';
+    document.getElementById('v_az_dir').textContent = dirFromAz(az);
+    document.getElementById('v_ill').textContent = ill + ' %';
+    document.getElementById('v_range').textContent = Number(range).toLocaleString('en-US') + ' km';
+    document.getElementById('v_mag').textContent = mag;
+    document.getElementById('v_sot').textContent = sot + '°';
+    document.getElementById('v_ra').textContent = ra;
+    document.getElementById('v_dec').textContent = dec;
+    document.getElementById('results').style.display='block';
+    var ok = document.getElementById('ok');
+    ok.style.display='block'; ok.textContent = 'تم - بيانات مباشرة من ناسا DE441';
+  }catch(err){
+    showFail(err.message || 'فشل الاتصال');
+  }finally{
+    document.getElementById('loading').style.display='none';
+    document.getElementById('btn').disabled=false;
+  }
+}
 </script>
 </body>
 </html>
