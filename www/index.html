@@ -11,34 +11,41 @@ h1{font-size:20px;margin:0 0 4px} p.sub{color:#9aa7bd;font-size:13px;margin:0 0 
 label{display:block;font-size:13px;color:#cbd5e1;margin:10px 0 6px}
 select,input{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:15px}
 .row{display:flex;gap:10px} .row>div{flex:1}
-button{width:100%;padding:14px;border:0;border-radius:12px;background:#22c55e;color:#000;font-weight:800;font-size:16px;cursor:pointer;margin-top:14px}
+button{width:100%;padding:12px;border:0;border-radius:10px;background:#22c55e;color:#000;font-weight:800;font-size:15px;cursor:pointer;margin-top:10px}
+button.small{padding:8px;font-size:13px;background:#334155;color:#fff;margin-top:6px}
 button:disabled{opacity:.6}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.box{background:#1e293b;border-radius:12px;padding:12px} .box small{color:#94a3b8;display:block;font-size:12px} .box b{font-size:16px;display:block;margin-top:2px} .box span{font-size:12px;color:#cbd5e1}
 .err{background:#7f1d1d;border:1px solid #ef4444;border-radius:12px;padding:12px;display:none;margin-top:12px}
 .ok{background:#0f2a1a;border:1px solid #22c55e;border-radius:12px;padding:10px;display:none;margin-top:12px;font-size:13px}
 pre{background:#020617;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:280px;overflow:auto}
 a{color:#7dd3fc;word-break:break-all;font-size:12px}
 .muted{color:#94a3b8;font-size:12px}
 h2{font-size:16px;margin:14px 0 6px}
-table{width:100%;border-collapse:collapse;font-size:14px} td,th{padding:9px;border-bottom:1px solid #334155;text-align:right} th{color:#94a3b8;font-weight:400}
-.good{color:#4ade80} .bad{color:#f87171}
+table{width:100%;border-collapse:collapse;font-size:14px} td,th{padding:9px;border-bottom:1px solid #334155;text-align:right;vertical-align:top} th{color:#94a3b8;font-weight:400} th:first-child{width:26%}
+.resList button{display:block;width:100%;text-align:right;background:#1e293b;color:#fff;border:1px solid #334155;margin-top:6px}
 </style>
 </head>
 <body>
 <h1>🌙 مقارنة الهلال بين مدينتين - ناسا مباشرة DE441</h1>
-<p class="sub">مدينة الرؤيا شرقاً، ومدينة السكن غرباً. كل البيانات من ناسا مباشرة، ما في شي وهمي.</p>
+<p class="sub">اكتب أي مدينة بالعالم، أو اكتب خط الطول والعرض يدوياً. كل البيانات من ناسا مباشرة، ما في شي وهمي.</p>
 
 <div class="card">
 <h2>مدينة الرؤيا</h2>
-<label>المدينة</label><select id="cityR"></select>
+<label>اكتب اسم المدينة - أي مدينة بالعالم</label>
+<input id="searchR" placeholder="مثال: بغداد، طهران، جاكرتا...">
+<button class="small" onclick="searchCity('R')">بحث عن المدينة</button>
+<div id="resR" class="resList"></div>
 <div class="row"><div><label>خط الطول Lon</label><input id="lonR" value="44.36"></div><div><label>خط العرض Lat</label><input id="latR" value="33.31"></div><div><label>الارتفاع m</label><input id="altR" value="0"></div></div>
+<div class="muted" id="nameR">المدينة الحالية: بغداد</div>
 </div>
 
 <div class="card">
 <h2>مدينة السكن</h2>
-<label>المدينة</label><select id="cityS"></select>
+<label>اكتب اسم المدينة - أي مدينة بالعالم</label>
+<input id="searchS" placeholder="مثال: بيروت، لندن، نيويورك...">
+<button class="small" onclick="searchCity('S')">بحث عن المدينة</button>
+<div id="resS" class="resList"></div>
 <div class="row"><div><label>خط الطول Lon</label><input id="lonS" value="35.5"></div><div><label>خط العرض Lat</label><input id="latS" value="33.9"></div><div><label>الارتفاع m</label><input id="altS" value="0"></div></div>
+<div class="muted" id="nameS">المدينة الحالية: بيروت</div>
 <label>تاريخ المساء اللي بدك تقارن فيه</label><input type="date" id="date">
 <button id="btn" onclick="compareCities()">قارن بين المدينتين من ناسا</button>
 <div id="loading" class="muted" style="display:none;margin-top:10px">...</div>
@@ -47,72 +54,65 @@ table{width:100%;border-collapse:collapse;font-size:14px} td,th{padding:9px;bord
 
 <div id="results" style="display:none">
 <div class="card">
-<h2>المقارنة - فارق خطوط العرض والطول</h2>
+<h2>الجدول - المدينتين جنب بعض والفارق بيناتهم</h2>
 <table>
-<tr><td>خط عرض مدينة الرؤيا</td><td id="c_latR">-</td></tr>
-<tr><td>خط عرض مدينة السكن</td><td id="c_latS">-</td></tr>
-<tr><td>فارق خط العرض</td><td id="c_dlat">-</td></tr>
-<tr><td>خط طول مدينة الرؤيا</td><td id="c_lonR">-</td></tr>
-<tr><td>خط طول مدينة السكن</td><td id="c_lonS">-</td></tr>
-<tr><td>فارق خط الطول</td><td id="c_dlon">-</td></tr>
-<tr><td>هل مدينة الرؤيا شرق مدينة السكن؟</td><td id="c_east">-</td></tr>
-<tr><td>هل نفس النصف الشمالي / الجنوبي؟</td><td id="c_hemi">-</td></tr>
-<tr><td>هل فارق العرض أقل من 2 درجة؟</td><td id="c_latOk">-</td></tr>
-<tr><td>هل فارق الطول أقل من 30 خط؟</td><td id="c_lonOk">-</td></tr>
-<tr><td><b>هل تتحقق شروط الرؤية الشرقية؟</b></td><td id="c_all"><b>-</b></td></tr>
-<tr><td>فرق ارتفاع الهلال (رؤيا - سكن)</td><td id="c_elDiff">-</td></tr>
-<tr><td>فرق مدة البقاء (رؤيا - سكن)</td><td id="c_stayDiff">-</td></tr>
-<tr><td>فرق غروب الشمس (رؤيا - سكن)</td><td id="c_sunsetDiff">-</td></tr>
+<tr><th>البيان</th><th>مدينة الرؤيا</th><th>مدينة السكن</th><th>الفارق (رؤيا - سكن)</th></tr>
+<tr><td>اسم المدينة</td><td id="t_nameR">-</td><td id="t_nameS">-</td><td>-</td></tr>
+<tr><td>خط العرض</td><td id="t_latR">-</td><td id="t_latS">-</td><td id="t_latD">-</td></tr>
+<tr><td>خط الطول</td><td id="t_lonR">-</td><td id="t_lonS">-</td><td id="t_lonD">-</td></tr>
+<tr><td>فارق خط العرض (مطلق)</td><td colspan="2">-</td><td id="t_dlatAbs">-</td></tr>
+<tr><td>فارق خط الطول (مطلق)</td><td colspan="2">-</td><td id="t_dlonAbs">-</td></tr>
+<tr><td>ارتفاع الهلال عن الأفق</td><td id="t_elR">-</td><td id="t_elS">-</td><td id="t_elD">-</td></tr>
+<tr><td>موقع الهلال</td><td id="t_azR">-</td><td id="t_azS">-</td><td id="t_azD">-</td></tr>
+<tr><td>الاقتران المركزي</td><td id="t_conjR">-</td><td id="t_conjS">-</td><td id="t_conjD">-</td></tr>
+<tr><td>اكتساب الهلال للنور</td><td id="t_illR">-</td><td id="t_illS">-</td><td id="t_illD">-</td></tr>
+<tr><td>غروب الهلال</td><td id="t_moonsetR">-</td><td id="t_moonsetS">-</td><td id="t_moonsetD">-</td></tr>
+<tr><td>عمر الهلال</td><td id="t_ageR">-</td><td id="t_ageS">-</td><td id="t_ageD">-</td></tr>
+<tr><td>موقع الشمس</td><td id="t_sunazR">-</td><td id="t_sunazS">-</td><td id="t_sunazD">-</td></tr>
+<tr><td>غروب الشمس</td><td id="t_sunsetR">-</td><td id="t_sunsetS">-</td><td id="t_sunsetD">-</td></tr>
+<tr><td>الاختلاف بين موقع الشمس والقمر</td><td id="t_azdifR">-</td><td id="t_azdifS">-</td><td id="t_azdifD">-</td></tr>
+<tr><td>الزاوية بين الشمس والقمر</td><td id="t_elongR">-</td><td id="t_elongS">-</td><td id="t_elongD">-</td></tr>
+<tr><td>مدة بقاء الهلال بعد غروب الشمس</td><td id="t_stayR">-</td><td id="t_stayS">-</td><td id="t_stayD">-</td></tr>
+<tr><td>المسافة بين الأرض والقمر</td><td id="t_rangeR">-</td><td id="t_rangeS">-</td><td id="t_rangeD">-</td></tr>
+<tr><td>القطر الزاوي للقمر</td><td id="t_diamR">-</td><td id="t_diamS">-</td><td id="t_diamD">-</td></tr>
+<tr><td>القدر الظاهري للقمر</td><td id="t_magR">-</td><td id="t_magS">-</td><td id="t_magD">-</td></tr>
 </table>
-<div class="muted" id="c_note" style="margin-top:8px"></div>
+<div class="muted" id="meta" style="margin-top:10px"></div>
+<div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل</a></div>
 </div>
-
-<div class="card"><h2>بيانات الهلال - مدينة الرؤيا عند غروب الشمس</h2><div class="grid">
-<div class="box"><small>ارتفاع الهلال عن الأفق</small><b id="v_el_R">-</b></div>
-<div class="box"><small>موقع الهلال</small><b id="v_az_R">-</b></div>
-<div class="box"><small>الاقتران المركزي</small><b id="v_conj_R">-</b></div>
-<div class="box"><small>اكتساب الهلال للنور</small><b id="v_ill_R">-</b></div>
-<div class="box"><small>غروب الهلال</small><b id="v_moonset_R">-</b></div>
-<div class="box"><small>عمر الهلال</small><b id="v_age_R">-</b></div>
-<div class="box"><small>موقع الشمس</small><b id="v_sunaz_R">-</b></div>
-<div class="box"><small>غروب الشمس</small><b id="v_sunset_R">-</b></div>
-<div class="box"><small>الاختلاف بين موقع الشمس والقمر</small><b id="v_azdif_R">-</b></div>
-<div class="box"><small>الزاوية بين الشمس والقمر</small><b id="v_elong_R">-</b></div>
-<div class="box"><small>مدة بقاء الهلال بعد غروب الشمس</small><b id="v_stay_R">-</b></div>
-<div class="box"><small>المسافة / القطر / القدر</small><b id="v_extra_R">-</b></div>
-</div></div>
-
-<div class="card"><h2>بيانات الهلال - مدينة السكن عند غروب الشمس</h2><div class="grid">
-<div class="box"><small>ارتفاع الهلال عن الأفق</small><b id="v_el_S">-</b></div>
-<div class="box"><small>موقع الهلال</small><b id="v_az_S">-</b></div>
-<div class="box"><small>الاقتران المركزي</small><b id="v_conj_S">-</b></div>
-<div class="box"><small>اكتساب الهلال للنور</small><b id="v_ill_S">-</b></div>
-<div class="box"><small>غروب الهلال</small><b id="v_moonset_S">-</b></div>
-<div class="box"><small>عمر الهلال</small><b id="v_age_S">-</b></div>
-<div class="box"><small>موقع الشمس</small><b id="v_sunaz_S">-</b></div>
-<div class="box"><small>غروب الشمس</small><b id="v_sunset_S">-</b></div>
-<div class="box"><small>الاختلاف بين موقع الشمس والقمر</small><b id="v_azdif_S">-</b></div>
-<div class="box"><small>الزاوية بين الشمس والقمر</small><b id="v_elong_S">-</b></div>
-<div class="box"><small>مدة بقاء الهلال بعد غروب الشمس</small><b id="v_stay_S">-</b></div>
-<div class="box"><small>المسافة / القطر / القدر</small><b id="v_extra_S">-</b></div>
-</div></div>
-
-<div class="card"><div class="muted" id="meta"></div><div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل</a></div></div>
 </div>
 
 <div class="card"><b>الناتج الخام من ناسا (للتحقق)</b><pre id="raw">لسا ما طلبت شي.</pre></div>
 
 <script>
-var cities=[["بيروت",35.5,33.9],["دمشق",36.29,33.51],["بغداد",44.36,33.31],["النجف",44.33,32.0],["كربلاء",44.02,32.61],["مكة",39.82,21.42],["المدينة",39.61,24.46],["قم",50.88,34.64],["طهران",51.39,35.69],["القاهرة",31.23,30.04],["عمان",35.93,31.95],["القدس",35.21,31.76],["إسطنبول",28.97,41.0],["دبي",55.30,25.20],["جاكرتا",106.84,-6.20],["كوالالمبور",101.68,3.13],["لندن",-0.12,51.50],["باريس",2.35,48.85],["نيويورك",-74.0,40.71]];
-function fillSel(id,defIdx){var sel=document.getElementById(id);cities.forEach(function(c,i){var o=document.createElement('option');o.value=i;o.textContent=c[0];if(i===defIdx)o.selected=true;sel.appendChild(o);});}
-fillSel('cityR',2);fillSel('cityS',0);
-document.getElementById('cityR').onchange=function(){var c=cities[parseInt(this.value)];document.getElementById('lonR').value=c[1];document.getElementById('latR').value=c[2];};
-document.getElementById('cityS').onchange=function(){var c=cities[parseInt(this.value)];document.getElementById('lonS').value=c[1];document.getElementById('latS').value=c[2];};
 (function(){var d=new Date();document.getElementById('date').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
 function pad(n){return String(n).padStart(2,'0');}
 function fmtUTC(dt){return dt.getUTCFullYear()+'-'+pad(dt.getUTCMonth()+1)+'-'+pad(dt.getUTCDate())+' '+pad(dt.getUTCHours())+':'+pad(dt.getUTCMinutes());}
 function fmtLocal(dt){return pad(dt.getHours())+':'+pad(dt.getMinutes());}
 function degMin(v){var a=Math.abs(v);var d=Math.floor(a);var m=Math.round((a-d)*60);if(m===60){d++;m=0;}return (v<0?'- ':'')+d+' درجة و '+m+' دقيقة';}
+async function searchCity(which){
+  var q=document.getElementById(which==='R'?'searchR':'searchS').value.trim();
+  if(!q){alert('اكتب اسم المدينة');return;}
+  var box=document.getElementById(which==='R'?'resR':'resS');
+  box.innerHTML='عم دور...';
+  try{
+    var res=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&q='+encodeURIComponent(q),{headers:{'Accept':'application/json'}});
+    var arr=await res.json();
+    if(!arr||arr.length===0){box.innerHTML='ما لقيت مدينة بهالاسم، جرّب اسم تاني أو اكتب خط الطول والعرض يدوياً.';return;}
+    box.innerHTML='';
+    arr.forEach(function(it){
+      var b=document.createElement('button');
+      b.textContent=it.display_name+'  ('+parseFloat(it.lat).toFixed(4)+', '+parseFloat(it.lon).toFixed(4)+')';
+      b.onclick=function(){
+        document.getElementById(which==='R'?'lonR':'lonS').value=parseFloat(it.lon).toFixed(4);
+        document.getElementById(which==='R'?'latR':'latS').value=parseFloat(it.lat).toFixed(4);
+        document.getElementById(which==='R'?'nameR':'nameS').textContent='المدينة الحالية: '+it.display_name;
+        box.innerHTML='تم الاختيار';
+      };
+      box.appendChild(b);
+    });
+  }catch(e){box.innerHTML='فشل البحث عن المدينة - جرّب مرة تانية أو اكتب الإحداثيات يدوياً.';}
+}
 function parseBlock(txt){var s=txt.indexOf('$$SOE');var e=txt.indexOf('$$EOE');if(s===-1||e===-1)return [];var block=txt.slice(s+5,e).trim();var lines=block.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});var out=[];lines.forEach(function(line){var parts=line.split(',').map(function(x){return x.trim();});var dateStr=parts[0];var nums=[];parts.forEach(function(p){if(p===''||p==='m'||p==='*'||p==='x')return;if(/[A-Za-z]{2,}/.test(p))return;var v=parseFloat(p);if(!isNaN(v)&&/^-?\d/.test(p))nums.push(v);});var dt=null;try{var m=dateStr.match(/(\d{4})-(\w{3})-(\d{2})\s+(\d{2}):(\d{2})/);if(m){var months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};dt=new Date(Date.UTC(parseInt(m[1]),months[m[2]],parseInt(m[3]),parseInt(m[4]),parseInt(m[5])));}}catch(e){}out.push({dateStr:dateStr,dt:dt,nums:nums,raw:line});});return out;}
 async function fetchHorizons(lon,lat,alt,command,startUTC,stopUTC,step,quantities){var url="https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='"+command+"'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='"+lon+","+lat+","+alt+"'&START_TIME='"+startUTC+"'&STOP_TIME='"+stopUTC+"'&STEP_SIZE='"+step+"'&QUANTITIES='"+quantities+"'&CSV_FORMAT='YES'&CAL_FORMAT='CAL'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";var res=await fetch(url);if(!res.ok)throw new Error('ناسا ما ردت - كود '+res.status);var j=await res.json();var txt=j.result||'';if(j.signature&&j.signature.error)throw new Error(j.signature.error);return {url:url,txt:txt,rows:parseBlock(txt)};}
 function setLoading(t){var el=document.getElementById('loading');el.style.display='block';el.textContent=t;}
@@ -156,21 +156,7 @@ async function getOneCity(lon,lat,alt,localMid,label){
   var azDiff=Math.abs(sunAZ-moonAZ);
   var stayMin=moonset?Math.round((moonset.getTime()-sunset.getTime())/60000):null;
   var ageMs=sunset.getTime()-conj.getTime();var ageH=Math.floor(ageMs/3600000);var ageM=Math.round((ageMs%3600000)/60000);
-  return {sunset:sunset,sunrise:sunrise,moonset:moonset,moonrise:moonrise,conj:conj,moonAZ:moonAZ,moonEL:moonEL,moonIll:moonIll,deltaAU:deltaAU,sot:sot,sunAZ:sunAZ,azDiff:azDiff,stayMin:stayMin,ageH:ageH,ageM:ageM,ra:ra,dec:dec,mag:mag,diam:diam,phase:phase,rangeKm:deltaAU*149597870.7};
-}
-function showCity(prefix,d){
-  document.getElementById('v_el_'+prefix).textContent=degMin(d.moonEL)+' ('+d.moonEL.toFixed(2)+'°)';
-  document.getElementById('v_az_'+prefix).textContent=degMin(d.moonAZ)+' ('+d.moonAZ.toFixed(2)+'°)';
-  document.getElementById('v_conj_'+prefix).textContent=d.conj.toLocaleDateString('ar',{weekday:'long'})+' '+fmtLocal(d.conj);
-  document.getElementById('v_ill_'+prefix).textContent=d.moonIll.toFixed(2)+' %';
-  document.getElementById('v_moonset_'+prefix).textContent=d.moonset?fmtLocal(d.moonset):'-';
-  document.getElementById('v_age_'+prefix).textContent=d.ageH+' ساعة و '+d.ageM+' دقيقة';
-  document.getElementById('v_sunaz_'+prefix).textContent=degMin(d.sunAZ)+' ('+d.sunAZ.toFixed(2)+'°)';
-  document.getElementById('v_sunset_'+prefix).textContent=fmtLocal(d.sunset);
-  document.getElementById('v_azdif_'+prefix).textContent=degMin(d.azDiff)+' ('+d.azDiff.toFixed(2)+'°)';
-  document.getElementById('v_elong_'+prefix).textContent=degMin(d.sot)+' ('+d.sot.toFixed(2)+'°)';
-  document.getElementById('v_stay_'+prefix).textContent=d.stayMin!==null?d.stayMin+' دقيقة':'-';
-  document.getElementById('v_extra_'+prefix).textContent=d.rangeKm.toLocaleString('en-US',{maximumFractionDigits:0})+' كلم / '+(d.diam!==null?d.diam.toFixed(2)+'°':'-')+' / '+(d.mag!==null?d.mag.toFixed(2):'-');
+  return {sunset:sunset,sunrise:sunrise,moonset:moonset,moonrise:moonrise,conj:conj,moonAZ:moonAZ,moonEL:moonEL,moonIll:moonIll,deltaAU:deltaAU,sot:sot,sunAZ:sunAZ,azDiff:azDiff,stayMin:stayMin,ageH:ageH,ageM:ageM,ageMin:ageMs/60000,ra:ra,dec:dec,mag:mag,diam:diam,phase:phase,rangeKm:deltaAU*149597870.7};
 }
 async function compareCities(){
   document.getElementById('err').style.display='none';document.getElementById('results').style.display='none';document.getElementById('ok').style.display='none';document.getElementById('btn').disabled=true;document.getElementById('raw').textContent='عم جيب...';
@@ -181,27 +167,60 @@ async function compareCities(){
     var lonS=parseFloat(document.getElementById('lonS').value),latS=parseFloat(document.getElementById('latS').value),altS=document.getElementById('altS').value||'0';
     var dR=await getOneCity(lonR,latR,altR,localMid,'مدينة الرؤيا');
     var dS=await getOneCity(lonS,latS,altS,localMid,'مدينة السكن');
-    showCity('R',dR);showCity('S',dS);
-    var dlat=Math.abs(latR-latS),dlon=Math.abs(lonR-lonS);
-    var east=lonR>lonS;
-    var hemi=(latR>=0)===(latS>=0);
-    var latOk=dlat<2,lonOk=dlon<=30;
-    var all=east&&hemi&&latOk&&lonOk;
-    document.getElementById('c_latR').textContent=latR+'°';
-    document.getElementById('c_latS').textContent=latS+'°';
-    document.getElementById('c_dlat').textContent=dlat.toFixed(4)+'°  ('+degMin(dlat)+')';
-    document.getElementById('c_lonR').textContent=lonR+'°';
-    document.getElementById('c_lonS').textContent=lonS+'°';
-    document.getElementById('c_dlon').textContent=dlon.toFixed(4)+' خط  ('+degMin(dlon)+')';
-    document.getElementById('c_east').innerHTML=east?'<span class="good">نعم - الرؤيا شرق السكن</span>':'<span class="bad">لا - الرؤيا غرب السكن</span>';
-    document.getElementById('c_hemi').innerHTML=hemi?'<span class="good">نعم - نفس النصف</span>':'<span class="bad">لا - نصف مختلف</span>';
-    document.getElementById('c_latOk').innerHTML=latOk?'<span class="good">نعم</span>':'<span class="bad">لا</span>';
-    document.getElementById('c_lonOk').innerHTML=lonOk?'<span class="good">نعم - أقل من 30</span>':'<span class="bad">لا - أكثر من 30</span>';
-    document.getElementById('c_all').innerHTML=all?'<span class="good">نعم - رؤية الرؤيا تكفي للسكن</span>':'<span class="bad">لا - لا تتحقق كل الشروط</span>';
-    document.getElementById('c_elDiff').textContent=(dR.moonEL-dS.moonEL).toFixed(2)+'°';
-    document.getElementById('c_stayDiff').textContent=(dR.stayMin!==null&&dS.stayMin!==null?(dR.stayMin-dS.stayMin)+' دقيقة':'-');
-    document.getElementById('c_sunsetDiff').textContent=Math.round((dR.sunset.getTime()-dS.sunset.getTime())/60000)+' دقيقة';
-    document.getElementById('c_note').textContent='القاعدة: الرؤيا شرق السكن + فرق العرض أقل من 2 درجة + نفس النصف + فرق الطول أقل من 30 خط = ليلة مشتركة مضمونة ورؤية الشرق تكفي للغرب.';
+    var nameR=document.getElementById('nameR').textContent.replace('المدينة الحالية: ','');
+    var nameS=document.getElementById('nameS').textContent.replace('المدينة الحالية: ','');
+    document.getElementById('t_nameR').textContent=nameR;
+    document.getElementById('t_nameS').textContent=nameS;
+    document.getElementById('t_latR').textContent=latR+'°';
+    document.getElementById('t_latS').textContent=latS+'°';
+    document.getElementById('t_latD').textContent=(latR-latS).toFixed(4)+'°';
+    document.getElementById('t_lonR').textContent=lonR+'°';
+    document.getElementById('t_lonS').textContent=lonS+'°';
+    document.getElementById('t_lonD').textContent=(lonR-lonS).toFixed(4)+'°';
+    document.getElementById('t_dlatAbs').textContent=Math.abs(latR-latS).toFixed(4)+'°  ('+degMin(Math.abs(latR-latS))+')';
+    document.getElementById('t_dlonAbs').textContent=Math.abs(lonR-lonS).toFixed(4)+'°  ('+degMin(Math.abs(lonR-lonS))+')';
+    document.getElementById('t_elR').textContent=degMin(dR.moonEL)+' ('+dR.moonEL.toFixed(2)+'°)';
+    document.getElementById('t_elS').textContent=degMin(dS.moonEL)+' ('+dS.moonEL.toFixed(2)+'°)';
+    document.getElementById('t_elD').textContent=(dR.moonEL-dS.moonEL).toFixed(2)+'°';
+    document.getElementById('t_azR').textContent=degMin(dR.moonAZ)+' ('+dR.moonAZ.toFixed(2)+'°)';
+    document.getElementById('t_azS').textContent=degMin(dS.moonAZ)+' ('+dS.moonAZ.toFixed(2)+'°)';
+    document.getElementById('t_azD').textContent=(dR.moonAZ-dS.moonAZ).toFixed(2)+'°';
+    document.getElementById('t_conjR').textContent=dR.conj.toLocaleDateString('ar',{weekday:'long'})+' '+fmtLocal(dR.conj)+' (UTC '+fmtUTC(dR.conj)+')';
+    document.getElementById('t_conjS').textContent=dS.conj.toLocaleDateString('ar',{weekday:'long'})+' '+fmtLocal(dS.conj)+' (UTC '+fmtUTC(dS.conj)+')';
+    document.getElementById('t_conjD').textContent=Math.round((dR.conj.getTime()-dS.conj.getTime())/60000)+' دقيقة';
+    document.getElementById('t_illR').textContent=dR.moonIll.toFixed(2)+' %';
+    document.getElementById('t_illS').textContent=dS.moonIll.toFixed(2)+' %';
+    document.getElementById('t_illD').textContent=(dR.moonIll-dS.moonIll).toFixed(2)+' %';
+    document.getElementById('t_moonsetR').textContent=dR.moonset?fmtLocal(dR.moonset):'-';
+    document.getElementById('t_moonsetS').textContent=dS.moonset?fmtLocal(dS.moonset):'-';
+    document.getElementById('t_moonsetD').textContent=(dR.moonset&&dS.moonset?Math.round((dR.moonset.getTime()-dS.moonset.getTime())/60000)+' دقيقة':'-');
+    document.getElementById('t_ageR').textContent=dR.ageH+' ساعة و '+dR.ageM+' دقيقة';
+    document.getElementById('t_ageS').textContent=dS.ageH+' ساعة و '+dS.ageM+' دقيقة';
+    document.getElementById('t_ageD').textContent=Math.round(dR.ageMin-dS.ageMin)+' دقيقة';
+    document.getElementById('t_sunazR').textContent=degMin(dR.sunAZ)+' ('+dR.sunAZ.toFixed(2)+'°)';
+    document.getElementById('t_sunazS').textContent=degMin(dS.sunAZ)+' ('+dS.sunAZ.toFixed(2)+'°)';
+    document.getElementById('t_sunazD').textContent=(dR.sunAZ-dS.sunAZ).toFixed(2)+'°';
+    document.getElementById('t_sunsetR').textContent=fmtLocal(dR.sunset);
+    document.getElementById('t_sunsetS').textContent=fmtLocal(dS.sunset);
+    document.getElementById('t_sunsetD').textContent=Math.round((dR.sunset.getTime()-dS.sunset.getTime())/60000)+' دقيقة';
+    document.getElementById('t_azdifR').textContent=degMin(dR.azDiff)+' ('+dR.azDiff.toFixed(2)+'°)';
+    document.getElementById('t_azdifS').textContent=degMin(dS.azDiff)+' ('+dS.azDiff.toFixed(2)+'°)';
+    document.getElementById('t_azdifD').textContent=(dR.azDiff-dS.azDiff).toFixed(2)+'°';
+    document.getElementById('t_elongR').textContent=degMin(dR.sot)+' ('+dR.sot.toFixed(2)+'°)';
+    document.getElementById('t_elongS').textContent=degMin(dS.sot)+' ('+dS.sot.toFixed(2)+'°)';
+    document.getElementById('t_elongD').textContent=(dR.sot-dS.sot).toFixed(2)+'°';
+    document.getElementById('t_stayR').textContent=dR.stayMin!==null?dR.stayMin+' دقيقة':'-';
+    document.getElementById('t_stayS').textContent=dS.stayMin!==null?dS.stayMin+' دقيقة':'-';
+    document.getElementById('t_stayD').textContent=(dR.stayMin!==null&&dS.stayMin!==null?(dR.stayMin-dS.stayMin)+' دقيقة':'-');
+    document.getElementById('t_rangeR').textContent=dR.rangeKm.toLocaleString('en-US',{maximumFractionDigits:0})+' كلم';
+    document.getElementById('t_rangeS').textContent=dS.rangeKm.toLocaleString('en-US',{maximumFractionDigits:0})+' كلم';
+    document.getElementById('t_rangeD').textContent=Math.round(dR.rangeKm-dS.rangeKm)+' كلم';
+    document.getElementById('t_diamR').textContent=dR.diam!==null?dR.diam.toFixed(4)+'°':'-';
+    document.getElementById('t_diamS').textContent=dS.diam!==null?dS.diam.toFixed(4)+'°':'-';
+    document.getElementById('t_diamD').textContent=(dR.diam!==null&&dS.diam!==null?(dR.diam-dS.diam).toFixed(4)+'°':'-');
+    document.getElementById('t_magR').textContent=dR.mag!==null?dR.mag.toFixed(2):'-';
+    document.getElementById('t_magS').textContent=dS.mag!==null?dS.mag.toFixed(2):'-';
+    document.getElementById('t_magD').textContent=(dR.mag!==null&&dS.mag!==null?(dR.mag-dS.mag).toFixed(2):'-');
     document.getElementById('meta').textContent='تاريخ المقارنة: '+dateVal+' | الرؤيا: '+lonR+', '+latR+' | السكن: '+lonS+', '+latS;
     document.getElementById('results').style.display='block';
     var ok=document.getElementById('ok');ok.style.display='block';ok.textContent='تم - بيانات المدينتين من ناسا DE441';
