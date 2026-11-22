@@ -81,7 +81,7 @@ h3{font-size:15px;margin:12px 0 4px}
 <div class="item"><h3>موقع الهلال <button class="q" onclick="toggleExp('exp_az')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_azR">-</b></div><div><small>مدينة السكن</small><b id="t_azS">-</b></div><div><small>الفارق</small><b id="t_azD">-</b></div></div><div class="explain" id="exp_az"><b>ماذا يعني؟</b> السمت، الزاوية الأفقية من الشمال: الصفر شمال، والتسعون شرق، والمئة والثمانون جنوب، والمئتان والسبعون غرب.</div></div>
 <div class="item"><h3>موقع الشمس <button class="q" onclick="toggleExp('exp_sunaz')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_sunazR">-</b></div><div><small>مدينة السكن</small><b id="t_sunazS">-</b></div><div><small>الفارق</small><b id="t_sunazD">-</b></div></div><div class="explain" id="exp_sunaz"><b>ماذا يعني؟</b> سمت الشمس عند الغروب، أي أين غربت الشمس بالضبط.</div></div>
 <div class="item"><h3>المسافة بين الأرض والقمر <button class="q" onclick="toggleExp('exp_range')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_rangeR">-</b></div><div><small>مدينة السكن</small><b id="t_rangeS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_range"><b>ماذا يعني؟</b> بُعد القمر عن الأرض، بين 356 ألف و 406 آلاف كلم. كلما كان أقرب، كان أكبر وأسطع.</div></div>
-<div class="item"><h3>القطر الزاوي للقمر <button class="q" onclick="toggleExp('exp_diam')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_diamR">-</b></div><div><small>مدينة السكن</small><b id="t_diamS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_diam"><b>ماذا يعني؟</b> حجم القمر في السماء بالدرجات، حوالي نصف درجة.</div></div>
+<div class="item"><h3>القطر الزاوي للقمر <button class="q" onclick="toggleExp('exp_diam')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_diamR">-</b></div><div><small>مدينة السكن</small><b id="t_diamS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_diam"><b>ماذا يعني؟</b> حجم القمر في السماء بالدرجات، حوالي نصف درجة. وناسا ترجعه بالثواني القوسية، لذلك نقسمه على 3600 لتحويله إلى درجات. فمثلا 1954 ثانية قوسية تساوي 0.543 درجة.</div></div>
 <div class="item"><h3>القدر الظاهري للقمر <button class="q" onclick="toggleExp('exp_mag')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_magR">-</b></div><div><small>مدينة السكن</small><b id="t_magS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_mag"><b>ماذا يعني؟</b> سطوع القمر. والرقم الأصغر يعني أسطع. والبدر حوالي -12.7، والهلال حوالي -6 إلى -8.</div></div>
 <div class="muted" id="meta" style="margin-top:10px"></div>
 <div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل</a></div>
@@ -146,7 +146,7 @@ async function getOneCity(lon,lat,alt,localMid,label,conj){
   setLoading('جارٍ جلب تفاصيل إضافية - '+label+'...');
   var extra=await fetchHorizons(lon,lat,alt,'301',ssUTC,ssUTC2,'1m','9,13');
   var mag=null,diam=null;
-  if(extra.rows.length>0&&extra.rows[0].nums.length>=3){mag=extra.rows[0].nums[0];diam=extra.rows[0].nums[2];}
+  if(extra.rows.length>0&&extra.rows[0].nums.length>=3){mag=extra.rows[0].nums[0];diam=extra.rows[0].nums[2]/3600;}
   setLoading('جارٍ جلب غروب القمر - '+label+'...');
   var moonEndUTC=fmtUTC(new Date(sunset.getTime()+24*3600*1000));
   var moonDay=await fetchHorizons(lon,lat,alt,'301',startUTC,moonEndUTC,'5m','4');
