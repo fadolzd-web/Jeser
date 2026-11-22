@@ -3,168 +3,210 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>موقع القمر - ناسا مباشرة</title>
+<title>مقارنة الهلال - ناسا مباشرة DE441</title>
 <style>
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial;background:#0b1220;color:#fff;padding:16px}
-h1{font-size:20px;margin:0 0 4px} p.sub{color:#9aa7bd;font-size:13px;margin:0 0 16px}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial;background:#0b1220;color:#fff;padding:14px}
+h1{font-size:20px;margin:0 0 4px} p.sub{color:#9aa7bd;font-size:13px;margin:0 0 14px}
 .card{background:#151f33;border:1px solid #26324f;border-radius:14px;padding:14px;margin-bottom:12px}
 label{display:block;font-size:13px;color:#cbd5e1;margin:10px 0 6px}
 select,input{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#fff;font-size:15px}
 .row{display:flex;gap:10px} .row>div{flex:1}
 button{width:100%;padding:14px;border:0;border-radius:12px;background:#22c55e;color:#000;font-weight:800;font-size:16px;cursor:pointer;margin-top:14px}
 button:disabled{opacity:.6}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.box{background:#1e293b;border-radius:12px;padding:12px} .box small{color:#94a3b8;display:block;font-size:12px} .box b{font-size:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.box{background:#1e293b;border-radius:12px;padding:12px} .box small{color:#94a3b8;display:block;font-size:12px} .box b{font-size:16px;display:block;margin-top:2px} .box span{font-size:12px;color:#cbd5e1}
 .err{background:#7f1d1d;border:1px solid #ef4444;border-radius:12px;padding:12px;display:none;margin-top:12px}
-.ok{background:#0f2a1a;border:1px solid #22c55e;border-radius:12px;padding:12px;display:none;margin-top:12px}
-pre{background:#020617;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:320px;overflow:auto}
+.ok{background:#0f2a1a;border:1px solid #22c55e;border-radius:12px;padding:10px;display:none;margin-top:12px;font-size:13px}
+pre{background:#020617;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:280px;overflow:auto}
 a{color:#7dd3fc;word-break:break-all;font-size:12px}
 .muted{color:#94a3b8;font-size:12px}
+h2{font-size:16px;margin:14px 0 6px}
+table{width:100%;border-collapse:collapse;font-size:14px} td,th{padding:9px;border-bottom:1px solid #334155;text-align:right} th{color:#94a3b8;font-weight:400}
+.good{color:#4ade80} .bad{color:#f87171}
 </style>
 </head>
 <body>
-<h1>🌙 موقع القمر - من ناسا مباشرة DE441</h1>
-<p class="sub">ما في بيانات وهمية. إذا فشل الاتصال، بيقول فشلت وما بيعرض شي.</p>
+<h1>🌙 مقارنة الهلال بين مدينتين - ناسا مباشرة DE441</h1>
+<p class="sub">مدينة الرؤيا شرقاً، ومدينة السكن غرباً. كل البيانات من ناسا مباشرة، ما في شي وهمي.</p>
+
 <div class="card">
-<label>المدينة</label>
-<select id="city"></select>
-<div class="row">
-<div><label>خط الطول Lon</label><input id="lon" value="35.5"></div>
-<div><label>خط العرض Lat</label><input id="lat" value="33.9"></div>
-<div><label>الارتفاع m</label><input id="alt" value="0"></div>
+<h2>مدينة الرؤيا</h2>
+<label>المدينة</label><select id="cityR"></select>
+<div class="row"><div><label>خط الطول Lon</label><input id="lonR" value="44.36"></div><div><label>خط العرض Lat</label><input id="latR" value="33.31"></div><div><label>الارتفاع m</label><input id="altR" value="0"></div></div>
 </div>
-<label>التاريخ والوقت</label>
-<input type="datetime-local" id="dt">
-<button id="btn" onclick="getMoon()">جيب بيانات القمر من ناسا</button>
-<div id="loading" class="muted" style="display:none;margin-top:10px">عم جيب من ناسا...</div>
-<div id="err" class="err"></div>
-<div id="ok" class="ok"></div>
+
+<div class="card">
+<h2>مدينة السكن</h2>
+<label>المدينة</label><select id="cityS"></select>
+<div class="row"><div><label>خط الطول Lon</label><input id="lonS" value="35.5"></div><div><label>خط العرض Lat</label><input id="latS" value="33.9"></div><div><label>الارتفاع m</label><input id="altS" value="0"></div></div>
+<label>تاريخ المساء اللي بدك تقارن فيه</label><input type="date" id="date">
+<button id="btn" onclick="compareCities()">قارن بين المدينتين من ناسا</button>
+<div id="loading" class="muted" style="display:none;margin-top:10px">...</div>
+<div id="err" class="err"></div><div id="ok" class="ok"></div>
 </div>
+
 <div id="results" style="display:none">
-<div class="grid">
-<div class="box"><small>الارتفاع EL</small><b id="v_el">-</b><small id="v_el_note"></small></div>
-<div class="box"><small>السمت AZ / الاتجاه</small><b id="v_az">-</b><small id="v_az_dir"></small></div>
-<div class="box"><small>الإضاءة Illumination</small><b id="v_ill">-</b></div>
-<div class="box"><small>المسافة Range</small><b id="v_range">-</b></div>
-<div class="box"><small>الاستطالة S-O-T</small><b id="v_sot">-</b></div>
-<div class="box"><small>معدل المسافة</small><b id="v_rr">-</b></div>
-</div>
-<div class="card" style="margin-top:12px">
-<div class="muted" id="meta"></div>
-<div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل - اضغط لتتأكد بنفسك</a></div>
-</div>
-</div>
 <div class="card">
-<b style="font-size:14px">الناتج الخام من ناسا (للتحقق)</b>
-<div class="muted">بيظهر دائما بعد المحاولة، حتى لو فشل التحليل.</div>
-<pre id="raw">لسا ما طلبت شي.</pre>
+<h2>المقارنة - فارق خطوط العرض والطول</h2>
+<table>
+<tr><td>خط عرض مدينة الرؤيا</td><td id="c_latR">-</td></tr>
+<tr><td>خط عرض مدينة السكن</td><td id="c_latS">-</td></tr>
+<tr><td>فارق خط العرض</td><td id="c_dlat">-</td></tr>
+<tr><td>خط طول مدينة الرؤيا</td><td id="c_lonR">-</td></tr>
+<tr><td>خط طول مدينة السكن</td><td id="c_lonS">-</td></tr>
+<tr><td>فارق خط الطول</td><td id="c_dlon">-</td></tr>
+<tr><td>هل مدينة الرؤيا شرق مدينة السكن؟</td><td id="c_east">-</td></tr>
+<tr><td>هل نفس النصف الشمالي / الجنوبي؟</td><td id="c_hemi">-</td></tr>
+<tr><td>هل فارق العرض أقل من 2 درجة؟</td><td id="c_latOk">-</td></tr>
+<tr><td>هل فارق الطول أقل من 30 خط؟</td><td id="c_lonOk">-</td></tr>
+<tr><td><b>هل تتحقق شروط الرؤية الشرقية؟</b></td><td id="c_all"><b>-</b></td></tr>
+<tr><td>فرق ارتفاع الهلال (رؤيا - سكن)</td><td id="c_elDiff">-</td></tr>
+<tr><td>فرق مدة البقاء (رؤيا - سكن)</td><td id="c_stayDiff">-</td></tr>
+<tr><td>فرق غروب الشمس (رؤيا - سكن)</td><td id="c_sunsetDiff">-</td></tr>
+</table>
+<div class="muted" id="c_note" style="margin-top:8px"></div>
 </div>
+
+<div class="card"><h2>بيانات الهلال - مدينة الرؤيا عند غروب الشمس</h2><div class="grid">
+<div class="box"><small>ارتفاع الهلال عن الأفق</small><b id="v_el_R">-</b></div>
+<div class="box"><small>موقع الهلال</small><b id="v_az_R">-</b></div>
+<div class="box"><small>الاقتران المركزي</small><b id="v_conj_R">-</b></div>
+<div class="box"><small>اكتساب الهلال للنور</small><b id="v_ill_R">-</b></div>
+<div class="box"><small>غروب الهلال</small><b id="v_moonset_R">-</b></div>
+<div class="box"><small>عمر الهلال</small><b id="v_age_R">-</b></div>
+<div class="box"><small>موقع الشمس</small><b id="v_sunaz_R">-</b></div>
+<div class="box"><small>غروب الشمس</small><b id="v_sunset_R">-</b></div>
+<div class="box"><small>الاختلاف بين موقع الشمس والقمر</small><b id="v_azdif_R">-</b></div>
+<div class="box"><small>الزاوية بين الشمس والقمر</small><b id="v_elong_R">-</b></div>
+<div class="box"><small>مدة بقاء الهلال بعد غروب الشمس</small><b id="v_stay_R">-</b></div>
+<div class="box"><small>المسافة / القطر / القدر</small><b id="v_extra_R">-</b></div>
+</div></div>
+
+<div class="card"><h2>بيانات الهلال - مدينة السكن عند غروب الشمس</h2><div class="grid">
+<div class="box"><small>ارتفاع الهلال عن الأفق</small><b id="v_el_S">-</b></div>
+<div class="box"><small>موقع الهلال</small><b id="v_az_S">-</b></div>
+<div class="box"><small>الاقتران المركزي</small><b id="v_conj_S">-</b></div>
+<div class="box"><small>اكتساب الهلال للنور</small><b id="v_ill_S">-</b></div>
+<div class="box"><small>غروب الهلال</small><b id="v_moonset_S">-</b></div>
+<div class="box"><small>عمر الهلال</small><b id="v_age_S">-</b></div>
+<div class="box"><small>موقع الشمس</small><b id="v_sunaz_S">-</b></div>
+<div class="box"><small>غروب الشمس</small><b id="v_sunset_S">-</b></div>
+<div class="box"><small>الاختلاف بين موقع الشمس والقمر</small><b id="v_azdif_S">-</b></div>
+<div class="box"><small>الزاوية بين الشمس والقمر</small><b id="v_elong_S">-</b></div>
+<div class="box"><small>مدة بقاء الهلال بعد غروب الشمس</small><b id="v_stay_S">-</b></div>
+<div class="box"><small>المسافة / القطر / القدر</small><b id="v_extra_S">-</b></div>
+</div></div>
+
+<div class="card"><div class="muted" id="meta"></div><div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل</a></div></div>
+</div>
+
+<div class="card"><b>الناتج الخام من ناسا (للتحقق)</b><pre id="raw">لسا ما طلبت شي.</pre></div>
+
 <script>
-var cities = [
-["بيروت",35.5,33.9],["دمشق",36.29,33.51],["بغداد",44.36,33.31],["النجف",44.33,32.0],["كربلاء",44.02,32.61],["مكة",39.82,21.42],["المدينة",39.61,24.46],["قم",50.88,34.64],["طهران",51.39,35.69],["القاهرة",31.23,30.04],["عمان",35.93,31.95],["القدس",35.21,31.76],["إسطنبول",28.97,41.0],["دبي",55.30,25.20],["جاكرتا",106.84,-6.20],["كوالالمبور",101.68,3.13],["لندن",-0.12,51.50],["باريس",2.35,48.85],["نيويورك",-74.0,40.71]
-];
-var sel = document.getElementById('city');
-cities.forEach(function(c,i){
-  var o = document.createElement('option');
-  o.value = i; o.textContent = c[0];
-  sel.appendChild(o);
-});
-sel.onchange = function(){
-  var c = cities[parseInt(sel.value)];
-  document.getElementById('lon').value = c[1];
-  document.getElementById('lat').value = c[2];
-};
-(function(){
-  var d = new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
-  document.getElementById('dt').value = d.toISOString().slice(0,16);
-})();
-function dirFromAz(az){
-  var dirs = ["شمال","شمال شرق","شرق","جنوب شرق","جنوب","جنوب غرب","غرب","شمال غرب"];
-  return dirs[Math.round(az/45)%8];
+var cities=[["بيروت",35.5,33.9],["دمشق",36.29,33.51],["بغداد",44.36,33.31],["النجف",44.33,32.0],["كربلاء",44.02,32.61],["مكة",39.82,21.42],["المدينة",39.61,24.46],["قم",50.88,34.64],["طهران",51.39,35.69],["القاهرة",31.23,30.04],["عمان",35.93,31.95],["القدس",35.21,31.76],["إسطنبول",28.97,41.0],["دبي",55.30,25.20],["جاكرتا",106.84,-6.20],["كوالالمبور",101.68,3.13],["لندن",-0.12,51.50],["باريس",2.35,48.85],["نيويورك",-74.0,40.71]];
+function fillSel(id,defIdx){var sel=document.getElementById(id);cities.forEach(function(c,i){var o=document.createElement('option');o.value=i;o.textContent=c[0];if(i===defIdx)o.selected=true;sel.appendChild(o);});}
+fillSel('cityR',2);fillSel('cityS',0);
+document.getElementById('cityR').onchange=function(){var c=cities[parseInt(this.value)];document.getElementById('lonR').value=c[1];document.getElementById('latR').value=c[2];};
+document.getElementById('cityS').onchange=function(){var c=cities[parseInt(this.value)];document.getElementById('lonS').value=c[1];document.getElementById('latS').value=c[2];};
+(function(){var d=new Date();document.getElementById('date').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
+function pad(n){return String(n).padStart(2,'0');}
+function fmtUTC(dt){return dt.getUTCFullYear()+'-'+pad(dt.getUTCMonth()+1)+'-'+pad(dt.getUTCDate())+' '+pad(dt.getUTCHours())+':'+pad(dt.getUTCMinutes());}
+function fmtLocal(dt){return pad(dt.getHours())+':'+pad(dt.getMinutes());}
+function degMin(v){var a=Math.abs(v);var d=Math.floor(a);var m=Math.round((a-d)*60);if(m===60){d++;m=0;}return (v<0?'- ':'')+d+' درجة و '+m+' دقيقة';}
+function parseBlock(txt){var s=txt.indexOf('$$SOE');var e=txt.indexOf('$$EOE');if(s===-1||e===-1)return [];var block=txt.slice(s+5,e).trim();var lines=block.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});var out=[];lines.forEach(function(line){var parts=line.split(',').map(function(x){return x.trim();});var dateStr=parts[0];var nums=[];parts.forEach(function(p){if(p===''||p==='m'||p==='*'||p==='x')return;if(/[A-Za-z]{2,}/.test(p))return;var v=parseFloat(p);if(!isNaN(v)&&/^-?\d/.test(p))nums.push(v);});var dt=null;try{var m=dateStr.match(/(\d{4})-(\w{3})-(\d{2})\s+(\d{2}):(\d{2})/);if(m){var months={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};dt=new Date(Date.UTC(parseInt(m[1]),months[m[2]],parseInt(m[3]),parseInt(m[4]),parseInt(m[5])));}}catch(e){}out.push({dateStr:dateStr,dt:dt,nums:nums,raw:line});});return out;}
+async function fetchHorizons(lon,lat,alt,command,startUTC,stopUTC,step,quantities){var url="https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='"+command+"'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='"+lon+","+lat+","+alt+"'&START_TIME='"+startUTC+"'&STOP_TIME='"+stopUTC+"'&STEP_SIZE='"+step+"'&QUANTITIES='"+quantities+"'&CSV_FORMAT='YES'&CAL_FORMAT='CAL'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";var res=await fetch(url);if(!res.ok)throw new Error('ناسا ما ردت - كود '+res.status);var j=await res.json();var txt=j.result||'';if(j.signature&&j.signature.error)throw new Error(j.signature.error);return {url:url,txt:txt,rows:parseBlock(txt)};}
+function setLoading(t){var el=document.getElementById('loading');el.style.display='block';el.textContent=t;}
+async function getOneCity(lon,lat,alt,localMid,label){
+  var startDay=new Date(localMid.getTime());var endDay=new Date(localMid.getTime()+24*3600*1000);
+  var startUTC=fmtUTC(startDay);var endUTC=fmtUTC(new Date(endDay.getTime()+2*3600*1000));
+  setLoading('عم جيب غروب الشمس - '+label+'...');
+  var sunDay=await fetchHorizons(lon,lat,alt,'10',startUTC,endUTC,'10m','4');
+  if(sunDay.rows.length===0)throw new Error('ناسا ما رجعت جدول الشمس - '+label);
+  var sunset=null,sunrise=null;
+  for(var i=0;i<sunDay.rows.length-1;i++){var el1=sunDay.rows[i].nums[1],el2=sunDay.rows[i+1].nums[1];if(el1===undefined||el2===undefined)continue;if(el1>0&&el2<=0){var t1=sunDay.rows[i].dt,t2=sunDay.rows[i+1].dt;var frac=el1/(el1-el2);sunset=new Date(t1.getTime()+frac*(t2.getTime()-t1.getTime()));}if(el1<=0&&el2>0){var t1b=sunDay.rows[i].dt,t2b=sunDay.rows[i+1].dt;var fracb=(0-el1)/(el2-el1);sunrise=new Date(t1b.getTime()+fracb*(t2b.getTime()-t1b.getTime()));}}
+  if(!sunset)throw new Error('ما لقيت غروب الشمس - '+label);
+  setLoading('عم جيب القمر عند الغروب - '+label+'...');
+  var ssUTC=fmtUTC(sunset);var ssUTC2=fmtUTC(new Date(sunset.getTime()+2*60000));
+  var moonAt=await fetchHorizons(lon,lat,alt,'301',ssUTC,ssUTC2,'1m','4,10,20,24');
+  if(moonAt.rows.length===0)throw new Error('ناسا ما رجعت جدول القمر - '+label);
+  document.getElementById('raw').textContent=moonAt.txt.slice(0,6000);document.getElementById('link').href=moonAt.url;
+  var mr=moonAt.rows[0].nums;if(mr.length<6)throw new Error('عدد أرقام القمر ناقص - '+label);
+  var moonAZ=mr[0],moonEL=mr[1],moonIll=mr[2],deltaAU=mr[3],deldot=mr[4],sot=mr[5];
+  setLoading('عم جيب الشمس عند الغروب - '+label+'...');
+  var sunAt=await fetchHorizons(lon,lat,alt,'10',ssUTC,ssUTC2,'1m','4');
+  var sunAZ=sunAt.rows.length>0?sunAt.rows[0].nums[0]:null;
+  if(sunAZ===null)throw new Error('ما لقيت موقع الشمس - '+label);
+  setLoading('عم جيب تفاصيل إضافية - '+label+'...');
+  var extra=await fetchHorizons(lon,lat,alt,'301',ssUTC,ssUTC2,'1m','1,9,12,19');
+  var ra=null,dec=null,mag=null,diam=null,phase=null;
+  if(extra.rows.length>0&&extra.rows[0].nums.length>=5){ra=extra.rows[0].nums[0];dec=extra.rows[0].nums[1];mag=extra.rows[0].nums[2];diam=extra.rows[0].nums[3];phase=extra.rows[0].nums[4];}
+  setLoading('عم جيب غروب القمر - '+label+'...');
+  var moonEndUTC=fmtUTC(new Date(sunset.getTime()+8*3600*1000));
+  var moonDay=await fetchHorizons(lon,lat,alt,'301',startUTC,moonEndUTC,'10m','4');
+  var moonset=null,moonrise=null;
+  for(var j=0;j<moonDay.rows.length-1;j++){var me1=moonDay.rows[j].nums[1],me2=moonDay.rows[j+1].nums[1];if(me1===undefined||me2===undefined)continue;var tt1=moonDay.rows[j].dt,tt2=moonDay.rows[j+1].dt;if(me1>0&&me2<=0&&tt1>sunset){var fr=me1/(me1-me2);moonset=new Date(tt1.getTime()+fr*(tt2.getTime()-tt1.getTime()));break;}}
+  for(var k=0;k<moonDay.rows.length-1;k++){var me1b=moonDay.rows[k].nums[1],me2b=moonDay.rows[k+1].nums[1];if(me1b===undefined||me2b===undefined)continue;if(me1b<=0&&me2b>0){var tt1c=moonDay.rows[k].dt,tt2c=moonDay.rows[k+1].dt;var frc=(0-me1b)/(me2b-me1b);moonrise=new Date(tt1c.getTime()+frc*(tt2c.getTime()-tt1c.getTime()));break;}}
+  setLoading('عم جيب الاقتران - '+label+'...');
+  var conjStartUTC=fmtUTC(new Date(sunset.getTime()-72*3600*1000));
+  var conjCoarse=await fetchHorizons(lon,lat,alt,'301',conjStartUTC,ssUTC,'30m','24');
+  var minRow=null,minVal=1e9;conjCoarse.rows.forEach(function(r){if(r.nums.length>0&&r.nums[0]<minVal){minVal=r.nums[0];minRow=r;}});
+  var conj=null;
+  if(minRow&&minRow.dt){var fineStart=fmtUTC(new Date(minRow.dt.getTime()-60*60000));var fineEnd=fmtUTC(new Date(minRow.dt.getTime()+60*60000));var conjFine=await fetchHorizons(lon,lat,alt,'301',fineStart,fineEnd,'1m','24');var min2=1e9,minRow2=null;conjFine.rows.forEach(function(r){if(r.nums.length>0&&r.nums[0]<min2){min2=r.nums[0];minRow2=r;}});if(minRow2)conj=minRow2.dt;}
+  if(!conj)throw new Error('ما لقيت الاقتران - '+label);
+  var azDiff=Math.abs(sunAZ-moonAZ);
+  var stayMin=moonset?Math.round((moonset.getTime()-sunset.getTime())/60000):null;
+  var ageMs=sunset.getTime()-conj.getTime();var ageH=Math.floor(ageMs/3600000);var ageM=Math.round((ageMs%3600000)/60000);
+  return {sunset:sunset,sunrise:sunrise,moonset:moonset,moonrise:moonrise,conj:conj,moonAZ:moonAZ,moonEL:moonEL,moonIll:moonIll,deltaAU:deltaAU,sot:sot,sunAZ:sunAZ,azDiff:azDiff,stayMin:stayMin,ageH:ageH,ageM:ageM,ra:ra,dec:dec,mag:mag,diam:diam,phase:phase,rangeKm:deltaAU*149597870.7};
 }
-function fmtUTC(dt){
-  var y = dt.getUTCFullYear();
-  var m = String(dt.getUTCMonth()+1).padStart(2,'0');
-  var dd = String(dt.getUTCDate()).padStart(2,'0');
-  var h = String(dt.getUTCHours()).padStart(2,'0');
-  var mi = String(dt.getUTCMinutes()).padStart(2,'0');
-  return y+'-'+m+'-'+dd+' '+h+':'+mi;
+function showCity(prefix,d){
+  document.getElementById('v_el_'+prefix).textContent=degMin(d.moonEL)+' ('+d.moonEL.toFixed(2)+'°)';
+  document.getElementById('v_az_'+prefix).textContent=degMin(d.moonAZ)+' ('+d.moonAZ.toFixed(2)+'°)';
+  document.getElementById('v_conj_'+prefix).textContent=d.conj.toLocaleDateString('ar',{weekday:'long'})+' '+fmtLocal(d.conj);
+  document.getElementById('v_ill_'+prefix).textContent=d.moonIll.toFixed(2)+' %';
+  document.getElementById('v_moonset_'+prefix).textContent=d.moonset?fmtLocal(d.moonset):'-';
+  document.getElementById('v_age_'+prefix).textContent=d.ageH+' ساعة و '+d.ageM+' دقيقة';
+  document.getElementById('v_sunaz_'+prefix).textContent=degMin(d.sunAZ)+' ('+d.sunAZ.toFixed(2)+'°)';
+  document.getElementById('v_sunset_'+prefix).textContent=fmtLocal(d.sunset);
+  document.getElementById('v_azdif_'+prefix).textContent=degMin(d.azDiff)+' ('+d.azDiff.toFixed(2)+'°)';
+  document.getElementById('v_elong_'+prefix).textContent=degMin(d.sot)+' ('+d.sot.toFixed(2)+'°)';
+  document.getElementById('v_stay_'+prefix).textContent=d.stayMin!==null?d.stayMin+' دقيقة':'-';
+  document.getElementById('v_extra_'+prefix).textContent=d.rangeKm.toLocaleString('en-US',{maximumFractionDigits:0})+' كلم / '+(d.diam!==null?d.diam.toFixed(2)+'°':'-')+' / '+(d.mag!==null?d.mag.toFixed(2):'-');
 }
-async function getMoon(){
-  document.getElementById('err').style.display='none';
-  document.getElementById('results').style.display='none';
-  document.getElementById('ok').style.display='none';
-  document.getElementById('loading').style.display='block';
-  document.getElementById('btn').disabled=true;
-  document.getElementById('raw').textContent = 'عم جيب...';
+async function compareCities(){
+  document.getElementById('err').style.display='none';document.getElementById('results').style.display='none';document.getElementById('ok').style.display='none';document.getElementById('btn').disabled=true;document.getElementById('raw').textContent='عم جيب...';
   try{
-    var lon = document.getElementById('lon').value.trim();
-    var lat = document.getElementById('lat').value.trim();
-    var alt = document.getElementById('alt').value.trim() || '0';
-    var dtVal = document.getElementById('dt').value;
-    if(!dtVal) throw new Error('اختار التاريخ والوقت');
-    var d = new Date(dtVal);
-    var startUTC = fmtUTC(d);
-    var d2 = new Date(d.getTime() + 2*60*1000);
-    var stopUTC = fmtUTC(d2);
-    // إصلاح مهم: STOP لازم يكون بعد START بدقيقتين، مش نفس اللحظة، وإلا ناسا بترجع جدول فاضي
-    var url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='301'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='" + lon + "," + lat + "," + alt + "'&START_TIME='" + startUTC + "'&STOP_TIME='" + stopUTC + "'&STEP_SIZE='1m'&QUANTITIES='4,10,20,24'&CSV_FORMAT='YES'&CAL_FORMAT='CAL'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";
-    document.getElementById('link').href = url;
-    document.getElementById('meta').textContent = 'الوقت المستعمل UTC: ' + startUTC + ' إلى ' + stopUTC + ' | الإحداثيات: ' + lon + ', ' + lat + ', ' + alt;
-    var res = await fetch(url);
-    if(!res.ok) throw new Error('ناسا ما ردت - كود ' + res.status);
-    var j = await res.json();
-    var txt = j.result || '';
-    document.getElementById('raw').textContent = txt.slice(0,6000) || '(ناسا رجعت جواب فاضي)';
-    if(j.signature && j.signature.error) throw new Error(j.signature.error);
-    if(!txt || txt.indexOf('$$SOE')===-1) throw new Error('ناسا رجعت جواب من دون جدول SOE. شوف الناتج الخام تحت.');
-    var s = txt.indexOf('$$SOE');
-    var e = txt.indexOf('$$EOE');
-    var block = txt.slice(s+5, e).trim();
-    var lines = block.split('\n').map(function(l){return l.trim()}).filter(function(l){return l.length>0});
-    if(lines.length===0) throw new Error('جدول ناسا فاضي. شوف الناتج الخام.');
-    // خد أول سطر فيه أرقام
-    var dataLine = null;
-    for(var i=0;i<lines.length;i++){
-      if(lines[i].indexOf(',')>-1 && /\d/.test(lines[i])){ dataLine = lines[i]; break; }
-    }
-    if(!dataLine) throw new Error('ما لقيت سطر بيانات. شوف الناتج الخام.');
-    var parts = dataLine.split(',').map(function(x){return x.trim()});
-    // شيل حقول التاريخ من الأول: التاريخ فيه حروف أو JD كبير
-    // نضل نشيل أول عنصر طالما فيه حروف أو رقمه أكبر من 10000 (JD)
-    while(parts.length>0){
-      var f = parts[0];
-      var num = parseFloat(f);
-      var hasLetter = /[A-Za-z]/.test(f);
-      var isJD = !isNaN(num) && Math.abs(num) > 10000;
-      var isDate = hasLetter || isJD || f.indexOf('-')>-1 && f.length>8 && /\d{4}/.test(f);
-      // إذا أول عنصر فيه حروف أو JD، شيله وكمّل
-      if(hasLetter || isJD){ parts.shift(); continue; }
-      // إذا أول عنصر هو تاريخ بصيغة 2026-Nov-22، هو فيه حروف فانشال فوق، فهون وقف
-      break;
-    }
-    // هلق parts لازم تكون: AZ, EL, Illum, Range, RangeRate, S-O-T
-    if(parts.length < 6) throw new Error('عدد الأعمدة بعد شيل التاريخ = ' + parts.length + '، المتوقع 6. السطر: ' + dataLine);
-    var az = parseFloat(parts[0]), el = parseFloat(parts[1]), ill = parts[2], range = parts[3], rr = parts[4], sot = parts[5];
-    if(isNaN(az) || isNaN(el)) throw new Error('أرقام غير صالحة. السطر: ' + dataLine);
-    document.getElementById('v_el').textContent = el.toFixed(4) + '°';
-    document.getElementById('v_el_note').textContent = el > 0 ? 'فوق الأفق' : 'تحت الأفق';
-    document.getElementById('v_az').textContent = az.toFixed(4) + '°';
-    document.getElementById('v_az_dir').textContent = dirFromAz(az);
-    document.getElementById('v_ill').textContent = ill + ' %';
-    document.getElementById('v_range').textContent = Number(range).toLocaleString('en-US') + ' km';
-    document.getElementById('v_sot').textContent = sot + '°';
-    document.getElementById('v_rr').textContent = rr + ' km/s';
+    var dateVal=document.getElementById('date').value;if(!dateVal)throw new Error('اختار التاريخ');
+    var localMid=new Date(dateVal+'T00:00:00');
+    var lonR=parseFloat(document.getElementById('lonR').value),latR=parseFloat(document.getElementById('latR').value),altR=document.getElementById('altR').value||'0';
+    var lonS=parseFloat(document.getElementById('lonS').value),latS=parseFloat(document.getElementById('latS').value),altS=document.getElementById('altS').value||'0';
+    var dR=await getOneCity(lonR,latR,altR,localMid,'مدينة الرؤيا');
+    var dS=await getOneCity(lonS,latS,altS,localMid,'مدينة السكن');
+    showCity('R',dR);showCity('S',dS);
+    var dlat=Math.abs(latR-latS),dlon=Math.abs(lonR-lonS);
+    var east=lonR>lonS;
+    var hemi=(latR>=0)===(latS>=0);
+    var latOk=dlat<2,lonOk=dlon<=30;
+    var all=east&&hemi&&latOk&&lonOk;
+    document.getElementById('c_latR').textContent=latR+'°';
+    document.getElementById('c_latS').textContent=latS+'°';
+    document.getElementById('c_dlat').textContent=dlat.toFixed(4)+'°  ('+degMin(dlat)+')';
+    document.getElementById('c_lonR').textContent=lonR+'°';
+    document.getElementById('c_lonS').textContent=lonS+'°';
+    document.getElementById('c_dlon').textContent=dlon.toFixed(4)+' خط  ('+degMin(dlon)+')';
+    document.getElementById('c_east').innerHTML=east?'<span class="good">نعم - الرؤيا شرق السكن</span>':'<span class="bad">لا - الرؤيا غرب السكن</span>';
+    document.getElementById('c_hemi').innerHTML=hemi?'<span class="good">نعم - نفس النصف</span>':'<span class="bad">لا - نصف مختلف</span>';
+    document.getElementById('c_latOk').innerHTML=latOk?'<span class="good">نعم</span>':'<span class="bad">لا</span>';
+    document.getElementById('c_lonOk').innerHTML=lonOk?'<span class="good">نعم - أقل من 30</span>':'<span class="bad">لا - أكثر من 30</span>';
+    document.getElementById('c_all').innerHTML=all?'<span class="good">نعم - رؤية الرؤيا تكفي للسكن</span>':'<span class="bad">لا - لا تتحقق كل الشروط</span>';
+    document.getElementById('c_elDiff').textContent=(dR.moonEL-dS.moonEL).toFixed(2)+'°';
+    document.getElementById('c_stayDiff').textContent=(dR.stayMin!==null&&dS.stayMin!==null?(dR.stayMin-dS.stayMin)+' دقيقة':'-');
+    document.getElementById('c_sunsetDiff').textContent=Math.round((dR.sunset.getTime()-dS.sunset.getTime())/60000)+' دقيقة';
+    document.getElementById('c_note').textContent='القاعدة: الرؤيا شرق السكن + فرق العرض أقل من 2 درجة + نفس النصف + فرق الطول أقل من 30 خط = ليلة مشتركة مضمونة ورؤية الشرق تكفي للغرب.';
+    document.getElementById('meta').textContent='تاريخ المقارنة: '+dateVal+' | الرؤيا: '+lonR+', '+latR+' | السكن: '+lonS+', '+latS;
     document.getElementById('results').style.display='block';
-    var ok = document.getElementById('ok');
-    ok.style.display='block'; ok.textContent = 'تم - بيانات مباشرة من ناسا DE441';
-  }catch(err){
-    var e = document.getElementById('err');
-    e.style.display='block'; e.textContent = 'فشلت - ' + (err.message || 'فشل الاتصال');
-  }finally{
-    document.getElementById('loading').style.display='none';
-    document.getElementById('btn').disabled=false;
-  }
+    var ok=document.getElementById('ok');ok.style.display='block';ok.textContent='تم - بيانات المدينتين من ناسا DE441';
+  }catch(err){var e=document.getElementById('err');e.style.display='block';e.textContent='فشلت - '+(err.message||'فشل الاتصال');}
+  finally{document.getElementById('loading').style.display='none';document.getElementById('btn').disabled=false;}
 }
 </script>
 </body>
