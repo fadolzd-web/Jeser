@@ -17,7 +17,7 @@ button:disabled{opacity:.6}
 .box{background:#1e293b;border-radius:12px;padding:12px} .box small{color:#94a3b8;display:block;font-size:12px} .box b{font-size:20px}
 .err{background:#7f1d1d;border:1px solid #ef4444;border-radius:12px;padding:12px;display:none;margin-top:12px}
 .ok{background:#0f2a1a;border:1px solid #22c55e;border-radius:12px;padding:12px;display:none;margin-top:12px}
-pre{background:#020617;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:300px;overflow:auto;display:none}
+pre{background:#020617;border-radius:10px;padding:10px;white-space:pre-wrap;word-break:break-word;font-size:11px;max-height:320px;overflow:auto}
 a{color:#7dd3fc;word-break:break-all;font-size:12px}
 .muted{color:#94a3b8;font-size:12px}
 </style>
@@ -25,7 +25,6 @@ a{color:#7dd3fc;word-break:break-all;font-size:12px}
 <body>
 <h1>🌙 موقع القمر - من ناسا مباشرة DE441</h1>
 <p class="sub">ما في بيانات وهمية. إذا فشل الاتصال، بيقول فشلت وما بيعرض شي.</p>
-
 <div class="card">
 <label>المدينة</label>
 <select id="city"></select>
@@ -41,26 +40,25 @@ a{color:#7dd3fc;word-break:break-all;font-size:12px}
 <div id="err" class="err"></div>
 <div id="ok" class="ok"></div>
 </div>
-
 <div id="results" style="display:none">
 <div class="grid">
 <div class="box"><small>الارتفاع EL</small><b id="v_el">-</b><small id="v_el_note"></small></div>
 <div class="box"><small>السمت AZ / الاتجاه</small><b id="v_az">-</b><small id="v_az_dir"></small></div>
 <div class="box"><small>الإضاءة Illumination</small><b id="v_ill">-</b></div>
 <div class="box"><small>المسافة Range</small><b id="v_range">-</b></div>
-<div class="box"><small>القدر الظاهري Magnitude</small><b id="v_mag">-</b></div>
 <div class="box"><small>الاستطالة S-O-T</small><b id="v_sot">-</b></div>
-<div class="box"><small>RA الظاهري</small><b id="v_ra">-</b></div>
-<div class="box"><small>Dec الظاهري</small><b id="v_dec">-</b></div>
+<div class="box"><small>معدل المسافة</small><b id="v_rr">-</b></div>
 </div>
 <div class="card" style="margin-top:12px">
 <div class="muted" id="meta"></div>
 <div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل - اضغط لتتأكد بنفسك</a></div>
-<button onclick="toggleRaw()" style="background:#334155;color:#fff">عرض الناتج الخام من ناسا</button>
-<pre id="raw"></pre>
 </div>
 </div>
-
+<div class="card">
+<b style="font-size:14px">الناتج الخام من ناسا (للتحقق)</b>
+<div class="muted">بيظهر دائما بعد المحاولة، حتى لو فشل التحليل.</div>
+<pre id="raw">لسا ما طلبت شي.</pre>
+</div>
 <script>
 var cities = [
 ["بيروت",35.5,33.9],["دمشق",36.29,33.51],["بغداد",44.36,33.31],["النجف",44.33,32.0],["كربلاء",44.02,32.61],["مكة",39.82,21.42],["المدينة",39.61,24.46],["قم",50.88,34.64],["طهران",51.39,35.69],["القاهرة",31.23,30.04],["عمان",35.93,31.95],["القدس",35.21,31.76],["إسطنبول",28.97,41.0],["دبي",55.30,25.20],["جاكرتا",106.84,-6.20],["كوالالمبور",101.68,3.13],["لندن",-0.12,51.50],["باريس",2.35,48.85],["نيويورك",-74.0,40.71]
@@ -76,7 +74,6 @@ sel.onchange = function(){
   document.getElementById('lon').value = c[1];
   document.getElementById('lat').value = c[2];
 };
-// default datetime now
 (function(){
   var d = new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
   document.getElementById('dt').value = d.toISOString().slice(0,16);
@@ -85,15 +82,13 @@ function dirFromAz(az){
   var dirs = ["شمال","شمال شرق","شرق","جنوب شرق","جنوب","جنوب غرب","غرب","شمال غرب"];
   return dirs[Math.round(az/45)%8];
 }
-function toggleRaw(){
-  var r = document.getElementById('raw');
-  r.style.display = (r.style.display==='block'?'none':'block');
-}
-function showFail(msg){
-  var e = document.getElementById('err');
-  e.style.display='block'; e.textContent = 'فشلت - ' + msg;
-  document.getElementById('results').style.display='none';
-  document.getElementById('ok').style.display='none';
+function fmtUTC(dt){
+  var y = dt.getUTCFullYear();
+  var m = String(dt.getUTCMonth()+1).padStart(2,'0');
+  var dd = String(dt.getUTCDate()).padStart(2,'0');
+  var h = String(dt.getUTCHours()).padStart(2,'0');
+  var mi = String(dt.getUTCMinutes()).padStart(2,'0');
+  return y+'-'+m+'-'+dd+' '+h+':'+mi;
 }
 async function getMoon(){
   document.getElementById('err').style.display='none';
@@ -101,54 +96,71 @@ async function getMoon(){
   document.getElementById('ok').style.display='none';
   document.getElementById('loading').style.display='block';
   document.getElementById('btn').disabled=true;
+  document.getElementById('raw').textContent = 'عم جيب...';
   try{
     var lon = document.getElementById('lon').value.trim();
     var lat = document.getElementById('lat').value.trim();
     var alt = document.getElementById('alt').value.trim() || '0';
     var dtVal = document.getElementById('dt').value;
-    if(!dtVal){ throw new Error('اختار التاريخ والوقت'); }
+    if(!dtVal) throw new Error('اختار التاريخ والوقت');
     var d = new Date(dtVal);
-    var utc = d.toISOString().slice(0,16).replace('T',' ');
-    // Horizons needs YYYY-MM-DD HH:MM
-    var url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='301'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='" + lon + "," + lat + "," + alt + "'&START_TIME='" + utc + "'&STOP_TIME='" + utc + "'&STEP_SIZE='1m'&QUANTITIES='4,10,20,24'&CSV_FORMAT='YES'&CAL_FORMAT='CAL'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";
+    var startUTC = fmtUTC(d);
+    var d2 = new Date(d.getTime() + 2*60*1000);
+    var stopUTC = fmtUTC(d2);
+    // إصلاح مهم: STOP لازم يكون بعد START بدقيقتين، مش نفس اللحظة، وإلا ناسا بترجع جدول فاضي
+    var url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='301'&EPHEM_TYPE='OBSERVER'&CENTER='coord@399'&SITE_COORD='" + lon + "," + lat + "," + alt + "'&START_TIME='" + startUTC + "'&STOP_TIME='" + stopUTC + "'&STEP_SIZE='1m'&QUANTITIES='4,10,20,24'&CSV_FORMAT='YES'&CAL_FORMAT='CAL'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";
     document.getElementById('link').href = url;
-    document.getElementById('meta').textContent = 'الوقت المستعمل UTC: ' + utc + ' | الإحداثيات: ' + lon + ', ' + lat + ', ' + alt;
+    document.getElementById('meta').textContent = 'الوقت المستعمل UTC: ' + startUTC + ' إلى ' + stopUTC + ' | الإحداثيات: ' + lon + ', ' + lat + ', ' + alt;
     var res = await fetch(url);
-    if(!res.ok){ throw new Error('ناسا ما ردت - كود ' + res.status); }
+    if(!res.ok) throw new Error('ناسا ما ردت - كود ' + res.status);
     var j = await res.json();
-    if(j.signature && j.signature.error){ throw new Error(j.signature.error); }
     var txt = j.result || '';
-    document.getElementById('raw').textContent = txt;
+    document.getElementById('raw').textContent = txt.slice(0,6000) || '(ناسا رجعت جواب فاضي)';
+    if(j.signature && j.signature.error) throw new Error(j.signature.error);
+    if(!txt || txt.indexOf('$$SOE')===-1) throw new Error('ناسا رجعت جواب من دون جدول SOE. شوف الناتج الخام تحت.');
     var s = txt.indexOf('$$SOE');
     var e = txt.indexOf('$$EOE');
-    if(s===-1 || e===-1 || e<=s){ throw new Error('ناسا رجعت جواب ناقص'); }
     var block = txt.slice(s+5, e).trim();
-    var lines = block.split('\n').filter(function(l){return l.trim().length>0});
-    if(lines.length===0){ throw new Error('ما في سطر بيانات من ناسا'); }
-    var parts = lines[0].split(',').map(function(x){return x.trim()});
-    // مع CAL و QUANTITIES 4,10,20,24 المتوقع: date, AZ, EL, Illum, Range, RangeRate, S-O-T = 7 أعمدة
-    // لا نشدد: إذا ناسا رجعت أعمدة زيادة، مناخد من الآخر
-    if(parts.length < 7){ throw new Error('عدد الأعمدة ناقص من ناسا: ' + parts.length + ' | السطر: ' + lines[0]); }
-    // إذا كان في عمودين للتاريخ، منزح
-    var off = parts.length - 7;
-    var az = parseFloat(parts[1+off]), el = parseFloat(parts[2+off]), ill = parts[3+off], range = parts[4+off], sot = parts[6+off];
-    var ra = '-', dec = '-', mag = 'غير متوفر من ناسا';
-    if(isNaN(az) || isNaN(el)){ throw new Error('أرقام غير صالحة من ناسا'); }
+    var lines = block.split('\n').map(function(l){return l.trim()}).filter(function(l){return l.length>0});
+    if(lines.length===0) throw new Error('جدول ناسا فاضي. شوف الناتج الخام.');
+    // خد أول سطر فيه أرقام
+    var dataLine = null;
+    for(var i=0;i<lines.length;i++){
+      if(lines[i].indexOf(',')>-1 && /\d/.test(lines[i])){ dataLine = lines[i]; break; }
+    }
+    if(!dataLine) throw new Error('ما لقيت سطر بيانات. شوف الناتج الخام.');
+    var parts = dataLine.split(',').map(function(x){return x.trim()});
+    // شيل حقول التاريخ من الأول: التاريخ فيه حروف أو JD كبير
+    // نضل نشيل أول عنصر طالما فيه حروف أو رقمه أكبر من 10000 (JD)
+    while(parts.length>0){
+      var f = parts[0];
+      var num = parseFloat(f);
+      var hasLetter = /[A-Za-z]/.test(f);
+      var isJD = !isNaN(num) && Math.abs(num) > 10000;
+      var isDate = hasLetter || isJD || f.indexOf('-')>-1 && f.length>8 && /\d{4}/.test(f);
+      // إذا أول عنصر فيه حروف أو JD، شيله وكمّل
+      if(hasLetter || isJD){ parts.shift(); continue; }
+      // إذا أول عنصر هو تاريخ بصيغة 2026-Nov-22، هو فيه حروف فانشال فوق، فهون وقف
+      break;
+    }
+    // هلق parts لازم تكون: AZ, EL, Illum, Range, RangeRate, S-O-T
+    if(parts.length < 6) throw new Error('عدد الأعمدة بعد شيل التاريخ = ' + parts.length + '، المتوقع 6. السطر: ' + dataLine);
+    var az = parseFloat(parts[0]), el = parseFloat(parts[1]), ill = parts[2], range = parts[3], rr = parts[4], sot = parts[5];
+    if(isNaN(az) || isNaN(el)) throw new Error('أرقام غير صالحة. السطر: ' + dataLine);
     document.getElementById('v_el').textContent = el.toFixed(4) + '°';
     document.getElementById('v_el_note').textContent = el > 0 ? 'فوق الأفق' : 'تحت الأفق';
     document.getElementById('v_az').textContent = az.toFixed(4) + '°';
     document.getElementById('v_az_dir').textContent = dirFromAz(az);
     document.getElementById('v_ill').textContent = ill + ' %';
     document.getElementById('v_range').textContent = Number(range).toLocaleString('en-US') + ' km';
-    document.getElementById('v_mag').textContent = mag;
     document.getElementById('v_sot').textContent = sot + '°';
-    document.getElementById('v_ra').textContent = ra;
-    document.getElementById('v_dec').textContent = dec;
+    document.getElementById('v_rr').textContent = rr + ' km/s';
     document.getElementById('results').style.display='block';
     var ok = document.getElementById('ok');
     ok.style.display='block'; ok.textContent = 'تم - بيانات مباشرة من ناسا DE441';
   }catch(err){
-    showFail(err.message || 'فشل الاتصال');
+    var e = document.getElementById('err');
+    e.style.display='block'; e.textContent = 'فشلت - ' + (err.message || 'فشل الاتصال');
   }finally{
     document.getElementById('loading').style.display='none';
     document.getElementById('btn').disabled=false;
