@@ -23,11 +23,9 @@ a{color:#7dd3fc;word-break:break-all;font-size:12px}
 h2{font-size:17px;margin:14px 0 8px;border-bottom:1px solid #334155;padding-bottom:6px}
 h3{font-size:15px;margin:12px 0 4px}
 .item{background:#1e293b;border-radius:12px;padding:12px;margin-bottom:10px}
-.item b{font-size:16px}
 .vals{display:flex;gap:10px;margin-top:8px} .vals>div{flex:1;background:#0f172a;border-radius:10px;padding:10px} .vals small{color:#94a3b8;display:block;font-size:12px} .vals b{font-size:15px}
 .vals .better{background:#14532d;border:1px solid #22c55e}
 .explain{font-size:13px;color:#cbd5e1;margin-top:8px;background:#0b1220;border-radius:10px;padding:10px;display:none}
-.explain b{color:#fff}
 .resList button{display:block;width:100%;text-align:right;background:#1e293b;color:#fff;border:1px solid #334155;margin-top:6px;padding:10px;border-radius:10px}
 .badge{display:inline-block;background:#14532d;border:1px solid #22c55e;color:#bbf7d0;padding:2px 10px;border-radius:20px;font-size:13px;margin-top:6px}
 .badge-no{display:inline-block;background:#3f1d1d;border:1px solid #ef4444;color:#fecaca;padding:2px 10px;border-radius:20px;font-size:13px;margin-top:6px}
@@ -36,7 +34,6 @@ h3{font-size:15px;margin:12px 0 4px}
 <body>
 <h1>🌙 مقارنة الهلال بين مدينتين - ناسا مباشرة DE441</h1>
 <p class="sub">اكتب اسم أي مدينة في العالم. جميع البيانات من ناسا مباشرة، ولا توجد بيانات وهمية. عند فشل أي طلب، تظهر رسالة فشل ولا تظهر أية أرقام.</p>
-
 <div class="card">
 <h2>مدينة الرؤية</h2>
 <label>اكتب اسم المدينة - أي مدينة في العالم</label>
@@ -46,7 +43,6 @@ h3{font-size:15px;margin:12px 0 4px}
 <div class="row"><div><label>خط الطول Lon</label><input id="lonR" value="44.36"></div><div><label>خط العرض Lat</label><input id="latR" value="33.31"></div><div><label>الارتفاع m</label><input id="altR" value="0"></div></div>
 <div class="muted" id="nameR">المدينة الحالية: بغداد</div>
 </div>
-
 <div class="card">
 <h2>مدينة السكن</h2>
 <label>اكتب اسم المدينة - أي مدينة في العالم</label>
@@ -60,59 +56,46 @@ h3{font-size:15px;margin:12px 0 4px}
 <div id="loading" class="muted" style="display:none;margin-top:10px">...</div>
 <div id="err" class="err"></div><div id="ok" class="ok"></div>
 </div>
-
 <div id="results" style="display:none">
 <div class="card">
 <h2>الاقتران المركزي - لحظة واحدة لكل الأرض <button class="q" onclick="toggleExp('exp_conj')">؟</button></h2>
 <div class="item"><b id="v_conjAll">-</b><div class="muted" id="v_conjUTC">-</div>
-<div class="explain" id="exp_conj"><b>ماذا يعني؟</b> لحظة تساوي خط طول الشمس وخط طول القمر، أي المحاق، وولادة الهلال. قبل هذه اللحظة لا يوجد هلال إطلاقا.<br><b>لماذا هو مهم؟</b> هو الصفر الذي يبدأ بعده عمر الهلال.<br><b>كيف يُحسب؟</b> بالبحث عن أصغر استطالة بمركز الأرض (جيوسنتريك) بدقة دقيقة، لا لكل مدينة على حدة، لأن الاقتران لحظة واحدة لكل الأرض.<br><b>لماذا لا يُطرح؟</b> لا يوجد فارق، فالاقتران واحد للمدينتين.</div></div>
+<div class="explain" id="exp_conj"><b>ماذا يعني؟</b> لحظة تساوي خط طول الشمس وخط طول القمر، أي المحاق، وولادة الهلال. قبل هذه اللحظة لا يوجد هلال إطلاقا.<br><b>لماذا هو مهم؟</b> هو الصفر الذي يبدأ بعده عمر الهلال.<br><b>كيف يُحسب؟</b> بالبحث عن أصغر استطالة، أي الرمز 23 في ناسا، بمركز الأرض، بدقة دقيقة، في نافذة 32 يوما قبل الغروب، لأن الاقتران لحظة واحدة لكل الأرض.</div></div>
 </div>
-
 <div class="card">
 <h2>المقارنة الأساسية - تسعة بنود</h2>
 <p class="muted">تضاء خانة مدينة السكن باللون الأخضر عندما تكون بياناتها أفضل من بيانات مدينة الرؤية في هذا البند. وتضاء خانة الشرط باللون الأخضر عندما يتحقق الشرط.</p>
-
 <div class="item"><h3>1 - ارتفاع الهلال عن الأفق <button class="q" onclick="toggleExp('exp_el')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_elR">-</b></div><div id="box_elS"><small>مدينة السكن</small><b id="t_elS">-</b></div><div><small>الفارق</small><b id="t_elD">-</b></div></div><div id="badge_el"></div><div class="explain" id="exp_el"><b>ماذا يعني؟</b> الزاوية العمودية بين الهلال والأفق. الصفر يعني على الأفق، والسالب يعني تحت الأفق.<br><b>لماذا هو مهم؟</b> كلما كان أعلى، كان أوضح وأقل تأثرا بالغبار والغيوم القريبة من الأفق.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما يكون ارتفاع الهلال فيها أعلى.</div></div>
-
-<div class="item"><h3>2 - الزاوية بين الشمس والقمر <button class="q" onclick="toggleExp('exp_elong')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_elongR">-</b></div><div id="box_elongS"><small>مدينة السكن</small><b id="t_elongS">-</b></div><div><small>الفارق</small><b id="t_elongD">-</b></div></div><div id="badge_elong"></div><div class="explain" id="exp_elong"><b>ماذا يعني؟</b> الاستطالة، الزاوية الكاملة في السماء بين الشمس والقمر، وتشمل فارق الارتفاع وفارق السمت.<br><b>لماذا هي مهمة؟</b> هي المعيار الأساسي. إذا كانت صغيرة، كان الهلال قريبا من الشمس وصعبا. وإذا كانت كبيرة، كان الهلال أبعد وأوضح.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما تكون الزاوية فيها أكبر.</div></div>
-
-<div class="item"><h3>3 - عمر الهلال <button class="q" onclick="toggleExp('exp_age')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_ageR">-</b></div><div id="box_ageS"><small>مدينة السكن</small><b id="t_ageS">-</b></div><div><small>الفارق</small><b id="t_ageD">-</b></div></div><div id="badge_age"></div><div class="explain" id="exp_age"><b>ماذا يعني؟</b> الوقت من الاقتران إلى غروب الشمس. كلما كان أكبر، كان الهلال أكبر وأسطع.<br><b>كيف يُحسب؟</b> غروب الشمس ناقص وقت الاقتران.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما يكون العمر فيها أطول.</div></div>
-
+<div class="item"><h3>2 - الزاوية بين الشمس والقمر <button class="q" onclick="toggleExp('exp_elong')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_elongR">-</b></div><div id="box_elongS"><small>مدينة السكن</small><b id="t_elongS">-</b></div><div><small>الفارق</small><b id="t_elongD">-</b></div></div><div id="badge_elong"></div><div class="explain" id="exp_elong"><b>ماذا يعني؟</b> الاستطالة، الرمز 23 في ناسا، الزاوية الكاملة في السماء بين الشمس والقمر.<br><b>لماذا هي مهمة؟</b> إذا كانت صغيرة، كان الهلال قريبا من الشمس وصعبا. وإذا كانت كبيرة، كان الهلال أبعد وأوضح.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما تكون الزاوية فيها أكبر.</div></div>
+<div class="item"><h3>3 - عمر الهلال <button class="q" onclick="toggleExp('exp_age')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_ageR">-</b></div><div id="box_ageS"><small>مدينة السكن</small><b id="t_ageS">-</b></div><div><small>الفارق</small><b id="t_ageD">-</b></div></div><div id="badge_age"></div><div class="explain" id="exp_age"><b>ماذا يعني؟</b> الوقت من الاقتران إلى غروب الشمس. كلما كان أكبر، كان الهلال أكبر وأسطع.<br><b>كيف يُحسب؟</b> غروب الشمس ناقص وقت الاقتران. ويُحسب الاقتران في نافذة 32 يوما، حتى لو كان الهلال في منتصف الشهر.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما يكون العمر فيها أطول.</div></div>
 <div class="item"><h3>4 - اكتساب الهلال للنور <button class="q" onclick="toggleExp('exp_ill')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_illR">-</b></div><div id="box_illS"><small>مدينة السكن</small><b id="t_illS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div id="badge_ill"></div><div class="explain" id="exp_ill"><b>ماذا يعني؟</b> نسبة الجزء المضيء من قرص القمر. الصفر بالمئة عند المحاق، والمئة بالمئة عند البدر.<br><b>لماذا لا يُطرح؟</b> القيمتان في وقتين مختلفين، فالفارق بينهما ليس فارقا حقيقيا في اللحظة نفسها.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما تكون النسبة فيها أعلى.</div></div>
-
 <div class="item"><h3>5 - مدة بقاء الهلال بعد غروب الشمس <button class="q" onclick="toggleExp('exp_stay')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_stayR">-</b></div><div id="box_stayS"><small>مدينة السكن</small><b id="t_stayS">-</b></div><div><small>الفارق</small><b id="t_stayD">-</b></div></div><div id="badge_stay"></div><div class="explain" id="exp_stay"><b>ماذا يعني؟</b> غروب الهلال ناقص غروب الشمس. وهو الوقت الذي يبقى فيه الهلال فوق الأفق بعد غياب الشمس.<br><b>لماذا هو مهم؟</b> كلما كانت المدة أطول، كان الوقت المتاح للرؤية أطول.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما تكون المدة فيها أطول.</div></div>
-
-<div class="item"><h3>6 - الاختلاف بين موقع الشمس والقمر <button class="q" onclick="toggleExp('exp_azdif')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_azdifR">-</b></div><div id="box_azdifS"><small>مدينة السكن</small><b id="t_azdifS">-</b></div><div><small>الفارق</small><b id="t_azdifD">-</b></div></div><div id="badge_azdif"></div><div class="explain" id="exp_azdif"><b>ماذا يعني؟</b> فارق السمت فقط: القيمة المطلقة لفارق سمت الشمس وسمت القمر. وهو المسافة الأفقية بينهما.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما يكون الفارق فيها أكبر، أي أن الهلال أبعد أفقيا عن موضع غروب الشمس.</div></div>
-
-<div class="item"><h3>7 - غروب الهلال بعد غروب الشمس <button class="q" onclick="toggleExp('exp_moonset')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_moonsetR">-</b><div class="muted" id="t_moonsetRutc">-</div></div><div id="box_moonsetS"><small>مدينة السكن</small><b id="t_moonsetS">-</b><div class="muted" id="t_moonsetSutc">-</div></div><div><small>الفارق (بـ UTC)</small><b id="t_moonsetD">-</b></div></div><div id="badge_moonset"></div><div class="explain" id="exp_moonset"><b>ماذا يعني؟</b> وقت نزول الهلال تحت الأفق. إذا غرب قبل الشمس، لا يمكن رؤيته.<br><b>كيف يُحسب؟</b> بمسح ارتفاع القمر كل خمس دقائق بعد الغروب حتى يعبر الصفر.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما يغرب الهلال فيها بعد الشمس، بينما يغرب قبلها في مدينة الرؤية، أو عندما تكون مدة بقائه فيها أطول.</div></div>
-
-<div class="item"><h3>8 - هل مدينة الرؤية شرق مدينة السكن؟ <button class="q" onclick="toggleExp('exp_east')">؟</button></h3><div class="vals"><div><small>خط طول الرؤية</small><b id="t_lonR">-</b></div><div><small>خط طول السكن</small><b id="t_lonS">-</b></div><div><small>الفارق</small><b id="t_lonD">-</b></div></div><div id="badge_east"></div><div class="explain" id="exp_east"><b>ماذا يعني؟</b> أن تكون مدينة الرؤية شرق مدينة السكن، أي أن خط طولها أكبر.<br><b>لماذا هو مهم؟</b> لأن الرؤية في الشرق تسبق الغروب في الغرب، فيكون الهلال قد وُلد، وتكون مدة بقائه أطول في الغرب.<br><b>متى يضاء بالأخضر؟</b> عندما تكون مدينة الرؤية شرق مدينة السكن.</div></div>
-
-<div class="item"><h3>9 - هل فارق دوائر العرض أقل من درجتين؟ <button class="q" onclick="toggleExp('exp_lat')">؟</button></h3><div class="vals"><div><small>خط عرض الرؤية</small><b id="t_latR">-</b></div><div><small>خط عرض السكن</small><b id="t_latS">-</b></div><div><small>الفارق المطلق</small><b id="t_latD">-</b></div></div><div id="badge_lat"></div><div class="explain" id="exp_lat"><b>ماذا يعني؟</b> فارق خط العرض بين المدينتين، من دون إشارة، أي القيمة المطلقة.<br><b>لماذا هو مهم؟</b> لأن تقارب دوائر العرض يعني تقارب ظروف الليل والفصول، وتقارب وضع الهلال.<br><b>متى يضاء بالأخضر؟</b> عندما يكون الفارق أقل من درجتين.</div></div>
-
+<div class="item"><h3>6 - الاختلاف بين موقع الشمس والقمر <button class="q" onclick="toggleExp('exp_azdif')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_azdifR">-</b></div><div id="box_azdifS"><small>مدينة السكن</small><b id="t_azdifS">-</b></div><div><small>الفارق</small><b id="t_azdifD">-</b></div></div><div id="badge_azdif"></div><div class="explain" id="exp_azdif"><b>ماذا يعني؟</b> فارق السمت فقط: القيمة المطلقة لفارق سمت الشمس وسمت القمر. وهو المسافة الأفقية بينهما.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما يكون الفارق فيها أكبر.</div></div>
+<div class="item"><h3>7 - غروب الهلال بعد غروب الشمس <button class="q" onclick="toggleExp('exp_moonset')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_moonsetR">-</b><div class="muted" id="t_moonsetRutc">-</div></div><div id="box_moonsetS"><small>مدينة السكن</small><b id="t_moonsetS">-</b><div class="muted" id="t_moonsetSutc">-</div></div><div><small>الفارق (بـ UTC)</small><b id="t_moonsetD">-</b></div></div><div id="badge_moonset"></div><div class="explain" id="exp_moonset"><b>ماذا يعني؟</b> وقت نزول الهلال تحت الأفق. إذا غرب قبل الشمس، لا يمكن رؤيته.<br><b>كيف يُحسب؟</b> بمسح ارتفاع القمر كل خمس دقائق بعد الغروب، في نافذة 24 ساعة بعد الغروب، لأن القمر الأحدب قد يغرب بعد 12 ساعة.<br><b>متى تكون مدينة السكن أفضل؟</b> عندما يغرب الهلال فيها بعد الشمس، بينما يغرب قبلها في مدينة الرؤية، أو عندما تكون مدة بقائه فيها أطول.</div></div>
+<div class="item"><h3>8 - هل مدينة الرؤية شرق مدينة السكن؟ <button class="q" onclick="toggleExp('exp_east')">؟</button></h3><div class="vals"><div><small>خط طول الرؤية</small><b id="t_lonR">-</b></div><div><small>خط طول السكن</small><b id="t_lonS">-</b></div><div><small>الفارق</small><b id="t_lonD">-</b></div></div><div id="badge_east"></div><div class="explain" id="exp_east"><b>ماذا يعني؟</b> أن تكون مدينة الرؤية شرق مدينة السكن، أي أن خط طولها أكبر.<br><b>متى يضاء بالأخضر؟</b> عندما تكون مدينة الرؤية شرق مدينة السكن.</div></div>
+<div class="item"><h3>9 - هل فارق دوائر العرض أقل من درجتين؟ <button class="q" onclick="toggleExp('exp_lat')">؟</button></h3><div class="vals"><div><small>خط عرض الرؤية</small><b id="t_latR">-</b></div><div><small>خط عرض السكن</small><b id="t_latS">-</b></div><div><small>الفارق المطلق</small><b id="t_latD">-</b></div></div><div id="badge_lat"></div><div class="explain" id="exp_lat"><b>ماذا يعني؟</b> فارق خط العرض بين المدينتين، من دون إشارة، أي القيمة المطلقة.<br><b>متى يضاء بالأخضر؟</b> عندما يكون الفارق أقل من درجتين.</div></div>
 </div>
-
 <div class="card">
 <h2>تفاصيل إضافية</h2>
-<div class="item"><h3>غروب الشمس - لحظة الرصد <button class="q" onclick="toggleExp('exp_sunset')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_sunsetR">-</b><div class="muted" id="t_sunsetRutc">-</div></div><div><small>مدينة السكن</small><b id="t_sunsetS">-</b><div class="muted" id="t_sunsetSutc">-</div></div><div><small>الفارق (بـ UTC)</small><b id="t_sunsetD">-</b></div></div><div class="explain" id="exp_sunset"><b>ماذا يعني؟</b> لحظة نزول قرص الشمس تحت الأفق. جميع حسابات الهلال تُجرى في هذه اللحظة.<br><b>لماذا يُحسب الفارق بـ UTC؟</b> لأن التوقيت المحلي يختلف بين المدينتين، وطرح التوقيت المحلي يعطي رقما غير صحيح.</div></div>
-<div class="item"><h3>موقع الهلال <button class="q" onclick="toggleExp('exp_az')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_azR">-</b></div><div><small>مدينة السكن</small><b id="t_azS">-</b></div><div><small>الفارق</small><b id="t_azD">-</b></div></div><div class="explain" id="exp_az"><b>ماذا يعني؟</b> السمت AZ، الزاوية الأفقية من الشمال: الصفر شمال، والتسعون شرق، والمئة والثمانون جنوب، والمئتان والسبعون غرب. وهو يبين أين ينظر الراصد في السماء.</div></div>
-<div class="item"><h3>موقع الشمس <button class="q" onclick="toggleExp('exp_sunaz')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_sunazR">-</b></div><div><small>مدينة السكن</small><b id="t_sunazS">-</b></div><div><small>الفارق</small><b id="t_sunazD">-</b></div></div><div class="explain" id="exp_sunaz"><b>ماذا يعني؟</b> سمت الشمس AZ عند الغروب، أي أين غربت الشمس بالضبط.</div></div>
-<div class="item"><h3>المسافة بين الأرض والقمر <button class="q" onclick="toggleExp('exp_range')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_rangeR">-</b></div><div><small>مدينة السكن</small><b id="t_rangeS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_range"><b>ماذا يعني؟</b> بُعد القمر عن الأرض، بين 356 ألف و 406 آلاف كلم. كلما كان أقرب، كان أكبر وأسطع.<br><b>لماذا لا يُطرح؟</b> القيمتان في وقتين مختلفين، والفارق ليس فارقا حقيقيا.</div></div>
-<div class="item"><h3>القطر الزاوي للقمر <button class="q" onclick="toggleExp('exp_diam')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_diamR">-</b></div><div><small>مدينة السكن</small><b id="t_diamS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_diam"><b>ماذا يعني؟</b> حجم القمر في السماء بالدرجات، حوالي نصف درجة. وهو يحدد حجمه الظاهري.</div></div>
+<div class="item"><h3>غروب الشمس - لحظة الرصد <button class="q" onclick="toggleExp('exp_sunset')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_sunsetR">-</b><div class="muted" id="t_sunsetRutc">-</div></div><div><small>مدينة السكن</small><b id="t_sunsetS">-</b><div class="muted" id="t_sunsetSutc">-</div></div><div><small>الفارق (بـ UTC)</small><b id="t_sunsetD">-</b></div></div><div class="explain" id="exp_sunset"><b>ماذا يعني؟</b> لحظة نزول قرص الشمس تحت الأفق. جميع حسابات الهلال تُجرى في هذه اللحظة.</div></div>
+<div class="item"><h3>موقع الهلال <button class="q" onclick="toggleExp('exp_az')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_azR">-</b></div><div><small>مدينة السكن</small><b id="t_azS">-</b></div><div><small>الفارق</small><b id="t_azD">-</b></div></div><div class="explain" id="exp_az"><b>ماذا يعني؟</b> السمت، الزاوية الأفقية من الشمال: الصفر شمال، والتسعون شرق، والمئة والثمانون جنوب، والمئتان والسبعون غرب.</div></div>
+<div class="item"><h3>موقع الشمس <button class="q" onclick="toggleExp('exp_sunaz')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_sunazR">-</b></div><div><small>مدينة السكن</small><b id="t_sunazS">-</b></div><div><small>الفارق</small><b id="t_sunazD">-</b></div></div><div class="explain" id="exp_sunaz"><b>ماذا يعني؟</b> سمت الشمس عند الغروب، أي أين غربت الشمس بالضبط.</div></div>
+<div class="item"><h3>المسافة بين الأرض والقمر <button class="q" onclick="toggleExp('exp_range')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_rangeR">-</b></div><div><small>مدينة السكن</small><b id="t_rangeS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_range"><b>ماذا يعني؟</b> بُعد القمر عن الأرض، بين 356 ألف و 406 آلاف كلم. كلما كان أقرب، كان أكبر وأسطع.</div></div>
+<div class="item"><h3>القطر الزاوي للقمر <button class="q" onclick="toggleExp('exp_diam')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_diamR">-</b></div><div><small>مدينة السكن</small><b id="t_diamS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_diam"><b>ماذا يعني؟</b> حجم القمر في السماء بالدرجات، حوالي نصف درجة.</div></div>
 <div class="item"><h3>القدر الظاهري للقمر <button class="q" onclick="toggleExp('exp_mag')">؟</button></h3><div class="vals"><div><small>مدينة الرؤية</small><b id="t_magR">-</b></div><div><small>مدينة السكن</small><b id="t_magS">-</b></div><div><small>الفارق</small><b>— لا يُطرح</b></div></div><div class="explain" id="exp_mag"><b>ماذا يعني؟</b> سطوع القمر. والرقم الأصغر يعني أسطع. والبدر حوالي -12.7، والهلال حوالي -6 إلى -8.</div></div>
 <div class="muted" id="meta" style="margin-top:10px"></div>
 <div style="margin-top:8px"><a id="link" href="#" target="_blank">رابط ناسا المستعمل</a></div>
 </div>
 </div>
-
 <div class="card"><b>الناتج الخام من ناسا (للتحقق)</b><pre id="raw">لم يُطلب شيء بعد.</pre></div>
-
 <script>
 function toggleExp(id){var e=document.getElementById(id);e.style.display=(e.style.display==='block'?'none':'block');}
 (function(){var d=new Date();document.getElementById('date').value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
 function pad(n){return String(n).padStart(2,'0');}
 function fmtUTC(dt){return dt.getUTCFullYear()+'-'+pad(dt.getUTCMonth()+1)+'-'+pad(dt.getUTCDate())+' '+pad(dt.getUTCHours())+':'+pad(dt.getUTCMinutes());}
 function fmtCityTime(dt,lon){var off=Math.round(lon/15);var t=new Date(dt.getTime()+off*3600*1000);return pad(t.getUTCHours())+':'+pad(t.getUTCMinutes())+' (UTC'+(off>=0?'+':'')+off+')';}
+function fmtSigned(v,unit){if(v<0){return 'ناقص '+Math.abs(v).toFixed(2)+' '+(unit||'');} return v.toFixed(2)+' '+(unit||'');}
+function fmtSignedInt(v,unit){if(v<0){return 'ناقص '+Math.abs(v)+' '+(unit||'');} return v+' '+(unit||'');}
 function degMin(v){var a=Math.abs(v);var d=Math.floor(a);var m=Math.round((a-d)*60);if(m===60){d++;m=0;}return (v<0?'- ':'')+d+' درجة و '+m+' دقيقة';}
 async function searchCity(which){
   var q=document.getElementById(which==='R'?'searchR':'searchS').value.trim();
@@ -130,12 +113,12 @@ function parseBlock(txt){var s=txt.indexOf('$$SOE');var e=txt.indexOf('$$EOE');i
 async function fetchHorizons(lon,lat,alt,command,startUTC,stopUTC,step,quantities,center){var c=center||'coord@399';var site=center?'':'&SITE_COORD=\''+lon+','+lat+','+alt+'\'';var url="https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND='"+command+"'&EPHEM_TYPE='OBSERVER'&CENTER='"+c+"'"+site+"&START_TIME='"+startUTC+"'&STOP_TIME='"+stopUTC+"'&STEP_SIZE='"+step+"'&QUANTITIES='"+quantities+"'&CSV_FORMAT='YES'&CAL_FORMAT='CAL'&ANG_FORMAT='DEG'&EXTRA_PREC='YES'";var res=await fetch(url);if(!res.ok)throw new Error('لم ترد ناسا - الرمز '+res.status);var j=await res.json();var txt=j.result||'';if(j.signature&&j.signature.error)throw new Error(j.signature.error);return {url:url,txt:txt,rows:parseBlock(txt)};}
 function setLoading(t){var el=document.getElementById('loading');el.style.display='block';el.textContent=t;}
 async function getConjGeocentric(sunset){
-  var startUTC=fmtUTC(new Date(sunset.getTime()-72*3600*1000));var endUTC=fmtUTC(sunset);
-  var coarse=await fetchHorizons(0,0,0,'301',startUTC,endUTC,'30m','24','500@399');
+  var startUTC=fmtUTC(new Date(sunset.getTime()-32*24*3600*1000));var endUTC=fmtUTC(sunset);
+  var coarse=await fetchHorizons(0,0,0,'301',startUTC,endUTC,'60m','23','500@399');
   var minRow=null,minVal=1e9;coarse.rows.forEach(function(r){if(r.nums.length>0&&r.nums[0]<minVal){minVal=r.nums[0];minRow=r;}});
   if(!minRow||!minRow.dt)throw new Error('لم يتم العثور على الاقتران');
   var fineStart=fmtUTC(new Date(minRow.dt.getTime()-60*60000));var fineEnd=fmtUTC(new Date(minRow.dt.getTime()+60*60000));
-  var fine=await fetchHorizons(0,0,0,'301',fineStart,fineEnd,'1m','24','500@399');
+  var fine=await fetchHorizons(0,0,0,'301',fineStart,fineEnd,'1m','23','500@399');
   var min2=1e9,minRow2=null;fine.rows.forEach(function(r){if(r.nums.length>0&&r.nums[0]<min2){min2=r.nums[0];minRow2=r;}});
   if(!minRow2)throw new Error('لم يتم العثور على الاقتران الدقيق');
   return minRow2.dt;
@@ -151,7 +134,7 @@ async function getOneCity(lon,lat,alt,localMid,label,conj){
   if(!sunset)throw new Error('لم يتم العثور على غروب الشمس - '+label);
   setLoading('جارٍ جلب القمر عند الغروب - '+label+'...');
   var ssUTC=fmtUTC(sunset);var ssUTC2=fmtUTC(new Date(sunset.getTime()+2*60000));
-  var moonAt=await fetchHorizons(lon,lat,alt,'301',ssUTC,ssUTC2,'1m','4,10,20,24');
+  var moonAt=await fetchHorizons(lon,lat,alt,'301',ssUTC,ssUTC2,'1m','4,10,20,23');
   if(moonAt.rows.length===0)throw new Error('لم ترجع ناسا جدول القمر - '+label);
   document.getElementById('raw').textContent=moonAt.txt.slice(0,6000);document.getElementById('link').href=moonAt.url;
   var mr=moonAt.rows[0].nums;if(mr.length<6)throw new Error('عدد أرقام القمر ناقص - '+label);
@@ -161,19 +144,20 @@ async function getOneCity(lon,lat,alt,localMid,label,conj){
   var sunAZ=sunAt.rows.length>0?sunAt.rows[0].nums[0]:null;
   if(sunAZ===null)throw new Error('لم يتم العثور على موقع الشمس - '+label);
   setLoading('جارٍ جلب تفاصيل إضافية - '+label+'...');
-  var extra=await fetchHorizons(lon,lat,alt,'301',ssUTC,ssUTC2,'1m','1,9,12,19');
+  var extra=await fetchHorizons(lon,lat,alt,'301',ssUTC,ssUTC2,'1m','9,13');
   var mag=null,diam=null;
-  if(extra.rows.length>0&&extra.rows[0].nums.length>=5){mag=extra.rows[0].nums[2];diam=extra.rows[0].nums[3];}
+  if(extra.rows.length>0&&extra.rows[0].nums.length>=3){mag=extra.rows[0].nums[0];diam=extra.rows[0].nums[2];}
   setLoading('جارٍ جلب غروب القمر - '+label+'...');
-  var moonEndUTC=fmtUTC(new Date(sunset.getTime()+12*3600*1000));
+  var moonEndUTC=fmtUTC(new Date(sunset.getTime()+24*3600*1000));
   var moonDay=await fetchHorizons(lon,lat,alt,'301',startUTC,moonEndUTC,'5m','4');
   var moonset=null;
   for(var j=0;j<moonDay.rows.length-1;j++){var me1=moonDay.rows[j].nums[1],me2=moonDay.rows[j+1].nums[1];if(me1===undefined||me2===undefined)continue;var tt1=moonDay.rows[j].dt,tt2=moonDay.rows[j+1].dt;if(me1>0&&me2<=0&&tt1>sunset){var fr=me1/(me1-me2);moonset=new Date(tt1.getTime()+fr*(tt2.getTime()-tt1.getTime()));break;}}
   var azDiff=Math.abs(sunAZ-moonAZ);
   var stayMin=moonset?Math.round((moonset.getTime()-sunset.getTime())/60000):null;
-  var ageMs=sunset.getTime()-conj.getTime();var ageH=Math.floor(ageMs/3600000);var ageM=Math.round((ageMs%3600000)/60000);
+  var ageMs=sunset.getTime()-conj.getTime();var ageAbs=Math.abs(ageMs);var ageDays=Math.floor(ageAbs/86400000);var ageH=Math.floor((ageAbs%86400000)/3600000);var ageM=Math.round((ageAbs%3600000)/60000);if(ageM===60){ageH++;ageM=0;}if(ageH===24){ageDays++;ageH=0;}
+  function fmtAge(){if(ageMs<0){return 'لم يولد بعد - الاقتران بعد الغروب بـ '+(ageDays>0?ageDays+' يوما و ':'')+ageH+' ساعة و '+ageM+' دقيقة';} if(ageDays>0){return ageDays+' يوما و '+ageH+' ساعة و '+ageM+' دقيقة';} return ageH+' ساعة و '+ageM+' دقيقة';}
   var moonAfter = moonset ? (moonset.getTime() > sunset.getTime()) : false;
-  return {sunset:sunset,moonset:moonset,moonAfter:moonAfter,moonAZ:moonAZ,moonEL:moonEL,moonIll:moonIll,deltaAU:deltaAU,sot:sot,sunAZ:sunAZ,azDiff:azDiff,stayMin:stayMin,ageH:ageH,ageM:ageM,ageMin:ageMs/60000,mag:mag,diam:diam,rangeKm:deltaAU*149597870.7};
+  return {sunset:sunset,moonset:moonset,moonAfter:moonAfter,moonAZ:moonAZ,moonEL:moonEL,moonIll:moonIll,deltaAU:deltaAU,sot:sot,sunAZ:sunAZ,azDiff:azDiff,stayMin:stayMin,ageText:fmtAge(),ageMin:ageMs/60000,mag:mag,diam:diam,rangeKm:deltaAU*149597870.7};
 }
 function setBetter(boxId,badgeId,isBetter){
   var box=document.getElementById(boxId); if(box) box.classList.toggle('better', !!isBetter);
@@ -193,42 +177,32 @@ async function compareCities(){
     var dS=await getOneCity(lonS,latS,altS,localMid,'مدينة السكن',conj);
     document.getElementById('v_conjAll').textContent=conj.toLocaleDateString('ar',{weekday:'long'})+' '+fmtCityTime(conj,0)+' بتوقيت غرينتش';
     document.getElementById('v_conjUTC').textContent='UTC: '+fmtUTC(conj)+' | بتوقيت الرؤية: '+fmtCityTime(conj,lonR)+' | بتوقيت السكن: '+fmtCityTime(conj,lonS);
-    // 1 ارتفاع
-    document.getElementById('t_elR').textContent=degMin(dR.moonEL)+' ('+dR.moonEL.toFixed(2)+'°)';document.getElementById('t_elS').textContent=degMin(dS.moonEL)+' ('+dS.moonEL.toFixed(2)+'°)';document.getElementById('t_elD').textContent=(dR.moonEL-dS.moonEL).toFixed(2)+'°'; setBetter('box_elS','badge_el', dS.moonEL>dR.moonEL);
-    // 2 زاوية
-    document.getElementById('t_elongR').textContent=degMin(dR.sot)+' ('+dR.sot.toFixed(2)+'°)';document.getElementById('t_elongS').textContent=degMin(dS.sot)+' ('+dS.sot.toFixed(2)+'°)';document.getElementById('t_elongD').textContent=(dR.sot-dS.sot).toFixed(2)+'°'; setBetter('box_elongS','badge_elong', dS.sot>dR.sot);
-    // 3 عمر
-    document.getElementById('t_ageR').textContent=dR.ageH+' ساعة و '+dR.ageM+' دقيقة';document.getElementById('t_ageS').textContent=dS.ageH+' ساعة و '+dS.ageM+' دقيقة';document.getElementById('t_ageD').textContent=Math.round(dR.ageMin-dS.ageMin)+' دقيقة'; setBetter('box_ageS','badge_age', dS.ageMin>dR.ageMin);
-    // 4 نور
+    document.getElementById('t_elR').textContent=degMin(dR.moonEL)+' = '+dR.moonEL.toFixed(2)+' درجة';document.getElementById('t_elS').textContent=degMin(dS.moonEL)+' = '+dS.moonEL.toFixed(2)+' درجة';document.getElementById('t_elD').textContent=fmtSigned(dR.moonEL-dS.moonEL,'درجة'); setBetter('box_elS','badge_el', dS.moonEL>dR.moonEL);
+    document.getElementById('t_elongR').textContent=degMin(dR.sot)+' = '+dR.sot.toFixed(2)+' درجة';document.getElementById('t_elongS').textContent=degMin(dS.sot)+' = '+dS.sot.toFixed(2)+' درجة';document.getElementById('t_elongD').textContent=fmtSigned(dR.sot-dS.sot,'درجة'); setBetter('box_elongS','badge_elong', dS.sot>dR.sot);
+    document.getElementById('t_ageR').textContent=dR.ageText;document.getElementById('t_ageS').textContent=dS.ageText;document.getElementById('t_ageD').textContent=fmtSignedInt(Math.round(dR.ageMin-dS.ageMin),'دقيقة'); setBetter('box_ageS','badge_age', dS.ageMin>dR.ageMin);
     document.getElementById('t_illR').textContent=dR.moonIll.toFixed(2)+' %';document.getElementById('t_illS').textContent=dS.moonIll.toFixed(2)+' %'; setBetter('box_illS','badge_ill', dS.moonIll>dR.moonIll);
-    // 5 بقاء
-    document.getElementById('t_stayR').textContent=dR.stayMin!==null?dR.stayMin+' دقيقة':'—';document.getElementById('t_stayS').textContent=dS.stayMin!==null?dS.stayMin+' دقيقة':'—';document.getElementById('t_stayD').textContent=(dR.stayMin!==null&&dS.stayMin!==null?(dR.stayMin-dS.stayMin)+' دقيقة':'—'); setBetter('box_stayS','badge_stay', (dS.stayMin!==null&&dR.stayMin!==null&&dS.stayMin>dR.stayMin));
-    // 6 اختلاف
-    document.getElementById('t_azdifR').textContent=degMin(dR.azDiff)+' ('+dR.azDiff.toFixed(2)+'°)';document.getElementById('t_azdifS').textContent=degMin(dS.azDiff)+' ('+dS.azDiff.toFixed(2)+'°)';document.getElementById('t_azdifD').textContent=(dR.azDiff-dS.azDiff).toFixed(2)+'°'; setBetter('box_azdifS','badge_azdif', dS.azDiff>dR.azDiff);
-    // 7 غروب الهلال
+    document.getElementById('t_stayR').textContent=dR.stayMin!==null?dR.stayMin+' دقيقة':'—';document.getElementById('t_stayS').textContent=dS.stayMin!==null?dS.stayMin+' دقيقة':'—';document.getElementById('t_stayD').textContent=(dR.stayMin!==null&&dS.stayMin!==null?fmtSignedInt(dR.stayMin-dS.stayMin,'دقيقة'):'—'); setBetter('box_stayS','badge_stay', (dS.stayMin!==null&&dR.stayMin!==null&&dS.stayMin>dR.stayMin));
+    document.getElementById('t_azdifR').textContent=degMin(dR.azDiff)+' = '+dR.azDiff.toFixed(2)+' درجة';document.getElementById('t_azdifS').textContent=degMin(dS.azDiff)+' = '+dS.azDiff.toFixed(2)+' درجة';document.getElementById('t_azdifD').textContent=fmtSigned(dR.azDiff-dS.azDiff,'درجة'); setBetter('box_azdifS','badge_azdif', dS.azDiff>dR.azDiff);
     document.getElementById('t_moonsetR').textContent=dR.moonset?fmtCityTime(dR.moonset,lonR):'لم يتم العثور على غروب';document.getElementById('t_moonsetRutc').textContent=dR.moonset?'UTC: '+fmtUTC(dR.moonset)+' | '+(dR.moonAfter?'غرب بعد الشمس':'غرب قبل الشمس'):'';
     document.getElementById('t_moonsetS').textContent=dS.moonset?fmtCityTime(dS.moonset,lonS):'لم يتم العثور على غروب';document.getElementById('t_moonsetSutc').textContent=dS.moonset?'UTC: '+fmtUTC(dS.moonset)+' | '+(dS.moonAfter?'غرب بعد الشمس':'غرب قبل الشمس'):'';
-    document.getElementById('t_moonsetD').textContent=(dR.moonset&&dS.moonset?Math.round((dR.moonset.getTime()-dS.moonset.getTime())/60000)+' دقيقة':'—');
+    document.getElementById('t_moonsetD').textContent=(dR.moonset&&dS.moonset?fmtSignedInt(Math.round((dR.moonset.getTime()-dS.moonset.getTime())/60000),'دقيقة'):'—');
     var moonBetter = (dS.moonAfter && !dR.moonAfter) || (dS.moonAfter && dR.moonAfter && dS.stayMin!==null && dR.stayMin!==null && dS.stayMin>dR.stayMin);
     setBetter('box_moonsetS','badge_moonset', moonBetter);
-    // 8 شرق
-    document.getElementById('t_lonR').textContent=lonR+'°';document.getElementById('t_lonS').textContent=lonS+'°';document.getElementById('t_lonD').textContent=Math.abs(lonR-lonS).toFixed(4)+'° ('+degMin(Math.abs(lonR-lonS))+')';
+    document.getElementById('t_lonR').textContent=lonR+' درجة';document.getElementById('t_lonS').textContent=lonS+' درجة';document.getElementById('t_lonD').textContent=Math.abs(lonR-lonS).toFixed(4)+' درجة = '+degMin(Math.abs(lonR-lonS));
     var isEast = lonR>lonS;
     document.getElementById('badge_east').innerHTML = isEast ? '<span class="badge">متحقق - مدينة الرؤية شرق مدينة السكن</span>' : '<span class="badge-no">غير متحقق - مدينة الرؤية ليست شرق مدينة السكن</span>';
-    // 9 فارق العرض
-    document.getElementById('t_latR').textContent=latR+'°';document.getElementById('t_latS').textContent=latS+'°';
-    var dLat=Math.abs(latR-latS); document.getElementById('t_latD').textContent=dLat.toFixed(4)+'° ('+degMin(dLat)+')';
+    document.getElementById('t_latR').textContent=latR+' درجة';document.getElementById('t_latS').textContent=latS+' درجة';
+    var dLat=Math.abs(latR-latS); document.getElementById('t_latD').textContent=dLat.toFixed(4)+' درجة = '+degMin(dLat);
     var latOk = dLat < 2;
     document.getElementById('badge_lat').innerHTML = latOk ? '<span class="badge">متحقق - الفارق أقل من درجتين</span>' : '<span class="badge-no">غير متحقق - الفارق أكبر من درجتين أو يساويهما</span>';
-    // تفاصيل إضافية
     document.getElementById('t_sunsetR').textContent=fmtCityTime(dR.sunset,lonR);document.getElementById('t_sunsetRutc').textContent='UTC: '+fmtUTC(dR.sunset);
     document.getElementById('t_sunsetS').textContent=fmtCityTime(dS.sunset,lonS);document.getElementById('t_sunsetSutc').textContent='UTC: '+fmtUTC(dS.sunset);
-    document.getElementById('t_sunsetD').textContent=Math.round((dR.sunset.getTime()-dS.sunset.getTime())/60000)+' دقيقة';
-    document.getElementById('t_azR').textContent=degMin(dR.moonAZ)+' ('+dR.moonAZ.toFixed(2)+'°)';document.getElementById('t_azS').textContent=degMin(dS.moonAZ)+' ('+dS.moonAZ.toFixed(2)+'°)';document.getElementById('t_azD').textContent=(dR.moonAZ-dS.moonAZ).toFixed(2)+'°';
-    document.getElementById('t_sunazR').textContent=degMin(dR.sunAZ)+' ('+dR.sunAZ.toFixed(2)+'°)';document.getElementById('t_sunazS').textContent=degMin(dS.sunAZ)+' ('+dS.sunAZ.toFixed(2)+'°)';document.getElementById('t_sunazD').textContent=(dR.sunAZ-dS.sunAZ).toFixed(2)+'°';
+    document.getElementById('t_sunsetD').textContent=fmtSignedInt(Math.round((dR.sunset.getTime()-dS.sunset.getTime())/60000),'دقيقة');
+    document.getElementById('t_azR').textContent=degMin(dR.moonAZ)+' = '+dR.moonAZ.toFixed(2)+' درجة';document.getElementById('t_azS').textContent=degMin(dS.moonAZ)+' = '+dS.moonAZ.toFixed(2)+' درجة';document.getElementById('t_azD').textContent=fmtSigned(dR.moonAZ-dS.moonAZ,'درجة');
+    document.getElementById('t_sunazR').textContent=degMin(dR.sunAZ)+' = '+dR.sunAZ.toFixed(2)+' درجة';document.getElementById('t_sunazS').textContent=degMin(dS.sunAZ)+' = '+dS.sunAZ.toFixed(2)+' درجة';document.getElementById('t_sunazD').textContent=fmtSigned(dR.sunAZ-dS.sunAZ,'درجة');
     document.getElementById('t_rangeR').textContent=dR.rangeKm.toLocaleString('en-US',{maximumFractionDigits:0})+' كلم';document.getElementById('t_rangeS').textContent=dS.rangeKm.toLocaleString('en-US',{maximumFractionDigits:0})+' كلم';
-    document.getElementById('t_diamR').textContent=dR.diam!==null?dR.diam.toFixed(4)+'°':'-';document.getElementById('t_diamS').textContent=dS.diam!==null?dS.diam.toFixed(4)+'°':'-';
-    document.getElementById('t_magR').textContent=dR.mag!==null?dR.mag.toFixed(2):'-';document.getElementById('t_magS').textContent=dS.mag!==null?dS.mag.toFixed(2):'-';
+    document.getElementById('t_diamR').textContent=dR.diam!==null?dR.diam.toFixed(4)+' درجة':'-';document.getElementById('t_diamS').textContent=dS.diam!==null?dS.diam.toFixed(4)+' درجة':'-';
+    document.getElementById('t_magR').textContent=dR.mag!==null?(dR.mag<0?'ناقص '+Math.abs(dR.mag).toFixed(2):dR.mag.toFixed(2)):'-';document.getElementById('t_magS').textContent=dS.mag!==null?(dS.mag<0?'ناقص '+Math.abs(dS.mag).toFixed(2):dS.mag.toFixed(2)):'-';
     document.getElementById('meta').textContent='تاريخ المقارنة: '+dateVal+' | الرؤية: '+lonR+', '+latR+' | السكن: '+lonS+', '+latS;
     document.getElementById('results').style.display='block';
     var ok=document.getElementById('ok');ok.style.display='block';ok.textContent='تم - بيانات المدينتين من ناسا DE441';
