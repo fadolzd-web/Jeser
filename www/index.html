@@ -74,6 +74,9 @@ th{background:#121c2e;color:#fff}
     <button class="primary" id="btnAutoDiscover" style="background:#121c2e;color:#fff">اكتشاف ملف المواقيت تلقائياً — اضغط هنا فقط</button>
   </div>
   <div class="meta" id="discoverMeta" style="display:none"></div>
+  <div class="row no-print">
+    <button class="primary" id="btnQeble" style="background:#0b6b3a;color:#fff">جلب ملف المواقيت الصحيح: qeble_openstr_main.js — اضغط هنا</button>
+  </div>
   <label for="jsSearch">بحث داخل الكود</label>
   <input id="jsSearch" type="text" placeholder="مثال: Prayer أو $.ajax أو CurrentBorj">
   <div class="meta" id="jsMeta">لم يتم الجلب بعد.</div>
@@ -212,61 +215,85 @@ document.getElementById('jsSearch').addEventListener('input',function(){
   setText('jsMeta','وجدت '+q+' عند الحرف '+idx+'. انسخ الكتلة من $.ajax إلى });');
 });
 
-// — اكتشاف تلقائي لملف المواقيت —
+// — جلب مباشر لملف المواقيت المكتشف من صورتك —
+document.getElementById('btnQeble').addEventListener('click', async()=>{
+  const url = 'https://arabic.nojumi.org/js/qeble_openstr_main.js?v=1.0.1';
+  document.getElementById('jsUrl').value = url;
+  setText('jsMeta','جارٍ جلب '+url+' …');
+  try{
+    const r = await fetch(url);
+    const t = await r.text();
+    lastJsText = t;
+    document.getElementById('jsView').textContent = t.slice(0,120000);
+    setText('jsMeta','تم الجلب: '+url+' | HTTP '+r.status+' | الطول: '+t.length+' — الآن اضغط "إظهار كتل $.ajax فقط" وانسخ الكتلة.');
+  }catch(e){ setText('jsMeta','تعذّر الجلب: '+e.message); }
+});
+// — اكتشاف تلقائي لملف المواقيت — يتخطى المكتبات العامة
 document.getElementById('btnAutoDiscover').addEventListener('click', async()=>{
   const dm = document.getElementById('discoverMeta');
   dm.style.display='block';
-  dm.textContent='جارٍ اكتشاف ملف المواقيت… جلب صفحة https://arabic.nojumi.org/prayertimes';
-  // 1) جرّب جلب صفحة المواقيت نفسها واستخراج src
+  dm.textContent='جارٍ اكتشاف ملف المواقيت…';
+  const LIBS = ['jquery','bootstrap','moment','persian','datepicker','leaflet','sweetalert','select2','owl','swiper','chart','popper','modernizr','polyfill','site.js','main.js','common.js','bundle','vendor'];
+  function isLib(u){ const l=u.toLowerCase(); return LIBS.some(k=>l.includes(k)); }
+  function toAbs(src){
+    if(src.startsWith('http')) return src;
+    if(src.startsWith('//')) return 'https:'+src;
+    if(src.startsWith('/')) return 'https://arabic.nojumi.org'+src;
+    return 'https://arabic.nojumi.org/'+src.replace(/^\.\//,'');
+  }
+  // 1) جلب صفحة المواقيت
+  let pageTxt='';
   try{
     const res = await fetch('https://arabic.nojumi.org/prayertimes');
-    const txt = await res.text();
-    const matches = [...txt.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]);
-    const unique = [...new Set(matches)];
-    if(unique.length){
-      dm.textContent = 'وجدت في صفحة المواقيت هذه الملفات:\n' + unique.join('\n') + '\n\nاضغط على واحد منها لجلبها، أو انسخ رابطها.';
-      // اجلب أول ملف ليس events.js واعرضه
-      const cand = unique.find(u=>!u.toLowerCase().includes('events')) || unique[0];
-      let full = cand.startsWith('http') ? cand : 'https://arabic.nojumi.org/' + cand.replace(/^\//,'');
-      document.getElementById('jsUrl').value = full;
-      dm.textContent += '\n\nجارٍ جلب: ' + full;
-      const r2 = await fetch(full);
-      const t2 = await r2.text();
-      lastJsText = t2;
-      document.getElementById('jsView').textContent = t2.slice(0,120000);
-      setText('jsMeta','تم جلب ملف المواقيت: '+full+' | HTTP '+r2.status+' | الطول: '+t2.length+' — الآن اضغط "إظهار كتل $.ajax فقط".');
-      return;
-    } else {
-      dm.textContent = 'صفحة المواقيت لم تُرجع قائمة src واضحة (الصفحة تُبنى بالجافاسكربت). سأجرّب أسماء الملفات الشائعة واحداً واحداً…';
-    }
-  }catch(e){ dm.textContent = 'تعذّر جلب صفحة المواقيت مباشرة: '+e.message+' — سأجرّب أسماء الملفات الشائعة…'; }
-  // 2) جرّب أسماء شائعة
-  const candidates = [
+    pageTxt = await res.text();
+  }catch(e){ dm.textContent='تعذّر جلب صفحة المواقيت: '+e.message; return; }
+  const allSrcs = [...new Set([...pageTxt.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]))];
+  if(!allSrcs.length){ dm.textContent='لم أجد أي src في الصفحة. الصفحة تُبنى بالجافاسكربت. سأجرّب الأسماء الشائعة.'; }
+  else {
+    dm.textContent = 'وجدت في الصفحة '+allSrcs.length+' ملفاً. أتخطى المكتبات العامة (jQuery و Bootstrap و moment …) وأجرّب الباقي:\n' + allSrcs.join('\n');
+  }
+  // 2) جرّب الملفات غير المكتبات، واحداً واحداً
+  const candidates = [];
+  for(const s of allSrcs){ if(!isLib(s)) candidates.push(toAbs(s)); }
+  // أسماء شائعة كاحتياط
+  candidates.push(
     'https://arabic.nojumi.org/JS/prayertimes.js',
     'https://arabic.nojumi.org/JS/prayer.js',
     'https://arabic.nojumi.org/JS/Prayertimes.js',
     'https://arabic.nojumi.org/JS/prayertime.js',
-    'https://arabic.nojumi.org/JS/prayertimes.min.js',
-    'https://arabic.nojumi.org/JS/prayerTimes.js',
-    'https://arabic.nojumi.org/JS/prayers.js',
-    'https://arabic.nojumi.org/js/prayertimes.js',
-  ];
+    'https://arabic.nojumi.org/JS/prayerTimes.js'
+  );
   for(const url of candidates){
     try{
       const r = await fetch(url);
       if(!r.ok){ dm.textContent += '\n— '+url+' : HTTP '+r.status; continue; }
       const t = await r.text();
-      if(t.length<200 || t.includes('<html') || t.includes('<!DOCTYPE')){ dm.textContent += '\n— '+url+' : ليس JS (HTML)'; continue; }
-      // نجح
-      document.getElementById('jsUrl').value = url;
-      lastJsText = t;
-      document.getElementById('jsView').textContent = t.slice(0,120000);
-      dm.textContent += '\n\n✓ وجدته: '+url+' | الطول: '+t.length+' — الآن اضغط "إظهار كتل $.ajax فقط" وانسخ الكتلة.';
-      setText('jsMeta','تم جلب ملف المواقيت: '+url+' — اضغط "إظهار كتل $.ajax فقط".');
-      return;
+      if(t.length<300 || t.includes('<!DOCTYPE') || t.includes('<html')){ dm.textContent += '\n— '+url+' : ليس JS'; continue; }
+      // إذا كان jQuery رغم الفلتر، تخطاه
+      if(t.includes('jQuery v3') || t.startsWith('/*! jQuery')){ dm.textContent += '\n— '+url+' : هذا jQuery — تخطيته'; continue; }
+      // هل فيه منطق مواقيت؟
+      const hasPrayer = /prayer|Prayer|Pray|اوقات|مواقيت|اذان|قبله|Qibla/i.test(t);
+      const hasAjax = t.includes('$.ajax') || t.includes('fetch(');
+      dm.textContent += '\n— '+url+' : طول '+t.length+' | فيه Prayer؟ '+(hasPrayer?'نعم':'لا')+' | فيه $.ajax؟ '+(hasAjax?'نعم':'لا');
+      if(hasPrayer && hasAjax){
+        document.getElementById('jsUrl').value = url;
+        lastJsText = t;
+        document.getElementById('jsView').textContent = t.slice(0,120000);
+        dm.textContent += '\n\n✓ هذا هو ملف المواقيت: '+url+'\nالآن اضغط "إظهار كتل $.ajax فقط".';
+        setText('jsMeta','تم جلب ملف المواقيت: '+url+' — اضغط "إظهار كتل $.ajax فقط".');
+        return;
+      }
+      // إذا لم يكن فيه Prayer لكنه ليس مكتبة، احفظه كاحتياط وكمّل
+      if(!hasPrayer && candidates.indexOf(url)===candidates.length-1){
+        // آخر واحد، اعرضه
+        document.getElementById('jsUrl').value = url;
+        lastJsText = t;
+        document.getElementById('jsView').textContent = t.slice(0,120000);
+        dm.textContent += '\n\nعرضت آخر ملف غير مكتبة. إذا لم يكن هو، انسخ قائمة الملفات في الأعلى وأرسلها.';
+      }
     }catch(e){ dm.textContent += '\n— '+url+' : تعذّر'; }
   }
-  dm.textContent += '\n\nلم أجد الملف بالأسماء الشائعة. انسخ رابط الصفحة من المتصفح والصقه في حقل الرابط واجلبه، أو أرسل لي ما ظهر في هذا المربع.';
+  dm.textContent += '\n\nلم أجد ملفاً فيه Prayer + $.ajax معاً. انسخ قائمة الملفات في الأعلى كاملة وأرسلها، وأنا أطلّع الاسم الصحيح.';
 });
 // — البحث عن مدينة —
 let typingTimer=null, currentSearch=null;
