@@ -282,10 +282,12 @@ async function fetchTimeout(url,opts,ms){
 }
 async function discoverDirectApiUrls(){
   const found=[];
-  const push=(u)=>{ if(!u) return; u=u.replace(/\\$/,'').replace(/[;,]$/,''); if(!/prayer/i.test(u)) return; if(/share|export|pdf/i.test(u)) return; if(u.includes('GetPrayerTimesFromAPI')) return; if(!found.includes(u)) found.push(u); };
+  const push=(u)=>{ if(!u) return; u=u.replace(/\\$/,'').replace(/[;,]$/,''); if(!/prayer/i.test(u)) return; if(/share|export|pdf/i.test(u)) return; if(!found.includes(u)) found.push(u); };
+  const pushFromText=(t)=>{ const defs=[...t.matchAll(/(directUrl|apiUrl)\s*=\s*([^;]{0,300});/g)].map(m=>m[2]); for(const d of defs){ const parts=[...d.matchAll(/["'](https?:\/\/[^"']+)["']/g)].map(m=>m[1]); parts.forEach(push); const rel=[...d.matchAll(/["'](\/[^"']*prayer[^"']*)["']/gi)].map(m=>m[1]); rel.forEach(x=>push('https://arabic.nojumi.org'+x)); } const m2=[...t.matchAll(/https?:\/\/[^\s"'\\]+prayer[^\s"'\\]*/gi)].map(x=>x[0]); m2.forEach(push); };
   try{
     const res=await fetchTimeout('https://arabic.nojumi.org/prayertimes',{method:'GET',credentials:'include'},6000);
     const pageHtml=await res.text();
+    pushFromText(pageHtml);
     const srcs=[...new Set([...pageHtml.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]))].slice(0,4);
     for(const s of srcs){
       let abs=s.startsWith('http')?s:(s.startsWith('//')?'https:'+s:(s.startsWith('/')?'https://arabic.nojumi.org'+s:'https://arabic.nojumi.org/'+s));
@@ -293,15 +295,7 @@ async function discoverDirectApiUrls(){
         const r=await fetchTimeout(abs,{method:'GET'},6000); if(!r.ok) continue;
         const t=await r.text();
         if(t.includes('jQuery v3')) continue;
-        const defs=[...t.matchAll(/(directUrl|apiUrl)\s*=\s*([^;]{0,300});/g)].map(m=>m[2]);
-        for(const d of defs){
-          const parts=[...d.matchAll(/["'](https?:\/\/[^"']+)["']/g)].map(m=>m[1]);
-          parts.forEach(push);
-          const rel=[...d.matchAll(/["'](\/[^"']*prayer[^"']*)["']/gi)].map(m=>m[1]);
-          rel.forEach(x=>push('https://arabic.nojumi.org'+x));
-        }
-        const m2=[...t.matchAll(/https?:\/\/[^\s"'\\]+prayer[^\s"'\\]*/gi)].map(x=>x[0]);
-        m2.forEach(push);
+        pushFromText(t);
         if(found.length) break;
       }catch(e){}
     }
@@ -330,28 +324,47 @@ function extractPrayerArray(txt){
   return null;
 }
 async function fetchRangeSingle(lat,lng,startStr,endStr){
-  // محاولة وحدة فقط: أول رابط مباشر، أول صيغة (startDate/endDate) بـ GET، مهلة 6 ثواني
-  // إذا فشلت، نرجع فوراً ليوم يوم، بدون 100 محاولة تعلق الواجهة
+  // الجلبة الوحدة الحقيقية قد تكون على نفس رابط اليوم يوم، لكن ببارامترات فترة بدل date واحد
+  // جرّبها أولاً بـ POST واحد سريع (مهلة 6 ثواني)، ثم جرّب الرابط المكتشف بـ GET
+  const rangeBodies=[
+    {lat:lat,lng:lng,startDate:startStr,endDate:endStr,navafel:false},
+    {lat:lat,lng:lng,start_date:startStr,end_date:endStr,navafel:false},
+    {lat:lat,lng:lng,from:startStr,to:endStr,navafel:false}
+  ];
+  let tried='';
+  for(const body of rangeBodies){
+    try{
+      tried+='POST '+URL_PRAYER_API+' '+JSON.stringify(body)+'\n';
+      const r=await fetchTimeout(URL_PRAYER_API,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify(body),credentials:'include'},6000);
+      const txt=await r.text();
+      if(r.ok){
+        const arr=extractPrayerArray(txt);
+        if(arr && arr.length>1) return {ok:true,directUrl:URL_PRAYER_API,params:body,method:'POST-رينج',days:arr,raw:txt,tried:tried};
+      }
+    }catch(e){ tried+='POST-رينج فشل/مهلة: '+e.message+'\n'; break; }
+  }
+  // إذا لم يقبل نفس الرابط الفترة، جرّب الرابط المباشر المكتشف (من الصفحة أو من JS) بـ GET واحد
   let urls=[];
   try{ urls=await discoverDirectApiUrls(); }catch(e){}
-  if(!urls.length) return {ok:false,reason:'لم أجد رابط API مباشر مختلف عن GetPrayerTimesFromAPI في كود الصفحة — الموقع نفسه يبني الشهر بيوم يوم',directUrl:null,raw:'',tried:'لم توجد روابط مباشرة'};
+  urls=urls.filter(u=>u!==URL_PRAYER_API);
+  if(!urls.length) return {ok:false,reason:'نفس رابط اليوم يوم لا يقبل الفترة، ولم أجد رابط فترة مباشر مختلف في الصفحة أو في JS — الموقع نفسه يبني الشهر بيوم يوم',directUrl:URL_PRAYER_API,raw:'',tried:tried};
   const directUrl=urls[0];
   const params={lat:lat,lng:lng,startDate:startStr,endDate:endStr,navafel:false};
-  let tried='GET '+directUrl+'?'+new URLSearchParams(params).toString()+'\n';
-  let lastRaw='';
+  tried+='GET '+directUrl+'?'+new URLSearchParams(params).toString()+'\n';
   try{
     const qs=new URLSearchParams(params).toString();
     const r=await fetchTimeout(directUrl+(directUrl.includes('?')?'&':'?')+qs,{method:'GET',credentials:'include'},6000);
-    const txt=await r.text(); lastRaw=txt;
+    const txt=await r.text();
     if(r.ok){
       const arr=extractPrayerArray(txt);
-      if(arr && arr.length>=1) return {ok:true,directUrl:directUrl,params:params,method:'GET',days:arr,raw:txt,tried:tried};
+      if(arr && arr.length>1) return {ok:true,directUrl:directUrl,params:params,method:'GET',days:arr,raw:txt,tried:tried};
     }
-    tried+='GET رجع HTTP '+r.status+' — أرجع ليوم يوم فوراً\n';
+    tried+='GET رجع HTTP '+r.status+'\n';
+    return {ok:false,reason:'نفس رابط اليوم يوم لا يقبل الفترة، والرابط المكتشف لم يرجع مصفوفة فترة',directUrl:directUrl,raw:txt,tried:tried};
   }catch(e){
-    tried+='GET فشل/انتهت المهلة: '+e.message+' — أرجع ليوم يوم فوراً\n';
+    tried+='GET فشل/مهلة: '+e.message+'\n';
+    return {ok:false,reason:'الجلبة الوحدة لم تنجح — أرجع ليوم يوم',directUrl:directUrl,raw:'',tried:tried};
   }
-  return {ok:false,reason:'الجلبة الوحدة لم تنجح بمحاولة وحدة سريعة — أرجع ليوم يوم',directUrl:directUrl,raw:lastRaw,tried:tried};
 }
 async function fetchOnePrayerDay(lat,lng,dateStr){
   const r=await postWeb(URL_PRAYER_API,{lat:lat,lng:lng,date:dateStr,navafel:false});
