@@ -60,7 +60,7 @@ th{background:#121c2e;color:#fff}
 <main>
 
 <!-- عارض الكود -->
-<section class="card">
+<section class="card" style="display:none">
   <h2>عارض الكود — بديل view-source على الأندرويد</h2>
   <p class="small">هذا القسم للفحص فقط، ما إلك شغل فيه للمواقيت. للمواقيت بس اضغط زر «إعداد جدول مواقيت الصلاة» بالأسفل، وما تحط شي.</p>
   <label for="jsUrl">رابط ملف الجافاسكربت</label>
@@ -96,7 +96,7 @@ th{background:#121c2e;color:#fff}
 
 <!-- المواقيت -->
 <section class="card">
-  <h2>2 — المواقيت: شهري / سنوي / فترة</h2>
+  <h2>المواقيت: شهري / سنوي / فترة — بس اكبس الزر</h2>
   <div class="mode no-print" id="modeBar">
     <button data-mode="month" class="active">إعداد جدول شهري</button>
     <button data-mode="year">إعداد جدول سنوي</button>
@@ -111,9 +111,9 @@ th{background:#121c2e;color:#fff}
   <label>مصدر المواقيت — ثابت، من الخادم فقط</label>
   <div class="meta" dir="ltr" style="text-align:left">https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI</div>
   <p class="small">ما تحط شي. بس اضغط زر «إعداد جدول مواقيت الصلاة». الجسر بيجيب <b>apiUrl</b> لحاله من موقع نجومي، وبيجرب الشهر أو السنة كلها بجلبة وحدة. إذا ما قبل الخادم الجلبة الوحدة، بيرجع فوراً لجسر اليوم يوم، لكن <b>بالتوازي</b> — 6 أيام مع بعض. في الحالتين كل يوم يرجع من الخادم، بلا حساب محلي: <span dir="ltr">{ lat, lng, date: &quot;YYYY/MM/DD&quot;, navafel: false }</span>.</p>
-  <label for="directApiUrl">رابط API المباشر — اتركه فارغاً، الجسر بيجيبه لحاله (لا تحط شي هنا)</label>
-  <input id="directApiUrl" type="text" placeholder="اتركه فارغاً — لا تحط شي" dir="ltr" style="text-align:left">
-  <p class="small">ما تحط شي. بس اضغط زر «إعداد جدول مواقيت الصلاة» تحت، والجسر بيجيب الشهر أو السنة كلها بضغطة وحدة.</p>
+  <label for="directApiUrl" style="display:none">رابط API المباشر — اتركه فارغاً، الجسر بيجيبه لحاله (لا تحط شي هنا)</label>
+  <input id="directApiUrl" type="hidden" placeholder="اتركه فارغاً — لا تحط شي" dir="ltr" style="text-align:left">
+  <p class="small">ما تحط شي. بس اضغط زر «إعداد جدول مواقيت الصلاة» تحت.</p>
   <div class="row no-print">
     <button class="primary" id="btnPrayer">إعداد جدول مواقيت الصلاة</button>
     <button class="ghost" id="btnClearPrayer">مسح النتائج</button>
