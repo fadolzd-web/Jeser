@@ -62,7 +62,7 @@ th{background:#121c2e;color:#fff}
 <!-- عارض الكود -->
 <section class="card">
   <h2>عارض الكود — بديل view-source على الأندرويد</h2>
-  <p class="small">الصق رابط أي ملف JS، واضغط جلب. سيجلب الملف ويعرضه كنص، مع بحث داخله.</p>
+  <p class="small">هذا القسم للفحص فقط، ما إلك شغل فيه للمواقيت. للمواقيت بس اضغط زر «إعداد جدول مواقيت الصلاة» بالأسفل، وما تحط شي.</p>
   <label for="jsUrl">رابط ملف الجافاسكربت</label>
   <input id="jsUrl" type="text" value="https://arabic.nojumi.org/JS/events.js?v=6" placeholder="https://arabic.nojumi.org/JS/...">
   <div class="row no-print">
@@ -110,7 +110,10 @@ th{background:#121c2e;color:#fff}
   </div>
   <label>مصدر المواقيت — ثابت، من الخادم فقط</label>
   <div class="meta" dir="ltr" style="text-align:left">https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI</div>
-  <p class="small">الجسر الآن يجرب جلبة وحدة بمحاولة وحدة سريعة (مهلة 6 ثواني). إذا نجحت، الشهر جلبة وحدة والسنة جلبة وحدة. إذا لم تنجح، يرجع فوراً لجسر اليوم يوم المثبت، بدون تعليق: <span dir="ltr">{ lat, lng, date: &quot;YYYY/MM/DD&quot;, navafel: false }</span>. في الحالتين كل يوم يرجع من الخادم، بلا حساب محلي.</p>
+  <p class="small">ما تحط شي. بس اضغط زر «إعداد جدول مواقيت الصلاة». الجسر بيجيب <b>apiUrl</b> لحاله من موقع نجومي، وبيجرب الشهر أو السنة كلها بجلبة وحدة. إذا ما قبل الخادم الجلبة الوحدة، بيرجع فوراً لجسر اليوم يوم، لكن <b>بالتوازي</b> — 6 أيام مع بعض. في الحالتين كل يوم يرجع من الخادم، بلا حساب محلي: <span dir="ltr">{ lat, lng, date: &quot;YYYY/MM/DD&quot;, navafel: false }</span>.</p>
+  <label for="directApiUrl">رابط API المباشر — اتركه فارغاً، الجسر بيجيبه لحاله (لا تحط شي هنا)</label>
+  <input id="directApiUrl" type="text" placeholder="اتركه فارغاً — لا تحط شي" dir="ltr" style="text-align:left">
+  <p class="small">ما تحط شي. بس اضغط زر «إعداد جدول مواقيت الصلاة» تحت، والجسر بيجيب الشهر أو السنة كلها بضغطة وحدة.</p>
   <div class="row no-print">
     <button class="primary" id="btnPrayer">إعداد جدول مواقيت الصلاة</button>
     <button class="ghost" id="btnClearPrayer">مسح النتائج</button>
@@ -274,34 +277,48 @@ function parsePrayerD(d){
   }
   return null;
 }
-// — جلبة وحدة خفيفة: محاولة وحدة سريعة، بمهلة، ثم رجوع فوري ليوم يوم —
-async function fetchTimeout(url,opts,ms){
-  const ctrl=new AbortController(); const t=setTimeout(()=>ctrl.abort(),ms);
-  try{ const r=await fetch(url,{...opts,signal:ctrl.signal}); return r; }
-  finally{ clearTimeout(t); }
-}
-async function discoverDirectApiUrls(){
-  const found=[];
-  const push=(u)=>{ if(!u) return; u=u.replace(/\\$/,'').replace(/[;,]$/,''); if(!/prayer/i.test(u)) return; if(/share|export|pdf/i.test(u)) return; if(!found.includes(u)) found.push(u); };
-  const pushFromText=(t)=>{ const defs=[...t.matchAll(/(directUrl|apiUrl)\s*=\s*([^;]{0,300});/g)].map(m=>m[2]); for(const d of defs){ const parts=[...d.matchAll(/["'](https?:\/\/[^"']+)["']/g)].map(m=>m[1]); parts.forEach(push); const rel=[...d.matchAll(/["'](\/[^"']*prayer[^"']*)["']/gi)].map(m=>m[1]); rel.forEach(x=>push('https://arabic.nojumi.org'+x)); } const m2=[...t.matchAll(/https?:\/\/[^\s"'\\]+prayer[^\s"'\\]*/gi)].map(x=>x[0]); m2.forEach(push); };
+// — جلبة وحدة: apiUrl مبني بالـ + في الكود الأصلي، لذلك نلتقط التعريف كاملاً حتى ; ونقيّمه —
+function buildUrlFromJsExpr(expr, lat, lng, startStr, endStr){
+  // startStr/endStr بصيغة YYYY/MM/DD
+  const sy=startStr.substr(0,4), sm=startStr.substr(5,2), sd=startStr.substr(8,2);
+  const ey=endStr.substr(0,4), em=endStr.substr(5,2), ed=endStr.substr(8,2);
+  // خريطة المتغيرات الشائعة في كود نجومي
+  const vars={
+    lat:lat, lng:lng, lon:lng, latitude:lat, longitude:lng,
+    startDate:startStr, endDate:endStr, start_date:startStr, end_date:endStr,
+    startY:sy, startM:sm, startD:sd, endY:ey, endM:em, endD:ed,
+    startYear:sy, startMonth:sm, startDay:sd, endYear:ey, endMonth:em, endDay:ed,
+    from:startStr, to:endStr, fromDate:startStr, toDate:endStr,
+    navafel:false, lang:'ar', language:'ar', shamsiMiladi:'miladi', dateType:'month'
+  };
+  // عرّف المتغيرات كثوابت ثم قيّم التعبير — التعبير هنا من كود الموقع نفسه، وهو توصيل نصوص فقط
   try{
-    const res=await fetchTimeout('https://arabic.nojumi.org/prayertimes',{method:'GET',credentials:'include'},6000);
-    const pageHtml=await res.text();
-    pushFromText(pageHtml);
-    const srcs=[...new Set([...pageHtml.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]))].slice(0,4);
-    for(const s of srcs){
-      let abs=s.startsWith('http')?s:(s.startsWith('//')?'https:'+s:(s.startsWith('/')?'https://arabic.nojumi.org'+s:'https://arabic.nojumi.org/'+s));
-      try{
-        const r=await fetchTimeout(abs,{method:'GET'},6000); if(!r.ok) continue;
-        const t=await r.text();
-        if(t.includes('jQuery v3')) continue;
-        pushFromText(t);
-        if(found.length) break;
-      }catch(e){}
-    }
+    const names=Object.keys(vars); const vals=names.map(k=>vars[k]);
+    const fn=new Function(...names, 'return ('+expr+');');
+    const out=fn(...vals);
+    if(typeof out==='string' && out.includes('http')) return out;
   }catch(e){}
-  return found;
+  return null;
 }
+function findApiUrlInText(t, lat, lng, startStr, endStr){
+  // 1) apiUrl = ... ; كاملاً
+  const m=[...t.matchAll(/\bapiUrl\s*=\s*([^;]{1,1200});/g)];
+  for(const mm of m){
+    const built=buildUrlFromJsExpr(mm[1], lat, lng, startStr, endStr);
+    if(built) return built;
+  }
+  // 2) directUrl = ... ; كاملاً — هو رابط كامل جاهز، لا تزد عليه بارامترات
+  const d=[...t.matchAll(/\bdirectUrl\s*=\s*([^;]{1,1200});/g)];
+  for(const mm of d){
+    const built=buildUrlFromJsExpr(mm[1], lat, lng, startStr, endStr);
+    if(built) return built;
+  }
+  // 3) رابط كامل حرفي فيه prayer و api
+  const lits=[...t.matchAll(/["'](https?:\/\/[^"']*prayer[^"']*)["']/gi)].map(x=>x[1]);
+  for(const u of lits){ if(!/share|export|pdf/i.test(u)) return u; }
+  return null;
+}
+async function discoverDirectApiUrls(){ return []; }
 function extractPrayerArray(txt){
   let j=null;
   try{ j=JSON.parse(txt); }catch(e){ return null; }
@@ -324,47 +341,67 @@ function extractPrayerArray(txt){
   return null;
 }
 async function fetchRangeSingle(lat,lng,startStr,endStr){
-  // الجلبة الوحدة الحقيقية قد تكون على نفس رابط اليوم يوم، لكن ببارامترات فترة بدل date واحد
-  // جرّبها أولاً بـ POST واحد سريع (مهلة 6 ثواني)، ثم جرّب الرابط المكتشف بـ GET
-  const rangeBodies=[
-    {lat:lat,lng:lng,startDate:startStr,endDate:endStr,navafel:false},
-    {lat:lat,lng:lng,start_date:startStr,end_date:endStr,navafel:false},
-    {lat:lat,lng:lng,from:startStr,to:endStr,navafel:false}
-  ];
-  let tried='';
-  for(const body of rangeBodies){
+  const pasted=(document.getElementById('directApiUrl')?document.getElementById('directApiUrl').value.trim():'');
+  if(pasted && pasted.includes('http')){
+    // الرابط الملصوق قد يكون كاملاً جاهزاً (directUrl) أو قاعدة (apiUrl) — جرّبه كما هو أولاً
     try{
-      tried+='POST '+URL_PRAYER_API+' '+JSON.stringify(body)+'\n';
-      const r=await fetchTimeout(URL_PRAYER_API,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify(body),credentials:'include'},6000);
+      const r=await fetchTimeout(pasted,{method:'GET',credentials:'include'},6000);
       const txt=await r.text();
-      if(r.ok){
-        const arr=extractPrayerArray(txt);
-        if(arr && arr.length>1) return {ok:true,directUrl:URL_PRAYER_API,params:body,method:'POST-رينج',days:arr,raw:txt,tried:tried};
+      if(r.ok){ const arr=extractPrayerArray(txt); if(arr && arr.length>1) return {ok:true,directUrl:pasted,params:{},method:'GET-ملصوق-كامل',days:arr,raw:txt,tried:'GET ملصوق كما هو: '+pasted}; }
+    }catch(e){}
+  }
+  // تلقائي بالكامل: لا تحط شي — الجسر بيجيب صفحة المواقيت وملفات JS تبعها لحاله وبيبني apiUrl لحاله
+  const candidates=['https://arabic.nojumi.org/prayertimes'];
+  let tried='';
+  for(const src of candidates){
+    try{
+      const r=await fetchTimeout(src,{method:'GET',credentials:'include'},6000);
+      if(!r.ok) continue;
+      const t=await r.text();
+      // إذا كان HTML، فتّش فيه وفي ملفات JS المذكورة فيه
+      const texts=[t];
+      if(t.includes('<script')){
+        const srcs=[...new Set([...t.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]))];
+        for(const s of srcs){
+          try{
+            let abs=s.startsWith('http')?s:(s.startsWith('//')?'https:'+s:(s.startsWith('/')?'https://arabic.nojumi.org'+s:'https://arabic.nojumi.org/'+s));
+            const rr=await fetchTimeout(abs,{method:'GET'},6000); if(rr.ok) texts.push(await rr.text());
+          }catch(e){}
+        }
       }
-    }catch(e){ tried+='POST-رينج فشل/مهلة: '+e.message+'\n'; break; }
+      for(const txt of texts){
+        if(txt.includes('jQuery v3')) continue;
+        const built=findApiUrlInText(txt, lat, lng, startStr, endStr);
+        if(!built) continue;
+        tried+='بناء apiUrl من: '+src+' => '+built+'\n';
+        // إذا كان directUrl كاملاً، لا تزد عليه بارامترات — جرّبه كما هو
+        // إذا كان apiUrl قاعدة، جرّبه كما هو أولاً، ثم مع بارامترات الفترة
+        const urlsToTry=[built];
+        const qs=new URLSearchParams({lat:lat,lng:lng,startDate:startStr,endDate:endStr,navafel:false}).toString();
+        if(!built.includes('lat=')) urlsToTry.push(built+(built.includes('?')?'&':'?')+qs);
+        for(const u of urlsToTry){
+          try{
+            const rr=await fetchTimeout(u,{method:'GET',credentials:'include'},6000);
+            const txt2=await rr.text();
+            if(rr.ok){
+              const arr=extractPrayerArray(txt2);
+              if(arr && arr.length>1) return {ok:true,directUrl:u,params:{},method:'GET-apiUrl-كامل',days:arr,raw:txt2,tried:tried};
+            }
+            tried+='GET '+u+' رجع HTTP '+rr.status+'\n';
+          }catch(e){ tried+='GET '+u+' فشل/مهلة: '+e.message+'\n'; }
+        }
+      }
+    }catch(e){ tried+='جلب '+src+' فشل: '+e.message+'\n'; }
   }
-  // إذا لم يقبل نفس الرابط الفترة، جرّب الرابط المباشر المكتشف (من الصفحة أو من JS) بـ GET واحد
-  let urls=[];
-  try{ urls=await discoverDirectApiUrls(); }catch(e){}
-  urls=urls.filter(u=>u!==URL_PRAYER_API);
-  if(!urls.length) return {ok:false,reason:'نفس رابط اليوم يوم لا يقبل الفترة، ولم أجد رابط فترة مباشر مختلف في الصفحة أو في JS — الموقع نفسه يبني الشهر بيوم يوم',directUrl:URL_PRAYER_API,raw:'',tried:tried};
-  const directUrl=urls[0];
-  const params={lat:lat,lng:lng,startDate:startStr,endDate:endStr,navafel:false};
-  tried+='GET '+directUrl+'?'+new URLSearchParams(params).toString()+'\n';
+  // أخيراً: POST فترة على نفس GetPrayerTimesFromAPI — الكتلة 2 تثبت أنه يقبل date واحد، لكن جرّب الفترة مرة وحدة
+  const body={lat:lat,lng:lng,startDate:startStr,endDate:endStr,navafel:false};
   try{
-    const qs=new URLSearchParams(params).toString();
-    const r=await fetchTimeout(directUrl+(directUrl.includes('?')?'&':'?')+qs,{method:'GET',credentials:'include'},6000);
+    const r=await fetchTimeout(URL_PRAYER_API,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify(body),credentials:'include'},6000);
     const txt=await r.text();
-    if(r.ok){
-      const arr=extractPrayerArray(txt);
-      if(arr && arr.length>1) return {ok:true,directUrl:directUrl,params:params,method:'GET',days:arr,raw:txt,tried:tried};
-    }
-    tried+='GET رجع HTTP '+r.status+'\n';
-    return {ok:false,reason:'نفس رابط اليوم يوم لا يقبل الفترة، والرابط المكتشف لم يرجع مصفوفة فترة',directUrl:directUrl,raw:txt,tried:tried};
-  }catch(e){
-    tried+='GET فشل/مهلة: '+e.message+'\n';
-    return {ok:false,reason:'الجلبة الوحدة لم تنجح — أرجع ليوم يوم',directUrl:directUrl,raw:'',tried:tried};
-  }
+    if(r.ok){ const arr=extractPrayerArray(txt); if(arr && arr.length>1) return {ok:true,directUrl:URL_PRAYER_API,params:body,method:'POST-رينج',days:arr,raw:txt,tried:tried}; }
+    tried+='POST-رينج رجع HTTP '+r.status+'\n';
+  }catch(e){ tried+='POST-رينج فشل/مهلة: '+e.message+'\n'; }
+  return {ok:false,reason:'لم أستطع بناء apiUrl كاملاً من الكود — انسخ سطر apiUrl = ... ; كاملاً من الملف والصقه في حقل الرابط المباشر',directUrl:'—',raw:'',tried:tried};
 }
 async function fetchOnePrayerDay(lat,lng,dateStr){
   const r=await postWeb(URL_PRAYER_API,{lat:lat,lng:lng,date:dateStr,navafel:false});
@@ -439,16 +476,24 @@ async function runPrayer(){
     // — لم تنجح الجلبة الوحدة، ارجع لجسر اليوم يوم المثبت —
     setText('prayerMeta','النمط: '+currentMode+' | عدد الأيام المطلوبة: '+dates.length+' | الجلبة الوحدة لم تنجح ('+(single.reason||'')+') — أرجع لجسر اليوم يوم…');
     const grouped={}; let firstRaw=''; let failCount=0; let firstFail='';
-    for(let i=0;i<dates.length;i++){
-      const ds=dates[i];
-      b.textContent='جارٍ الجلب… '+(i+1)+'/'+dates.length;
-      const res=await fetchOnePrayerDay(lat,lng,ds);
-      if(i===0) firstRaw=res.raw||'';
-      if(!res.ok||!res.day){ failCount++; if(!firstFail) firstFail=ds+' HTTP '+res.status+' '+(res.raw||'').slice(0,500); continue; }
-      const mk=(res.day.prayerDate||ds).substr(5,2);
-      if(!grouped[mk]) grouped[mk]=[];
-      grouped[mk].push(res.day);
+    // توازي: 6 أيام مع بعض، بدل 1/30 ... 30/30 بالتسلسل — ضغطة وحدة تجيب الشهر كله بسرعة
+    b.textContent='جارٍ الجلب بالتوازي… '+dates.length+' يوم';
+    const CONC=6;
+    for(let s=0;s<dates.length;s+=CONC){
+      const chunk=dates.slice(s,s+CONC);
+      const results=await Promise.all(chunk.map(ds=>fetchOnePrayerDay(lat,lng,ds)));
+      results.forEach((res,idx)=>{
+        const ds=chunk[idx];
+        if(s===0 && idx===0) firstRaw=res.raw||'';
+        if(!res.ok||!res.day){ failCount++; if(!firstFail) firstFail=ds+' HTTP '+res.status+' '+(res.raw||'').slice(0,500); return; }
+        const mk=(res.day.prayerDate||ds).substr(5,2);
+        if(!grouped[mk]) grouped[mk]=[];
+        grouped[mk].push(res.day);
+      });
+      b.textContent='جارٍ الجلب بالتوازي… '+Math.min(s+CONC,dates.length)+'/'+dates.length;
     }
+    // رتّب أيام كل شهر بالتاريخ كما رجعت من الخادم
+    Object.keys(grouped).forEach(k=>grouped[k].sort((a,b)=>String(a.prayerDate||'').localeCompare(String(b.prayerDate||''))));
     const total=Object.keys(grouped).reduce((s,k)=>s+grouped[k].length,0);
     setText('debugPrayer','المسار: يوم يوم (احتياط بعد فشل الجلبة الوحدة)\nسبب فشل الجلبة الوحدة: '+(single.reason||'')+'\nالروابط المكتشفة: '+(single.directUrl||'—')+'\n\nمحاولات الجلبة الوحدة:\n'+String(single.tried||'').slice(0,3000)+'\n\nآخر رد خام للجلبة الوحدة:\n'+String(single.raw||'').slice(0,6000)+'\n\n--- يوم يوم ---\nPOST '+URL_PRAYER_API+'\nالحمولة الأولى: '+JSON.stringify({lat:lat,lng:lng,date:dates[0],navafel:false},null,2)+'\nالنمط: '+currentMode+' | الأيام المطلوبة: '+dates.length+' | الناجحة: '+total+' | الفاشلة: '+failCount+'\nأول فشل: '+(firstFail||'—')+'\n\nأول رد خام من الخادم (يوم يوم):\n'+String(firstRaw).slice(0,4000));
     if(total===0){ setBadge('st2','2 — فشل: لم يرجع الخادم أي يوم','fail'); setText('prayerMeta','الخادم لم يرجع أي يوم. افتح الرد الخام في الأسفل.'); return; }
