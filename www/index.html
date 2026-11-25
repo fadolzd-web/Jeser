@@ -265,11 +265,12 @@ async function step3(){
     dst: dst, tc: state.tc,
     borjFilter: borjFilter,
     showShamsi: showShamsi, showQamari: showQamari, showGregorian: showGregorian,
-    solarMonthDisplay: solarMonthDisplay
+    solarMonthDisplay: solarMonthDisplay,
+    lunarMonthDisplay: lunarVal,
+    hijriAdjustment: hijriVal
   };
-  // الحقول الاختيارية: إن تركتها فارغة لا نرسل قيمة مخترعة، بل نتركها غائبة كما لو لم يختر المستخدم خياراً
-  if(lunarVal) payload.lunarMonthDisplay = lunarVal;
-  if(hijriVal) payload.hijriAdjustment = hijriVal;
+  // تصحيح جراحي واحد: ASP.NET يعتبر غياب المفتاح = missing value = 500
+  // لذلك نرسل المفتاحين دائماً، حتى لو كانت القيمة ""، ولا نحذفهما أبداً
 
   setText('req3','POST '+URL_MOON+'\n'+JSON.stringify(payload, null, 2));
   try{
