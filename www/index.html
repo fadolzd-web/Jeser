@@ -274,8 +274,10 @@ function parsePrayerD(d){
   }
   return null;
 }
-// — جلبة وحدة: اكتشاف الرابط المباشر من كود الصفحة نفسها، بلا تخمين —
-async function discoverDirectApiUrl(){
+// — جلبة وحدة: اكتشاف كل روابط Prayer من كود الصفحة، بلا تخمين —
+async function discoverDirectApiUrls(){
+  const found=[];
+  const push=(u)=>{ if(!u) return; u=u.replace(/\\$/,'').replace(/[;,]$/,''); if(!/prayer/i.test(u)) return; if(/share|export|pdf/i.test(u)) return; if(!found.includes(u)) found.push(u); };
   try{
     const res=await fetch('https://arabic.nojumi.org/prayertimes',{method:'GET',credentials:'include'});
     const pageHtml=await res.text();
@@ -286,42 +288,98 @@ async function discoverDirectApiUrl(){
         const r=await fetch(abs); if(!r.ok) continue;
         const t=await r.text();
         if(t.includes('jQuery v3')) continue;
-        // ابحث عن تعريف directUrl أو apiUrl
-        const m1=t.match(/(directUrl|apiUrl)\s*=\s*["']([^"']+)["']/);
-        if(m1 && /prayer/i.test(m1[2])) return m1[2];
-        // ابحث عن أي رابط فيه prayer و api في نفس السطر
+        // 1) تعريف directUrl / apiUrl — حتى لو كان مركباً بالـ + : خذ أول جزء فيه prayer أو api
+        const defs=[...t.matchAll(/(directUrl|apiUrl)\s*=\s*([^;]{0,300});/g)].map(m=>m[2]);
+        for(const d of defs){
+          const parts=[...d.matchAll(/["'](https?:\/\/[^"']+)["']/g)].map(m=>m[1]);
+          parts.forEach(push);
+          const rel=[...d.matchAll(/["'](\/[^"']*prayer[^"']*)["']/gi)].map(m=>m[1]);
+          rel.forEach(x=>push('https://arabic.nojumi.org'+x));
+        }
+        // 2) أي رابط كامل فيه prayer
         const m2=[...t.matchAll(/https?:\/\/[^\s"'\\]+prayer[^\s"'\\]*/gi)].map(x=>x[0]);
-        for(const u of m2){ if(!/share|export|pdf/i.test(u)) return u; }
+        m2.forEach(push);
+        // 3) أي مسار نسبي فيه api و prayer
+        const m3=[...t.matchAll(/["'](\/[^"']*api[^"']*prayer[^"']*)["']/gi)].map(x=>x[1]);
+        m3.forEach(x=>push('https://arabic.nojumi.org'+x));
       }catch(e){}
     }
   }catch(e){}
+  // رتّب: الـ API المباشر أولاً، و GetPrayerTimesFromAPI (يوم يوم) آخراً لأنه ليس جلبة وحدة
+  found.sort((a,b)=>{
+    const sa=a.includes('GetPrayerTimesFromAPI')?1:0; const sb=b.includes('GetPrayerTimesFromAPI')?1:0;
+    if(sa!==sb) return sa-sb;
+    return (b.includes('/api/')?1:0)-(a.includes('/api/')?1:0);
+  });
+  return found;
+}
+function extractPrayerArray(txt){
+  // الرد قد يكون JSON عادي، أو { d: "JSON نصي" } مثل WebMethod، أو مصفوفة مباشرة
+  let j=null;
+  try{ j=JSON.parse(txt); }catch(e){ return null; }
+  if(typeof j==='string'){ try{ j=JSON.parse(j); }catch(e){ return null; } }
+  if(j && j.d!=null){
+    if(typeof j.d==='string'){ try{ j=JSON.parse(j.d); }catch(e){ return null; } }
+    else if(typeof j.d==='object'){ j=j.d; }
+  }
+  if(Array.isArray(j)) return j;
+  if(j && j.data){
+    let d=j.data;
+    if(typeof d==='string'){ try{ d=JSON.parse(d); }catch(e){ return null; } }
+    if(Array.isArray(d)) return d;
+    if(d && Array.isArray(d.prayerTimes)) return d.prayerTimes;
+    if(d && Array.isArray(d.prayer_times)) return d.prayer_times;
+    if(d && Array.isArray(d.times)) return d.times;
+  }
+  if(j && Array.isArray(j.prayerTimes)) return j.prayerTimes;
+  if(j && Array.isArray(j.result)) return j.result;
   return null;
 }
 async function fetchRangeSingle(lat,lng,startStr,endStr){
-  const directUrl=await discoverDirectApiUrl();
-  if(!directUrl) return {ok:false,reason:'لم أجد رابط API مباشر في كود الصفحة',directUrl:null,raw:''};
-  // جرّب صيغ بارامترات الفترة الشائعة في كود الموقع، والخادم هو الذي يثبت أيها صحيحة
-  const tries=[
-    {lat:lat,lng:lng,startDate:startStr,endDate:endStr},
-    {lat:lat,lng:lng,start_date:startStr,end_date:endStr},
-    {lat:lat,lng:lng,from:startStr,to:endStr},
-    {lat:lat,lng:lng,date:startStr,endDate:endStr}
+  const urls=await discoverDirectApiUrls();
+  if(!urls.length) return {ok:false,reason:'لم أجد رابط API مباشر في كود الصفحة',directUrl:null,raw:''};
+  const dash=(s)=>s.replaceAll('/','-');
+  const paramSets=[
+    {startDate:startStr,endDate:endStr},
+    {start_date:startStr,end_date:endStr},
+    {from:startStr,to:endStr},
+    {fromDate:startStr,toDate:endStr},
+    {start:startStr,end:endStr},
+    {sDate:startStr,eDate:endStr},
+    {dateFrom:startStr,dateTo:endStr},
+    {startDate:dash(startStr),endDate:dash(endStr)},
+    {start_date:dash(startStr),end_date:dash(endStr)},
+    {from:dash(startStr),to:dash(endStr)}
   ];
-  let lastRaw='';
-  for(const params of tries){
-    try{
-      const qs=new URLSearchParams(params).toString();
-      const url=directUrl+(directUrl.includes('?')?'&':'?')+qs;
-      const r=await fetch(url,{method:'GET',credentials:'include'});
-      const txt=await r.text(); lastRaw=txt;
-      if(!r.ok) continue;
-      let j=null; try{ j=JSON.parse(txt); }catch(e){ continue; }
-      const arr=j && j.data && j.data.prayerTimes;
-      if(arr && arr.length>1) return {ok:true,directUrl:directUrl,params:params,days:arr,raw:txt};
-      if(arr && arr.length===1) return {ok:true,directUrl:directUrl,params:params,days:arr,raw:txt};
-    }catch(e){}
+  let lastRaw=''; let tried='';
+  for(const directUrl of urls){
+    for(const base of paramSets){
+      const params={lat:lat,lng:lng,...base,navafel:false};
+      // جرّب GET
+      try{
+        const qs=new URLSearchParams(params).toString();
+        const url=directUrl+(directUrl.includes('?')?'&':'?')+qs;
+        tried+='GET '+url+'\n';
+        const r=await fetch(url,{method:'GET',credentials:'include'});
+        const txt=await r.text(); lastRaw=txt;
+        if(r.ok){
+          const arr=extractPrayerArray(txt);
+          if(arr && arr.length>=1) return {ok:true,directUrl:directUrl,params:params,method:'GET',days:arr,raw:txt,tried:tried};
+        }
+      }catch(e){}
+      // جرّب POST JSON — بعض الـ API المباشرة تقبل POST مثل WebMethod
+      try{
+        const r2=await fetch(directUrl,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify(params),credentials:'include'});
+        const txt2=await r2.text(); lastRaw=txt2;
+        tried+='POST '+directUrl+' '+JSON.stringify(params)+'\n';
+        if(r2.ok){
+          const arr2=extractPrayerArray(txt2);
+          if(arr2 && arr2.length>=1) return {ok:true,directUrl:directUrl,params:params,method:'POST',days:arr2,raw:txt2,tried:tried};
+        }
+      }catch(e){}
+    }
   }
-  return {ok:false,reason:'وجدت الرابط المباشر لكن أي صيغة بارامترات لم ترجع مصفوفة prayerTimes',directUrl:directUrl,raw:lastRaw};
+  return {ok:false,reason:'وجدت روابط مباشرة لكن أي صيغة بارامترات (GET و POST) لم ترجع مصفوفة prayerTimes — افتح الرد الخام بالأسفل، هو الذي يثبت الصيغة الصحيحة',directUrl:urls.join(' | '),raw:lastRaw,tried:tried};
 }
 async function fetchOnePrayerDay(lat,lng,dateStr){
   const r=await postWeb(URL_PRAYER_API,{lat:lat,lng:lng,date:dateStr,navafel:false});
@@ -389,7 +447,7 @@ async function runPrayer(){
       fullPrayerHtml=tableHtmlSingle; setHTML('renderPrayer',tableHtmlSingle);
       setBadge('st2','2 — نجاح من الخادم: جلبة وحدة ('+single.days.length+' يوم)','ok');
       setText('prayerMeta','تم عرض '+single.days.length+' يوم من جلبة وحدة، بلا حساب محلي.');
-      setText('debugPrayer','GET '+single.directUrl+'\nالبارامترات الناجحة: '+JSON.stringify(single.params,null,2)+'\nالنمط: '+currentMode+' | الفترة: '+rangeStart+' إلى '+rangeEnd+' | lat='+lat+' lng='+lng+'\n\nأول رد خام من الخادم:\n'+String(single.raw).slice(0,8000));
+      setText('debugPrayer',(single.method||'GET')+' '+single.directUrl+'\nالبارامترات الناجحة: '+JSON.stringify(single.params,null,2)+'\nالنمط: '+currentMode+' | الفترة: '+rangeStart+' إلى '+rangeEnd+' | lat='+lat+' lng='+lng+'\n\nأول رد خام من الخادم:\n'+String(single.raw).slice(0,8000));
       buildMonthBar();
       return;
     }
@@ -407,7 +465,7 @@ async function runPrayer(){
       grouped[mk].push(res.day);
     }
     const total=Object.keys(grouped).reduce((s,k)=>s+grouped[k].length,0);
-    setText('debugPrayer','المسار: يوم يوم (احتياط بعد فشل الجلبة الوحدة)\nسبب فشل الجلبة الوحدة: '+(single.reason||'')+' | الرابط المكتشف: '+(single.directUrl||'—')+'\nPOST '+URL_PRAYER_API+'\nالحمولة الأولى: '+JSON.stringify({lat:lat,lng:lng,date:dates[0],navafel:false},null,2)+'\nالنمط: '+currentMode+' | الأيام المطلوبة: '+dates.length+' | الناجحة: '+total+' | الفاشلة: '+failCount+'\nأول فشل: '+(firstFail||'—')+'\n\nأول رد خام من الخادم (يوم يوم):\n'+String(firstRaw).slice(0,8000));
+    setText('debugPrayer','المسار: يوم يوم (احتياط بعد فشل الجلبة الوحدة)\nسبب فشل الجلبة الوحدة: '+(single.reason||'')+'\nالروابط المكتشفة: '+(single.directUrl||'—')+'\n\nمحاولات الجلبة الوحدة:\n'+String(single.tried||'').slice(0,3000)+'\n\nآخر رد خام للجلبة الوحدة:\n'+String(single.raw||'').slice(0,6000)+'\n\n--- يوم يوم ---\nPOST '+URL_PRAYER_API+'\nالحمولة الأولى: '+JSON.stringify({lat:lat,lng:lng,date:dates[0],navafel:false},null,2)+'\nالنمط: '+currentMode+' | الأيام المطلوبة: '+dates.length+' | الناجحة: '+total+' | الفاشلة: '+failCount+'\nأول فشل: '+(firstFail||'—')+'\n\nأول رد خام من الخادم (يوم يوم):\n'+String(firstRaw).slice(0,4000));
     if(total===0){ setBadge('st2','2 — فشل: لم يرجع الخادم أي يوم','fail'); setText('prayerMeta','الخادم لم يرجع أي يوم. افتح الرد الخام في الأسفل.'); return; }
     const tableHtml=buildPrayerTableHtml(grouped);
     fullPrayerHtml=tableHtml; setHTML('renderPrayer',tableHtml); setBadge('st2','2 — نجاح من الخادم ('+total+' يوم)','ok'); setText('prayerMeta','تم عرض '+total+' يوم كما رجع من الخادم، بلا تعديل وبلا حساب محلي.'+(failCount?(' — فشل '+failCount+' يوم.'):'')); buildMonthBar();
