@@ -2,227 +2,191 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مختبر جسر القمر - النجومي - نسخة مستقلة</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مختبر جسر القمر - النجومي</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#0a1f14;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;padding:12px 12px 40px}
-h1{font-size:19px;color:#fde68a;margin:4px 0 2px}
-.sub{color:#9ca3af;font-size:12px;line-height:1.7;margin-bottom:10px}
-.card{background:rgba(0,0,0,.28);border:1px solid rgba(212,175,55,.22);border-radius:14px;padding:12px;margin-bottom:10px}
-.card h2{font-size:14px;color:#fde68a;margin:0 0 8px}
-label{font-size:12px;color:#e8d9a3;display:block;margin:8px 0 4px}
-input{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(212,175,55,.35);background:#0f2418;color:#fff;font-size:14px;direction:ltr;text-align:left}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.btn{display:block;width:100%;padding:13px;border-radius:12px;border:1px solid #d4af37;background:linear-gradient(135deg,#d4af37,#8a6d1b);color:#0a1f14;font-weight:900;font-size:14px;margin:8px 0;cursor:pointer}
-.btn.sec{background:#14532d;color:#e8d9a3;border-color:rgba(212,175,55,.4)}
-.btn.ghost{background:transparent;color:#e8d9a3}
-.status{background:rgba(0,0,0,.35);border:1px solid rgba(212,175,55,.18);border-radius:10px;padding:10px;font-size:12px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
-table{width:100%;border-collapse:collapse;font-size:12px}
-table td{border-bottom:1px solid rgba(212,175,55,.14);padding:9px 5px;vertical-align:top;color:#fff}
-table td:first-child{color:#fde68a;font-weight:700;width:36%}
-pre{background:#000;border:1px solid rgba(212,175,55,.2);border-radius:10px;padding:10px;font-size:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:#e5e7eb;max-height:320px;overflow:auto;direction:ltr;text-align:left}
-a{color:#fde68a;font-weight:900}
-.small{font-size:11px;color:#9ca3af;line-height:1.7}
-.ok{color:#4ade80}.bad{color:#f87171}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial;background:#eef2f7;color:#111;padding:16px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:22px;margin:6px 0 4px} .sub{color:#555;margin:0 0 16px;font-size:14px}
+.card{background:#fff;border:1px solid #dde3ec;border-radius:12px;padding:14px;margin:0 0 14px}
+.card h2{font-size:17px;margin:0 0 8px} .hint{color:#555;font-size:13px;margin:0 0 10px;line-height:1.7}
+label{display:block;font-size:13px;color:#333;margin:8px 0 4px} input{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;background:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px} @media(max-width:600px){.row{grid-template-columns:1fr}}
+button{border:0;border-radius:10px;padding:11px 16px;font-size:15px;font-weight:700;cursor:pointer;background:#1c6eae;color:#fff;margin-top:10px;width:100%}
+button:disabled{background:#9db4c6;cursor:not-allowed}
+pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto;font-size:13px;line-height:1.7;direction:ltr;text-align:left}
+.badge{display:inline-block;background:#e0f2fe;color:#075985;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700}
+.err{color:#b91c1c;font-weight:700} .ok{color:#047857;font-weight:700}
+.cand{margin:6px 0} .cand button{background:#fff;color:#1c6eae;border:1px solid #1c6eae;padding:8px 10px;font-size:13px}
+.log{font-size:13px;line-height:1.8} .log div{border-bottom:1px solid #eef2f7;padding:6px 0}
+.small{font-size:12px;color:#666;line-height:1.7}
 </style>
 </head>
 <body>
+<div class="wrap">
 <h1>🌙 مختبر جسر القمر - النجومي</h1>
-<div class="sub">نسخة مستقلة، ملف HTML واحد. لا تلمس التقويم ولا الصايغ ولا المصحف.<br>القاعدة: نعرض ما يرجع من الخادم فقط. بلا حساب محلي وبلا رقم مخترع. إذا لم يرجع الخادم بيانات، نعرض تعذّر الجلب.</div>
+<p class="sub">نعرض ما يرجع من الخادم فقط. بلا حساب محلي وبلا رقم مخترع.</p>
 
 <div class="card">
-<h2>الإعدادات</h2>
-<div class="row">
-<div><label>خط العرض lat</label><input id="lat" value="32.00"></div>
-<div><label>خط الطول lng</label><input id="lng" value="44.33"></div>
-</div>
-<div class="row">
-<div><label>تاريخ الابتداء</label><input id="startDate" value=""></div>
-<div><label>تاريخ الانتهاء</label><input id="endDate" value=""></div>
-</div>
-<div class="small">الافتراضي: النجف الأشرف. الابتداء اليوم ناقص 5 أيام. الانتهاء اليوم زائد 60 يوم. الصيغة: 2026/11/25</div>
-<button class="btn sec" id="btnToday">تحديث التواريخ إلى اليوم</button>
+<h2>1. اكتشاف الإعداد</h2>
+<p class="hint">يجلب صفحة <b>https://arabic.nojumi.org/events</b> كنص، ويستخرج كتلة <b>App_Config</b> فقط. لا يوجد أي طلب على <b>Events.aspx</b>.</p>
+<button id="btnConfig">اكتشاف الإعداد من صفحة events</button>
+<div id="configStatus" class="small"></div>
+<pre id="configOut">لم يتم الجلب بعد.</pre>
 </div>
 
 <div class="card">
-<h2>التجربة</h2>
-<button class="btn" id="btnMethods">جرّب أسماء الدوال المرشحة</button>
-<button class="btn sec" id="btnDiscover">اكتشف المراسلة من صفحة النجومي</button>
-<button class="btn sec" id="btnHtml">جلب صفحة النجومي HTML للفحص</button>
-<button class="btn ghost" id="btnClear">مسح السجل والنتائج</button>
-<div style="text-align:center;margin-top:6px"><a href="https://arabic.nojumi.org/events" target="_blank" rel="noopener">فتح صفحة النجومي - موقع القمر في الأبراج</a></div>
+<h2>2. تحليل events.js</h2>
+<p class="hint">يجلب <b>/JS/events.js?v=6</b> كنص، ويعرض فقط الأسطر التي تحتوي على <b>App_Config</b> أو <b>apiKey</b> أو <b>ajax</b> أو <b>fetch</b>. يتجاهل تماماً <b>ScriptResource.axd</b> و <b>gtag</b> و <b>jquery</b> و <b>leaflet</b>. تنبيه: <b>get_events</b> في إطار Microsoft Ajax ليست أحداث القمر.</p>
+<button id="btnJs">تحليل ملف events.js</button>
+<div id="jsStatus" class="small"></div>
+<pre id="jsOut">لم يتم الجلب بعد.</pre>
+<div id="candidates"></div>
 </div>
 
-<div class="card"><h2>الحالة</h2><div class="status" id="status">جاهز. اضغط زر التجربة.</div></div>
+<div class="card">
+<h2>3. جلب الأحداث من العنوان المكتشف فقط</h2>
+<p class="hint">هذا الزر يبقى معطّلاً حتى يُكتشف عنوان حقيقي في المرحلة 2. عند اكتشاف عنوان، اختره من القائمة أعلاه، ثم اجلب. يعرض الرد الخام كما رجع من الخادم.</p>
+<label>العنوان المكتشف</label>
+<input id="endpoint" placeholder="اختر عنواناً من المرحلة 2 أولاً" value="">
+<label>مفتاح الواجهة كما رجع من الخادم</label>
+<input id="apiKey" readonly placeholder="سيظهر بعد المرحلة 1">
+<div class="row">
+<div><label>من تاريخ</label><input id="fromDate" value="2026/11/20"></div>
+<div><label>إلى تاريخ</label><input id="toDate" value="2027/01/24"></div>
+</div>
+<div class="row">
+<div><label>خط العرض</label><input id="lat" value="32"></div>
+<div><label>خط الطول</label><input id="lng" value="44.33"></div>
+</div>
+<button id="btnFetch" disabled>جلب الأحداث من العنوان المكتشف</button>
+<div id="fetchStatus" class="small"></div>
+<pre id="fetchOut">لم يتم الجلب بعد.</pre>
+</div>
 
-<div class="card"><h2>النتائج - بستايل جدول السنة للصايغ</h2><div id="results"><div class="small">لا توجد نتائج بعد.</div></div></div>
+<div class="card">
+<h2>سجل المحاولات</h2>
+<div id="log" class="log"><div>لا توجد محاولات بعد.</div></div>
+</div>
 
-<div class="card"><h2>الرد الخام من الخادم</h2><pre id="raw">لا يوجد رد بعد.</pre></div>
-
-<div class="card"><h2>سجل المحاولات</h2><div class="status" id="log">لا توجد محاولات بعد.</div></div>
-
-<div class="small">ملاحظة: إذا فتحت الملف من المتصفح وظهر خطأ CORS، هذا حجب من المتصفح وليس فشل الجسر. داخل تطبيق التقويم، الجلب يتم عبر CapacitorHttp ولهذا يعمل جسر الصلاة. المختبر يعرض رسالة الخطأ كما هي، بلا تجميل.</div>
+<p class="small">ملف مستقل واحد. بلا رياكت وبلا بناء. لا يلمس التقويم ولا الصايغ ولا المصحف. إذا لم يرجع الخادم بيانات، يعرض تعذّر جلب البيانات من الخادم.</p>
+</div>
 
 <script>
-function fmt(d){var y=d.getFullYear();var m=String(d.getMonth()+1).padStart(2,'0');var day=String(d.getDate()).padStart(2,'0');return y+'/'+m+'/'+day;}
-function setToday(){var n=new Date();var s=new Date(n);s.setDate(n.getDate()-5);var e=new Date(n);e.setDate(n.getDate()+60);document.getElementById('startDate').value=fmt(s);document.getElementById('endDate').value=fmt(e);}
-setToday();
-document.getElementById('btnToday').onclick=setToday;
-var logLines=[];
-function setStatus(t){document.getElementById('status').textContent=t;}
-function addLog(t){logLines.unshift(new Date().toLocaleTimeString('ar')+' - '+t);document.getElementById('log').textContent=logLines.slice(0,60).join('\n');}
-function setRaw(t){document.getElementById('raw').textContent=String(t).slice(0,4000);}
-function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function renderTable(rows){
-  if(!rows||!rows.length){document.getElementById('results').innerHTML='<div class="small">لم يرجع الخادم أي بيانات قابلة للعرض.</div>';return;}
-  var h='<table>';
-  rows.slice(0,80).forEach(function(r,i){
-    h+='<tr><td>حدث '+(i+1)+'</td><td>'+esc(r)+'</td></tr>';
-  });
-  h+='</table><div class="small">عدد الصفوف المعروضة من الرد: '+rows.length+'</div>';
-  document.getElementById('results').innerHTML=h;
+var apiKeyVal = '';
+function now(){ return new Date().toLocaleTimeString('ar-EG'); }
+function addLog(msg){
+  var log = document.getElementById('log');
+  if(log.textContent.indexOf('لا توجد محاولات')>=0) log.innerHTML='';
+  var d=document.createElement('div'); d.textContent = now() + ' | ' + msg; log.prepend(d);
 }
-function extractRows(obj){
-  var out=[];
-  function walk(n,depth){
-    if(out.length>120||depth>7||!n||typeof n!=='object') return;
-    if(Array.isArray(n)){n.forEach(function(x){walk(x,depth+1)});return;}
-    var keys=Object.keys(n);
-    var hasDate=keys.some(function(k){return /date|day|time|zodiac|sign|moon|qamar|aqrab|scorpio/i.test(k)});
-    if(hasDate){out.push(JSON.stringify(n));return;}
-    keys.forEach(function(k){walk(n[k],depth+1)});
-  }
-  walk(obj,0);
-  return out;
-}
-async function postOne(url,body){
-  // Capacitor أولا، ثم fetch مباشرة
-  try{
-    if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.CapacitorHttp){
-      var r=await window.Capacitor.Plugins.CapacitorHttp.post({url:url,headers:{'Content-Type':'application/json; charset=utf-8'},data:body});
-      var d=r&&r.data!=null?(typeof r.data==='string'?r.data:JSON.stringify(r.data)):'';
-      return {ok:(r.status>=200&&r.status<300),status:r.status,body:d,via:'CapacitorHttp'};
-    }
-  }catch(e){return {ok:false,status:0,body:'Capacitor خطأ: '+e.message,via:'CapacitorHttp'};}
-  try{
-    var ctrl=new AbortController();var to=setTimeout(function(){try{ctrl.abort()}catch(e){}},12000);
-    try{
-      var res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify(body),signal:ctrl.signal});
-      var txt=await res.text();
-      return {ok:res.ok,status:res.status,body:txt,via:'fetch'};
-    }finally{clearTimeout(to);}
-  }catch(e){return {ok:false,status:0,body:'fetch خطأ: '+e.message,via:'fetch'};}
-}
-async function tryMethods(){
-  var lat=parseFloat(document.getElementById('lat').value);
-  var lng=parseFloat(document.getElementById('lng').value);
-  var start=document.getElementById('startDate').value.trim();
-  var end=document.getElementById('endDate').value.trim();
-  var names=['GetMoonInZodiacFromAPI','GetMoonPositionFromAPI','GetMoonZodiacFromAPI','GetMoonEventsFromAPI','GetMoonEvents','GetEventsFromAPI'];
-  var bases=['https://arabic.nojumi.org/WebPages/Events.aspx/','https://arabic.nojumi.org/Events.aspx/'];
-  var payloads=[
-    {lat:lat,lng:lng,startDate:start,endDate:end},
-    {lat:lat,lng:lng,date:start,navafel:false}
-  ];
-  setStatus('جارٍ التجربة... لا تغلق الصفحة.');
-  addLog('بدء تجربة الدوال - lat='+lat+' lng='+lng+' من '+start+' إلى '+end);
-  for(var bi=0;bi<bases.length;bi++){
-    for(var ni=0;ni<names.length;ni++){
-      for(var pi=0;pi<payloads.length;pi++){
-        var url=bases[bi]+names[ni];
-        var body=payloads[pi];
-        var r=await postOne(url,body);
-        var line=names[ni]+' | '+bases[bi]+' | حمولة '+(pi+1)+' | HTTP '+r.status+' | '+r.via+' | طول الرد '+(r.body?r.body.length:0);
-        addLog(line);
-        setStatus(line+'\n'+(r.body?r.body.slice(0,600):'بلا رد'));
-        if(r.ok&&r.body&&r.body.length>20){
-          try{
-            var j=JSON.parse(r.body);
-            var d=(j&&j.d!==undefined)?j.d:j;
-            var txtD=typeof d==='string'?d:JSON.stringify(d);
-            if(txtD&&txtD.length>20&&txtD.toLowerCase().indexOf('error')===-1&&txtD.indexOf('404')===-1){
-              setStatus('✅ نجح - '+names[ni]+' - '+url+' - HTTP '+r.status);
-              setRaw(r.body);
-              var rows=extractRows(j);
-              renderTable(rows.length?rows:[txtD.slice(0,2000)]);
-              addLog('✅ نجاح حقيقي: '+url);
-              return;
-            }
-          }catch(e){
-            // رد غير JSON، نعرضه كما هو إذا كان فيه بيانات
-            if(r.body.indexOf('العقرب')!==-1||r.body.indexOf('Moon')!==-1||r.body.indexOf('Zodiac')!==-1){
-              setStatus('✅ رجع نص فيه قمر/عقرب - '+url);
-              setRaw(r.body);
-              renderTable([r.body.slice(0,2000)]);
-              return;
-            }
-          }
-        }
-      }
-    }
-  }
-  setStatus('❌ تعذّر الجلب من مركز البحوث. كل الأسماء رجعت 404 أو خطأ أو بلا بيانات. افتح صفحة النجومي للتحقق.');
-  addLog('❌ فشل كل الأسماء - لم يرجع الخادم بيانات');
-}
-document.getElementById('btnMethods').onclick=tryMethods;
+function setStatus(id, html){ document.getElementById(id).innerHTML = html; }
 
-async function getHtml(url){
+document.getElementById('btnConfig').onclick = async function(){
+  var out = document.getElementById('configOut');
+  setStatus('configStatus','جاري الجلب...');
+  addLog('المرحلة 1 | GET https://arabic.nojumi.org/events');
   try{
-    if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.CapacitorHttp){
-      var r=await window.Capacitor.Plugins.CapacitorHttp.get({url:url,headers:{'Accept':'text/html'}});
-      var t=r&&r.data!=null?(typeof r.data==='string'?r.data:JSON.stringify(r.data)):'';
-      if(t&&t.length>500) return t;
-    }
-  }catch(e){}
-  try{
-    var res=await fetch(url,{method:'GET',cache:'no-store'});
-    if(res.ok){var txt=await res.text();if(txt&&txt.length>500) return txt;}
-  }catch(e){throw e;}
-  return null;
-}
-document.getElementById('btnHtml').onclick=async function(){
-  setStatus('جارٍ جلب صفحة النجومي...');
-  try{
-    var html=await getHtml('https://arabic.nojumi.org/events');
-    if(!html){setStatus('❌ لم يرجع الخادم صفحة HTML.');return;}
-    setStatus('تم جلب الصفحة. الطول: '+html.length+' حرف. فيها كلمة العقرب: '+(html.indexOf('العقرب')!==-1?'نعم':'لا'));
-    setRaw(html.slice(0,4000));
-    addLog('جلب /events HTML - طول '+html.length);
-  }catch(e){setStatus('❌ خطأ جلب الصفحة: '+e.message);addLog('خطأ /events: '+e.message);}
+    var r = await fetch('https://arabic.nojumi.org/events');
+    var t = await r.text();
+    addLog('المرحلة 1 | الحالة: ' + r.status + ' | الطول: ' + t.length);
+    if(!r.ok){ out.textContent = 'تعذّر جلب البيانات من الخادم. الحالة: ' + r.status; setStatus('configStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>'); return; }
+    var m = t.match(/var\s+App_Config\s*=\s*\{([\s\S]*?)\};/);
+    var k = t.match(/apiKey\s*:\s*'([^']+)'/);
+    if(k) { apiKeyVal = k[1]; document.getElementById('apiKey').value = apiKeyVal; }
+    var can = t.match(/rel="canonical"[^>]*href="([^"]+)"/);
+    var show = '';
+    if(m) show += 'App_Config = {' + m[1] + '};\n\n';
+    else show += 'لم تُعثر على كتلة App_Config في الرد.\n\n';
+    if(can) show += 'canonical: ' + can[1] + '\n';
+    show += 'طول الرد الكامل: ' + t.length + '\n';
+    out.textContent = show;
+    setStatus('configStatus','<span class="ok">تم اكتشاف الإعداد من الخادم</span>');
+  }catch(e){
+    out.textContent = 'تعذّر جلب البيانات من الخادم. ' + e.message;
+    setStatus('configStatus','<span class="err">تعذّر جلب البيانات من الخادم - قد يكون حظر CORS من المتصفح</span>');
+    addLog('المرحلة 1 | خطأ: ' + e.message);
+  }
 };
-document.getElementById('btnDiscover').onclick=async function(){
-  setStatus('جارٍ اكتشاف المراسلة من صفحة النجومي...');
+
+document.getElementById('btnJs').onclick = async function(){
+  var out = document.getElementById('jsOut');
+  setStatus('jsStatus','جاري الجلب...');
+  addLog('المرحلة 2 | GET https://arabic.nojumi.org/JS/events.js?v=6');
   try{
-    var html=await getHtml('https://arabic.nojumi.org/events');
-    if(!html){setStatus('❌ لم يرجع الخادم صفحة.');return;}
-    var srcs=[];var re=/<script[^>]+src=["']([^"']+)["']/gi;var m;
-    while((m=re.exec(html))!==null){srcs.push(m[1]);}
-    addLog('وجد '+srcs.length+' ملف جافاسكربت في الصفحة');
-    setStatus('وجد '+srcs.length+' ملف جافاسكربت. جارٍ فحصها...');
-    var found=[];
-    for(var i=0;i<srcs.length;i++){
-      var s=srcs[i];
-      var full=s.indexOf('http')===0?s:(s.charAt(0)==='/'?'https://arabic.nojumi.org'+s:'https://arabic.nojumi.org/'+s);
-      try{
-        var js=await getHtml(full);
-        if(!js) continue;
-        var lines=js.split('\n');
-        lines.forEach(function(line,idx){
-          if(/fetch\(|axios|aspx\/|api\/|Events|Moon|Zodiac|GetMoon/i.test(line)){
-            found.push(full+' | سطر '+(idx+1)+' | '+line.trim().slice(0,220));
-          }
-        });
-      }catch(e){}
+    var r = await fetch('https://arabic.nojumi.org/JS/events.js?v=6');
+    var t = await r.text();
+    addLog('المرحلة 2 | الحالة: ' + r.status + ' | الطول: ' + t.length);
+    if(!r.ok){ out.textContent='تعذّر جلب البيانات من الخادم. الحالة: '+r.status; setStatus('jsStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>'); return; }
+    var lines = t.split('\n');
+    var keys = ['App_Config','apiKey','applicationPath','ajax','fetch','XMLHttpRequest','PageMethods','WebMethod','loadingEvents'];
+    var found = [];
+    lines.forEach(function(line,i){
+      for(var j=0;j<keys.length;j++){ if(line.indexOf(keys[j])>=0){ found.push((i+1)+': '+line.trim()); break; } }
+    });
+    if(found.length===0){ out.textContent='لم تُعثر على أي سطر يحتوي على apiKey أو ajax أو fetch في events.js.\nطول الملف: '+t.length; setStatus('jsStatus','<span class="err">لا يوجد عنوان مكتشف</span>'); return; }
+    out.textContent = found.join('\n');
+    setStatus('jsStatus','<span class="ok">تم العثور على '+found.length+' سطراً مهماً من أصل '+lines.length+' سطراً</span>');
+    // استخراج عناوين مرشحة
+    var candSet = {};
+    var re1 = /https?:\/\/[^\s'"]+/g;
+    var re2 = /\/[A-Za-z0-9_\-\.\/\?\=\&\%]+(?:api|event|moon|zodiac)[A-Za-z0-9_\-\.\/\?\=\&\%]*/gi;
+    var m1; while((m1=re1.exec(t))!==null){ candSet[m1[0]]=1; }
+    var m2; while((m2=re2.exec(t))!==null){ if(m2[0].length>4) candSet[m2[0]]=1; }
+    var cands = Object.keys(candSet);
+    var box = document.getElementById('candidates');
+    if(cands.length===0){
+      box.innerHTML = '<p class="small err">لم يُستخرج أي عنوان مرشح. انسخ السطر المكتشف هنا يدوياً في حقل العنوان.</p>';
+    } else {
+      var h = '<p class="small"><b>عناوين مرشحة مكتشفة - اختر واحداً لتفعيل المرحلة 3:</b></p>';
+      cands.forEach(function(c){
+        var safe = c.replace(/"/g,'&quot;');
+        h += '<div class="cand"><button type="button" data-url="'+safe+'">استخدام: '+safe+'</button></div>';
+      });
+      box.innerHTML = h;
+      box.querySelectorAll('button').forEach(function(b){
+        b.onclick = function(){
+          document.getElementById('endpoint').value = b.getAttribute('data-url');
+          document.getElementById('btnFetch').disabled = false;
+          addLog('تم اختيار العنوان المكتشف: ' + b.getAttribute('data-url'));
+        };
+      });
     }
-    if(!found.length){setStatus('لم يجد أي مراسلة في ملفات الجافاسكربت. الصفحة قد تكون تفاعلية بالكامل.');renderTable([]);return;}
-    setStatus('✅ وجد '+found.length+' سطر مرشح. انظر الجدول.');
-    renderTable(found.slice(0,80));
-    setRaw('الملفات: '+srcs.join('\n'));
-    found.slice(0,20).forEach(function(f){addLog(f);});
-  }catch(e){setStatus('❌ خطأ الاكتشاف: '+e.message);}
+  }catch(e){
+    out.textContent='تعذّر جلب البيانات من الخادم. '+e.message;
+    setStatus('jsStatus','<span class="err">تعذّر جلب البيانات من الخادم - قد يكون حظر CORS</span>');
+    addLog('المرحلة 2 | خطأ: '+e.message);
+  }
 };
-document.getElementById('btnClear').onclick=function(){logLines=[];document.getElementById('log').textContent='لا توجد محاولات بعد.';document.getElementById('results').innerHTML='<div class="small">لا توجد نتائج بعد.</div>';document.getElementById('raw').textContent='لا يوجد رد بعد.';setStatus('تم المسح. جاهز.');};
+
+document.getElementById('btnFetch').onclick = async function(){
+  var ep = document.getElementById('endpoint').value.trim();
+  var out = document.getElementById('fetchOut');
+  if(!ep){ setStatus('fetchStatus','<span class="err">لا يوجد عنوان مكتشف</span>'); return; }
+  var full = ep;
+  if(ep.charAt(0)==='/') full = 'https://arabic.nojumi.org' + ep;
+  var from = document.getElementById('fromDate').value;
+  var to = document.getElementById('toDate').value;
+  var lat = document.getElementById('lat').value;
+  var lng = document.getElementById('lng').value;
+  var sep = full.indexOf('?')>=0 ? '&' : '?';
+  var url = full + sep + 'apiKey=' + encodeURIComponent(apiKeyVal) + '&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&lat=' + encodeURIComponent(lat) + '&lng=' + encodeURIComponent(lng);
+  setStatus('fetchStatus','جاري الجلب من: ' + url);
+  addLog('المرحلة 3 | GET ' + url);
+  try{
+    var r = await fetch(url);
+    var t = await r.text();
+    addLog('المرحلة 3 | الحالة: ' + r.status + ' | الطول: ' + t.length);
+    if(!r.ok){ out.textContent='تعذّر جلب البيانات من الخادم. الحالة: '+r.status+'\n'+t.slice(0,2000); setStatus('fetchStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>'); return; }
+    out.textContent = t.slice(0,8000);
+    setStatus('fetchStatus','<span class="ok">رجع الخادم بيانات - الحالة: '+r.status+' - الطول: '+t.length+'</span>');
+    if(t.trim()==='' || t.indexOf('لم يتم العثور')>=0){ setStatus('fetchStatus','<span class="err">الخادم لم يرجع بيانات</span>'); }
+  }catch(e){
+    out.textContent='تعذّر جلب البيانات من الخادم. '+e.message;
+    setStatus('fetchStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>');
+    addLog('المرحلة 3 | خطأ: '+e.message);
+  }
+};
 </script>
 </body>
 </html>
