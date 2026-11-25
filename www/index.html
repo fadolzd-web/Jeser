@@ -70,7 +70,7 @@ th{background:#121c2e;color:#fff}
     <button class="ghost" id="btnFindAjax">إظهار كتل $.ajax فقط</button>
     <button class="ghost" id="btnCopyJs">نسخ الكود</button>
   </div>
-  <div class="note">ثبت بالفحص: حساب المواقيت ليس في أي ملف JS. ملف <b>prayer-times-share.js</b> هو وحدة مشاركة فقط، وملف <b>qeble_openstr_main.js</b> هو خريطة القبلة. لذلك أُلغيت أزرار الاكتشاف المضللة. جسر المواقيت في الأسفل يجلب صفحة المواقيت نفسها من الخادم ويعرض جدولها، بلا حساب محلي. عارض الكود هنا للفحص اليدوي فقط.</div>
+  <div class="note">ثبت بالفحص من الكود الأصلي: دالة المواقيت هي <b>GetPrayerTimesFromAPI</b> في <b>/WebPages/PrayerTimes.aspx</b>. ملف <b>prayer-times-share.js</b> هو مشاركة فقط، وملف <b>qeble_openstr_main.js</b> هو خريطة القبلة. الجسر في الأسفل يستعمل الدالة المثبتة فقط، بلا حساب محلي. عارض الكود هنا للفحص اليدوي فقط.</div>
   <label for="jsSearch">بحث داخل الكود</label>
   <input id="jsSearch" type="text" placeholder="مثال: Prayer أو $.ajax أو CurrentBorj">
   <div class="meta" id="jsMeta">لم يتم الجلب بعد.</div>
@@ -109,8 +109,8 @@ th{background:#121c2e;color:#fff}
     <div id="endBox" style="display:none"><label for="endDate">تاريخ النهاية YYYY/MM/DD</label><input id="endDate" type="text" value="2026/12/31"></div>
   </div>
   <label>مصدر المواقيت — ثابت، من الخادم فقط</label>
-  <div class="meta" dir="ltr" style="text-align:left">https://arabic.nojumi.org/prayertimes</div>
-  <p class="small">لا يوجد حقل رابط دالة هنا عن قصد. حساب المواقيت يتم داخل هذه الصفحة على الخادم. الجسر يجلب الصفحة نفسها، ويرسل نموذجها كما هو مع المدينة والسنة والشهر والنمط، ويعرض الجدول الذي يرجعه الخادم حرفياً.</p>
+  <div class="meta" dir="ltr" style="text-align:left">https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI</div>
+  <p class="small">الحمولة المثبتة من الكود الأصلي: <span dir="ltr">{ lat, lng, date: &quot;YYYY/MM/DD&quot;, navafel: false }</span>. الجدول الشهري والسنوي والفترة يُبنى من تكرار النداء على أيام الفترة، وكل يوم يرجع من الخادم بلا حساب محلي.</p>
   <div class="row no-print">
     <button class="primary" id="btnPrayer">إعداد جدول مواقيت الصلاة</button>
     <button class="ghost" id="btnClearPrayer">مسح النتائج</button>
@@ -136,7 +136,7 @@ th{background:#121c2e;color:#fff}
 const URL_TZ='https://arabic.nojumi.org/Default.aspx/TimeZoneData';
 const URL_SEARCH='https://arabic.nojumi.org/webpages/Events.aspx/SearchCity';
 const URL_PDF='https://arabic.nojumi.org/WebPages/ExportHandler.ashx';
-const URL_PRAYER_PAGE='https://arabic.nojumi.org/prayertimes';
+const URL_PRAYER_API='https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI';
 let state={tc:null,zoneName:null,formatted:null,year:null,month:null,day:null,hour:null,minute:null,second:null,gmtOffset:null,lat:32,lng:44.33};
 let currentMode='month';
 let fullPrayerHtml='';
@@ -262,60 +262,85 @@ function buildMonthBar(){
     bar.appendChild(btn);
   });
 }
-async function pickLargestTable(doc){
-  const tables=[...doc.querySelectorAll('table')];
-  if(!tables.length) return null;
-  tables.sort((a,b)=>b.querySelectorAll('tr').length - a.querySelectorAll('tr').length);
-  return tables[0];
+function pad2(n){ return String(n).padStart(2,'0'); }
+function fmtDate(y,m,d){ return y+'/'+pad2(m)+'/'+pad2(d); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function parsePrayerD(d){
+  if(d==null) return null;
+  if(typeof d==='object') return d;
+  if(typeof d==='string'){
+    const clean=d.replace(/^\uFEFF\xA0\s]+/,'').trim();
+    try{ return JSON.parse(clean); }catch(e){ return null; }
+  }
+  return null;
+}
+async function fetchOnePrayerDay(lat,lng,dateStr){
+  const r=await postWeb(URL_PRAYER_API,{lat:lat,lng:lng,date:dateStr,navafel:false});
+  if(!r.ok) return {ok:false,status:r.status,raw:r.text,day:null};
+  const api=parsePrayerD(r.json&&r.json.d);
+  if(!api || !api.data || !api.data.prayerTimes || !api.data.prayerTimes.length) return {ok:false,status:r.status,raw:r.text,day:null};
+  return {ok:true,status:r.status,raw:r.text,day:api.data.prayerTimes[0]};
+}
+function buildPrayerTableHtml(grouped){
+  // grouped: { '11': [day,...], '12': [...] } — كل شهر قسم data-month حتى تعمل أزرار الأشهر كمرشح
+  const monthNames=['','January','February','March','April','May','June','July','August','September','October','November','December'];
+  let out='';
+  const keys=Object.keys(grouped).sort();
+  keys.forEach(mk=>{
+    const rows=grouped[mk];
+    out+='<div data-month="'+esc(mk)+'"><h3 style="margin:10px 0 6px">شهر '+esc(mk)+' — '+esc(monthNames[parseInt(mk,10)]||'')+'</h3>';
+    out+='<table><thead><tr><th>التاريخ</th><th>الفجر</th><th>الشروق</th><th>الظهر</th><th>الغروب</th><th>المغرب</th><th>منتصف الليل</th><th>منتصف الليل الشرعي</th></tr></thead><tbody>';
+    rows.forEach(p=>{
+      const d=p.prayerDate||p.date||'';
+      out+='<tr><td>'+esc(d)+'</td><td>'+esc(p.fajr)+'</td><td>'+esc(p.sunrise)+'</td><td>'+esc(p.dhuhr||p.zohr)+'</td><td>'+esc(p.sunset)+'</td><td>'+esc(p.maghreb)+'</td><td>'+esc(p.midnight)+'</td><td>'+esc(p.astronomicalMidnight||p.sharee_midnight)+'</td></tr>';
+    });
+    out+='</tbody></table></div>';
+  });
+  return out;
 }
 async function runPrayer(){
   const b=document.getElementById('btnPrayer'); b.disabled=true; b.textContent='جارٍ الجلب من الخادم…';
   try{
     const ok1=await step1(); if(!ok1) return;
     setBadge('st2','2 — جارٍ…','run');
-    const year=document.getElementById('yearInput').value.trim();
-    const month=document.getElementById('monthInput').value.trim();
+    const year=parseInt(document.getElementById('yearInput').value.trim(),10);
+    const month=parseInt(document.getElementById('monthInput').value.trim(),10);
     const start=document.getElementById('startDate').value.trim();
     const end=document.getElementById('endDate').value.trim();
-    const lat=document.getElementById('latInput').value.trim();
-    const lng=document.getElementById('lngInput').value.trim();
-    // 1) جلب الصفحة كما هي من الخادم
-    const res=await fetch(URL_PRAYER_PAGE,{method:'GET',credentials:'include'});
-    const pageHtml=await res.text();
-    if(!res.ok){ setBadge('st2','2 — فشل: HTTP '+res.status,'fail'); setText('prayerMeta','الخادم رد بخطأ عند جلب صفحة المواقيت.'); setText('debugPrayer','GET '+URL_PRAYER_PAGE+'\nHTTP '+res.status+'\n'+pageHtml.slice(0,8000)); return; }
-    const doc=new DOMParser().parseFromString(pageHtml,'text/html');
-    // 2) اقرأ نموذج الصفحة نفسه من الخادم، ولا تخمن أسماء حقول
-    const form=doc.querySelector('form');
-    let finalHtml=pageHtml;
-    let usedForm=false;
-    if(form){
-      const fd=new FormData();
-      form.querySelectorAll('input, select, textarea').forEach(el=>{
-        const n=el.getAttribute('name'); if(!n) return;
-        const ln=n.toLowerCase();
-        let v=el.value||'';
-        if(ln.includes('lat')) v=lat;
-        else if(ln.includes('lng')||ln.includes('lon')) v=lng;
-        else if(ln.includes('year') && !ln.includes('start') && !ln.includes('end')) v=year;
-        else if(ln.includes('month') && !ln.includes('start') && !ln.includes('end')) v=(currentMode==='year' ? '' : month);
-        else if(ln.includes('start')) v=start;
-        else if(ln.includes('end')) v=end;
-        else if(ln.includes('mode')||ln.includes('type')) v=currentMode;
-        fd.append(n,v);
-      });
-      // أضف حقول النمط والمدينة الشائعة فقط إذا كانت موجودة أصلاً في النموذج، لا تخترع حقولاً
-      const action=form.getAttribute('action')||URL_PRAYER_PAGE;
-      const absAction=action.startsWith('http')?action:(action.startsWith('/')?'https://arabic.nojumi.org'+action:URL_PRAYER_PAGE);
-      try{
-        const r2=await fetch(absAction,{method:(form.getAttribute('method')||'POST').toUpperCase(),body:fd,credentials:'include'});
-        if(r2.ok){ finalHtml=await r2.text(); usedForm=true; }
-      }catch(e){ /* ارجع لصفحة GET الافتراضية */ }
+    const lat=state.lat; const lng=state.lng;
+    // بناء قائمة التواريخ من النمط فقط، بلا أي حساب فلكي
+    let dates=[];
+    if(currentMode==='month'){
+      if(!year||!month||month<1||month>12){ setBadge('st2','2 — فشل: سنة أو شهر غير صالح','fail'); return; }
+      const daysInMonth=new Date(Date.UTC(year,month,0)).getUTCDate();
+      for(let d=1;d<=daysInMonth;d++) dates.push(fmtDate(year,month,d));
+    } else if(currentMode==='year'){
+      if(!year){ setBadge('st2','2 — فشل: سنة غير صالحة','fail'); return; }
+      for(let m=1;m<=12;m++){ const dim=new Date(Date.UTC(year,m,0)).getUTCDate(); for(let d=1;d<=dim;d++) dates.push(fmtDate(year,m,d)); }
+    } else {
+      // فترة: YYYY/MM/DD إلى YYYY/MM/DD
+      const sp=start.split('/').map(x=>parseInt(x,10)); const ep=end.split('/').map(x=>parseInt(x,10));
+      let cur=new Date(Date.UTC(sp[0],sp[1]-1,sp[2])); const last=new Date(Date.UTC(ep[0],ep[1]-1,ep[2]));
+      if(isNaN(cur.getTime())||isNaN(last.getTime())||cur>last){ setBadge('st2','2 — فشل: فترة غير صالحة','fail'); return; }
+      while(cur<=last){ dates.push(fmtDate(cur.getUTCFullYear(),cur.getUTCMonth()+1,cur.getUTCDate())); cur=new Date(cur.getTime()+86400000); }
     }
-    const doc2=new DOMParser().parseFromString(finalHtml,'text/html');
-    const table=pickLargestTable(doc2);
-    setText('debugPrayer','GET '+URL_PRAYER_PAGE+'\nHTTP '+res.status+'\nالنمط: '+currentMode+' | السنة: '+year+' | الشهر: '+month+' | الفترة: '+start+' إلى '+end+' | lat='+lat+' lng='+lng+' | tc='+state.tc+'\nاستعمل نموذج الصفحة نفسه؟ '+(usedForm?'نعم':'لا — عرض الجدول الافتراضي من GET')+'\n\nأول 8000 حرف من رد الخادم:\n'+finalHtml.slice(0,8000));
-    if(!table){ setBadge('st2','2 — فشل: لا يوجد جدول في رد الخادم','fail'); setText('prayerMeta','الخادم لم يرجع جدولاً. افتح تفاصيل الرد الخام في الأسفل وانسخ أول 8000 حرف.'); return; }
-    fullPrayerHtml=table.outerHTML; setHTML('renderPrayer',table.outerHTML); setBadge('st2','2 — نجاح من الخادم','ok'); setText('prayerMeta','تم عرض أكبر جدول رجعه الخادم حرفياً، بلا تعديل وبلا حساب محلي.'); buildMonthBar();
+    setText('prayerMeta','النمط: '+currentMode+' | عدد الأيام المطلوبة: '+dates.length+' | جارٍ جلب كل يوم من الخادم…');
+    const grouped={}; let firstRaw=''; let failCount=0; let firstFail='';
+    for(let i=0;i<dates.length;i++){
+      const ds=dates[i];
+      b.textContent='جارٍ الجلب… '+(i+1)+'/'+dates.length;
+      const res=await fetchOnePrayerDay(lat,lng,ds);
+      if(i===0) firstRaw=res.raw||'';
+      if(!res.ok||!res.day){ failCount++; if(!firstFail) firstFail=ds+' HTTP '+res.status+' '+(res.raw||'').slice(0,500); continue; }
+      const mk=(res.day.prayerDate||ds).substr(5,2);
+      if(!grouped[mk]) grouped[mk]=[];
+      grouped[mk].push(res.day);
+    }
+    const total=Object.keys(grouped).reduce((s,k)=>s+grouped[k].length,0);
+    setText('debugPrayer','POST '+URL_PRAYER_API+'\nالحمولة الأولى: '+JSON.stringify({lat:lat,lng:lng,date:dates[0],navafel:false},null,2)+'\nالنمط: '+currentMode+' | الأيام المطلوبة: '+dates.length+' | الناجحة: '+total+' | الفاشلة: '+failCount+'\nأول فشل: '+(firstFail||'—')+'\n\nأول رد خام من الخادم:\n'+String(firstRaw).slice(0,8000));
+    if(total===0){ setBadge('st2','2 — فشل: لم يرجع الخادم أي يوم','fail'); setText('prayerMeta','الخادم لم يرجع أي يوم. افتح الرد الخام في الأسفل.'); return; }
+    const tableHtml=buildPrayerTableHtml(grouped);
+    fullPrayerHtml=tableHtml; setHTML('renderPrayer',tableHtml); setBadge('st2','2 — نجاح من الخادم ('+total+' يوم)','ok'); setText('prayerMeta','تم عرض '+total+' يوم كما رجع من الخادم، بلا تعديل وبلا حساب محلي.'+(failCount?(' — فشل '+failCount+' يوم.'):'')); buildMonthBar();
   }catch(e){ setBadge('st2','2 — فشل: تعذّر الاتصال','fail'); setText('debugPrayer','خطأ: '+e.message); }
   finally{ b.disabled=false; b.textContent='إعداد جدول مواقيت الصلاة'; }
 }
