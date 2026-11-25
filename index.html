@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>التقويم الشامل — المواقيت + عارض الكود</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f6f5f1;color:#1a1a1a;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;line-height:1.7}
+header{background:#121c2e;color:#fff;padding:22px 16px}
+header h1{margin:0 0 6px;font-size:22px}
+header p{margin:0;opacity:.85;font-size:14px}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:#fff;border:1px solid #e5e0d5;border-radius:14px;padding:16px;margin:14px 0}
+.card h2{margin:0 0 10px;font-size:18px}
+label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}
+input[type="text"],select{width:100%;padding:11px 12px;border:1px solid #d8d2c4;border-radius:10px;font-size:15px;background:#fffdf8}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+button{border:0;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:800;cursor:pointer}
+.primary{background:#c9a227;color:#121c2e}
+.ghost{background:#eee9dc;color:#121c2e}
+.danger{background:#b3261e;color:#fff}
+.check{display:flex;gap:8px;align-items:center;background:#fbf8ef;border:1px solid #e5e0d5;border-radius:10px;padding:10px 12px;font-size:14px}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#eee}
+.badge.ok{background:#d9f2dd;color:#145a1f}
+.badge.fail{background:#fde2e0;color:#8a1a14}
+.badge.wait{background:#eee;color:#555}
+.badge.run{background:#fff3c4;color:#6b5900}
+pre{white-space:pre-wrap;word-break:break-word;background:#101828;color:#e8eefc;border-radius:10px;padding:12px;font-size:12.5px;max-height:380px;overflow:auto;direction:ltr;text-align:left}
+.meta{font-size:13px;color:#555;background:#f6f5f1;border-radius:10px;padding:10px 12px}
+.render{border:1px solid #e5e0d5;border-radius:12px;padding:12px;background:#fff;min-height:60px;overflow:auto}
+.note{font-size:13px;color:#5a4a1a;background:#fff8d6;border:1px solid #e8d9a0;border-radius:10px;padding:10px 12px}
+.small{font-size:12.5px;color:#666}
+.search-box{position:relative}
+.search-results{border:1px solid #e5e0d5;border-radius:10px;background:#fff;margin-top:6px;display:none;max-height:280px;overflow:auto}
+.search-results.active{display:block}
+.search-results ul{list-style:none;margin:0;padding:0}
+.search-results ul li{padding:10px 12px;border-bottom:1px solid #eee;cursor:pointer}
+.search-results ul li:hover{background:#fbf8ef}
+.cityloader{display:none;font-size:13px;color:#666;margin-top:6px}
+.mode{display:flex;gap:8px;flex-wrap:wrap}
+.mode button{padding:10px 16px}
+.mode button.active{background:#121c2e;color:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid #e5e0d5;padding:8px;text-align:center}
+th{background:#121c2e;color:#fff}
+.month-bar{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.month-bar button{padding:8px 12px;font-size:13px}
+.month-bar button.active{background:#c9a227;color:#121c2e}
+@media print{header,.no-print{display:none!important} main{max-width:100%} .card{border:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>التقويم الشامل — المواقيت + عارض الكود</h1>
+  <p>واجهة واحدة. تعرض الكود، وتجلب المواقيت من الخادم فقط. بلا حساب محلي وبلا رقم مخترع.</p>
+</header>
+<main>
+
+<!-- عارض الكود -->
+<section class="card">
+  <h2>عارض الكود — بديل view-source على الأندرويد</h2>
+  <p class="small">الصق رابط أي ملف JS، واضغط جلب. سيجلب الملف ويعرضه كنص، مع بحث داخله.</p>
+  <label for="jsUrl">رابط ملف الجافاسكربت</label>
+  <input id="jsUrl" type="text" value="https://arabic.nojumi.org/JS/events.js?v=6" placeholder="https://arabic.nojumi.org/JS/...">
+  <div class="row no-print">
+    <button class="primary" id="btnFetchJs">جلب الكود</button>
+    <button class="ghost" id="btnFindAjax">إظهار كتل $.ajax فقط</button>
+    <button class="ghost" id="btnCopyJs">نسخ الكود</button>
+  </div>
+  <div class="row no-print">
+    <button class="primary" id="btnAutoDiscover" style="background:#121c2e;color:#fff">اكتشاف ملف المواقيت تلقائياً — اضغط هنا فقط</button>
+  </div>
+  <div class="meta" id="discoverMeta" style="display:none"></div>
+  <div class="row no-print">
+    <button class="primary" id="btnShareJs" style="background:#7a1f8a;color:#fff">جلب prayer-times-share.js — الملف المتبقي</button>
+    <button class="primary" id="btnScanAll" style="background:#b45309;color:#fff">فحص كل ملفات الصفحة: أي واحد فيه Prayer؟</button>
+  </div>
+  <div class="row no-print">
+    <button class="primary" id="btnQeble" style="background:#0b6b3a;color:#fff">جلب ملف المواقيت الصحيح: qeble_openstr_main.js — اضغط هنا</button>
+  </div>
+  <label for="jsSearch">بحث داخل الكود</label>
+  <input id="jsSearch" type="text" placeholder="مثال: Prayer أو $.ajax أو CurrentBorj">
+  <div class="meta" id="jsMeta">لم يتم الجلب بعد.</div>
+  <pre id="jsView">—</pre>
+  <div class="note">غيّر الرابط يدوياً الآن: امسح الرابط الحالي، الصق الرابط الجديد، واضغط <b>جلب الكود</b>. الزر التلقائي فشل لأنه جاب jQuery، لذلك نستعمل اليدوي.</div>
+</section>
+
+<!-- المكان -->
+<section class="card">
+  <h2>1 — المكان والتوقيت</h2>
+  <div class="search-box">
+    <label for="inpCityName">اسم المدينة</label>
+    <input id="inpCityName" type="text" placeholder="ابحث عن مدينة" autocomplete="off">
+    <div class="cityloader" id="cityLoader">جارٍ البحث…</div>
+    <div class="search-results" id="searchResults"><ul id="searchList"></ul></div>
+  </div>
+  <div class="grid">
+    <div><label for="latInput">خط العرض</label><input id="latInput" type="text" value="32"></div>
+    <div><label for="lngInput">خط الطول</label><input id="lngInput" type="text" value="44.33"></div>
+  </div>
+  <div class="meta" id="locMeta">المدينة: غير محددة. فرق التوقيت والوقت من الخادم بعد اختيار المدينة أو تشغيل الحساب.</div>
+</section>
+
+<!-- المواقيت -->
+<section class="card">
+  <h2>2 — المواقيت: شهري / سنوي / فترة</h2>
+  <div class="mode no-print" id="modeBar">
+    <button data-mode="month" class="active">إعداد جدول شهري</button>
+    <button data-mode="year">إعداد جدول سنوي</button>
+    <button data-mode="period">إعداد الجدول لفترة زمنية</button>
+  </div>
+  <div class="grid">
+    <div id="yearBox"><label for="yearInput">السنة</label><input id="yearInput" type="text" value="2026"></div>
+    <div id="monthBox"><label for="monthInput">الشهر (1 - 12)</label><input id="monthInput" type="text" value="11"></div>
+    <div id="startBox" style="display:none"><label for="startDate">تاريخ البداية YYYY/MM/DD</label><input id="startDate" type="text" value="2026/01/01"></div>
+    <div id="endBox" style="display:none"><label for="endDate">تاريخ النهاية YYYY/MM/DD</label><input id="endDate" type="text" value="2026/12/31"></div>
+  </div>
+  <label for="endpointInput">رابط دالة المواقيت في الخادم — الصقه من عارض الكود</label>
+  <input id="endpointInput" type="text" value="" placeholder="مثال: https://arabic.nojumi.org/webpages/PrayerTimes.aspx/... — لا تخمن، انسخه من الكود">
+  <p class="small">لا يوجد اسم افتراضي هنا عن قصد. الاسم الحقيقي يأتي من ملف JS الخاص بصفحة المواقيت، الذي تجلبه من عارض الكود في الأعلى. إذا تركت الحقل فارغاً، لن يرسل الجسر أي طلب، بل سيطلب منك لصق الرابط.</p>
+  <div class="row no-print">
+    <button class="primary" id="btnPrayer">إعداد جدول مواقيت الصلاة</button>
+    <button class="ghost" id="btnClearPrayer">مسح النتائج</button>
+  </div>
+  <p style="margin:12px 0 6px"><span class="badge wait" id="st1">1 — المنطقة الزمنية: بانتظار</span> <span class="badge wait" id="st2">2 — المواقيت: بانتظار</span></p>
+  <div class="meta" id="prayerMeta">لم يتم التشغيل بعد.</div>
+</section>
+
+<section class="card">
+  <h2>3 — جدول المواقيت</h2>
+  <div class="month-bar no-print" id="monthBar"></div>
+  <div class="row no-print">
+    <button class="ghost" id="btnWord">تصدير Word</button>
+    <button class="ghost" id="btnPdf">تصدير PDF</button>
+    <button class="ghost" id="btnPrint">طباعة</button>
+  </div>
+  <div class="render" id="renderPrayer">لم يتم الحساب بعد.</div>
+  <details style="margin-top:10px"><summary class="small">الطلب المرسل والرد الخام — للتحقق</summary><pre id="debugPrayer">—</pre></details>
+</section>
+
+</main>
+<script>
+const URL_TZ='https://arabic.nojumi.org/Default.aspx/TimeZoneData';
+const URL_SEARCH='https://arabic.nojumi.org/webpages/Events.aspx/SearchCity';
+const URL_PDF='https://arabic.nojumi.org/WebPages/ExportHandler.ashx';
+let state={tc:null,zoneName:null,formatted:null,year:null,month:null,day:null,hour:null,minute:null,second:null,gmtOffset:null,lat:32,lng:44.33};
+let currentMode='month';
+let fullPrayerHtml='';
+function setBadge(id,t,c){const el=document.getElementById(id);el.textContent=t;el.className='badge '+c;}
+function setText(id,v){document.getElementById(id).textContent=v;}
+function setHTML(id,v){document.getElementById(id).innerHTML=v;}
+async function postWeb(url,payload){
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify(payload)});
+  const text=await res.text(); let json=null; try{json=JSON.parse(text);}catch(e){}
+  return {status:res.status,ok:res.ok,text,json};
+}
+function parseFormatted(f){
+  const datePart=String(f).substr(0,10); const timePart=String(f).substr(11);
+  return {datePart,timePart,year:datePart.substr(0,4),month:datePart.substr(5,2),day:datePart.substr(8,2),hour:String(timePart).split(':')[0]||'',minute:String(timePart).split(':')[1]||'',second:String(timePart).split(':')[2]||''};
+}
+async function step1(){
+  setBadge('st1','1 — المنطقة الزمنية: جارٍ…','run');
+  const lat=parseFloat(document.getElementById('latInput').value.trim());
+  const lng=parseFloat(document.getElementById('lngInput').value.trim());
+  if(isNaN(lat)||isNaN(lng)){setBadge('st1','1 — فشل: إحداثيات ناقصة','fail');return false;}
+  state.lat=lat; state.lng=lng;
+  try{
+    const r=await postWeb(URL_TZ,{lat:lat,lng:lng});
+    if(!r.ok){setBadge('st1','1 — فشل: HTTP '+r.status,'fail');return false;}
+    const d=r.json&&r.json.d; if(!d){setBadge('st1','1 — فشل: لا يوجد result.d','fail');return false;}
+    let p; try{p=JSON.parse(d);}catch(e){setBadge('st1','1 — فشل: result.d ليس JSON','fail');return false;}
+    if(p.status!=='OK'){setBadge('st1','1 — فشل: status ليس OK','fail');return false;}
+    const tc=p.gmtOffset/3600; const pt=parseFormatted(p.formatted||'');
+    state={...state,tc:String(tc),zoneName:p.zoneName||'',formatted:p.formatted||'',year:pt.year,month:pt.month,day:pt.day,hour:pt.hour,minute:pt.minute,second:pt.second,gmtOffset:p.gmtOffset};
+    setBadge('st1','1 — نجاح من الخادم','ok');
+    setText('locMeta','المنطقة: '+(state.zoneName||'—')+' | فرق التوقيت tc = '+state.tc+' | التاريخ من الخادم = '+pt.datePart+' | الوقت من الخادم = '+pt.timePart);
+    return true;
+  }catch(e){setBadge('st1','1 — فشل: تعذّر الاتصال','fail');setText('prayerMeta','تعذّر الاتصال. '+e.message);return false;}
+}
+// — عارض الكود —
+let lastJsText='';
+document.getElementById('btnFetchJs').addEventListener('click',async()=>{
+  const url=document.getElementById('jsUrl').value.trim();
+  if(!url){setText('jsMeta','الصق رابط ملف JS أولاً.');return;}
+  setText('jsMeta','جارٍ الجلب…');
+  try{
+    const res=await fetch(url);
+    const txt=await res.text();
+    lastJsText=txt;
+    setText('jsView',txt.slice(0,120000));
+    setText('jsMeta','تم الجلب. HTTP '+res.status+' | الطول: '+txt.length+' حرف. ابحث داخل الكود عن $.ajax أو Prayer.');
+    // إذا كان HTML، استخرج أسماء ملفات JS تلقائياً
+    if(txt.includes('<script')){
+      const matches=[...txt.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]);
+      if(matches.length) setText('jsMeta','هذا HTML، وليس JS. وجدت ملفات JS: '+matches.join(' | ')+' — الصق رابط أحدها في الحقل واجلبه.');
+    }
+  }catch(e){setText('jsMeta','تعذّر الجلب: '+e.message+' — جرّب رابطاً آخر أو استعمل تطبيق Acode.');}
+});
+document.getElementById('btnFindAjax').addEventListener('click',()=>{
+  if(!lastJsText){setText('jsMeta','اجلب الكود أولاً.');return;}
+  const parts=lastJsText.split('$.ajax');
+  if(parts.length<2){setText('jsView','لا يوجد $.ajax في هذا الملف. جرّب البحث عن fetch أو Prayer.');return;}
+  let out='';
+  for(let i=1;i<parts.length;i++){ out+='--- $.ajax رقم '+i+' ---\n'+parts[i].slice(0,3000)+'\n\n'; }
+  setText('jsView',out);
+  setText('jsMeta','وجدت '+(parts.length-1)+' كتلة $.ajax. انسخ الكتلة كاملة من $.ajax إلى });');
+});
+document.getElementById('btnCopyJs').addEventListener('click',async()=>{
+  try{await navigator.clipboard.writeText(document.getElementById('jsView').textContent); setText('jsMeta','تم النسخ.');}catch(e){setText('jsMeta','تعذّر النسخ التلقائي. حدّد النص وانسخه يدوياً.');}
+});
+document.getElementById('jsSearch').addEventListener('input',function(){
+  const q=this.value.trim(); if(!q||!lastJsText) return;
+  const idx=lastJsText.indexOf(q);
+  if(idx===-1){setText('jsMeta','غير موجود: '+q);return;}
+  setText('jsView',lastJsText.slice(Math.max(0,idx-500),idx+3500));
+  setText('jsMeta','وجدت '+q+' عند الحرف '+idx+'. انسخ الكتلة من $.ajax إلى });');
+});
+
+// — جلب prayer-times-share.js + فحص كل الملفات —
+document.getElementById('btnShareJs').addEventListener('click', async()=>{
+  const url='https://arabic.nojumi.org/JS/prayer-times-share.js?v=1.0.13';
+  document.getElementById('jsUrl').value=url;
+  setText('jsMeta','جارٍ جلب '+url+' …');
+  try{
+    const r=await fetch(url); const t=await r.text();
+    lastJsText=t; document.getElementById('jsView').textContent=t.slice(0,120000);
+    setText('jsMeta','تم الجلب: '+url+' | HTTP '+r.status+' | الطول: '+t.length+' | فيه Prayer؟ '+(t.toLowerCase().includes('prayer')?'نعم':'لا')+' | فيه $.ajax؟ '+(t.includes('$.ajax')?'نعم':'لا')+' — اضغط "إظهار كتل $.ajax فقط".');
+  }catch(e){ setText('jsMeta','تعذّر: '+e.message); }
+});
+document.getElementById('btnScanAll').addEventListener('click', async()=>{
+  const dm=document.getElementById('discoverMeta'); dm.style.display='block';
+  dm.textContent='جارٍ فحص كل ملفات صفحة المواقيت…';
+  try{
+    const res=await fetch('https://arabic.nojumi.org/prayertimes');
+    const txt=await res.text();
+    const srcs=[...new Set([...txt.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]))];
+    dm.textContent='وجدت '+srcs.length+' ملفاً. أفحصها واحداً واحداً…\n';
+    for(const s of srcs){
+      let abs=s.startsWith('http')?s:(s.startsWith('//')?'https:'+s:(s.startsWith('/')?'https://arabic.nojumi.org'+s:'https://arabic.nojumi.org/'+s));
+      try{
+        const r=await fetch(abs); if(!r.ok){ dm.textContent+='\n— '+s+' : HTTP '+r.status; continue; }
+        const t=await r.text();
+        if(t.includes('jQuery v3')){ dm.textContent+='\n— '+s+' : jQuery — تخطي'; continue; }
+        const hasPrayer=/prayer/i.test(t); const hasAjax=t.includes('$.ajax')||t.includes('fetch(');
+        const hasPrayerTimes=/GetPrayer|PrayerTimes|prayer-times|مواقيت|اوقات/i.test(t);
+        dm.textContent+='\n— '+s+' : طول '+t.length+' | Prayer؟ '+(hasPrayer?'نعم':'لا')+' | PrayerTimes؟ '+(hasPrayerTimes?'نعم':'لا')+' | $.ajax؟ '+(hasAjax?'نعم':'لا');
+        if(hasPrayerTimes && hasAjax){
+          dm.textContent+='\n\n✓ هذا هو الملف: '+abs+' — جارٍ عرضه…';
+          document.getElementById('jsUrl').value=abs; lastJsText=t; document.getElementById('jsView').textContent=t.slice(0,120000);
+          setText('jsMeta','هذا هو ملف المواقيت: '+abs+' — اضغط "إظهار كتل $.ajax فقط".');
+          return;
+        }
+      }catch(e){ dm.textContent+='\n— '+s+' : تعذّر'; }
+    }
+    // إذا لم نجد في الملفات الخارجية، المنطق قد يكون Inline داخل HTML نفسه
+    dm.textContent+='\n\nلم أجد PrayerTimes + $.ajax في أي ملف خارجي. هذا يعني المنطق غالباً Inline داخل HTML الصفحة نفسها. ابحث في HTML عن "Prayer".';
+    // اعرض مقاطع Prayer من HTML الصفحة
+    const idxs=[...txt.matchAll(/Prayer/gi)].map(m=>m.index).slice(0,5);
+    if(idxs.length){
+      let out='--- مقاطع Prayer داخل HTML الصفحة ---\n';
+      idxs.forEach(i=>{ out+=txt.slice(Math.max(0,i-600), i+1200)+'\n\n---\n'; });
+      document.getElementById('jsView').textContent=out;
+      setText('jsMeta','المنطق Inline داخل الصفحة. انسخ المقطع الذي ظهر وابعته.');
+    } else {
+      document.getElementById('jsView').textContent='لا يوجد Prayer داخل HTML الصفحة أيضاً. أرسل قائمة الفحص كاملة.';
+    }
+  }catch(e){ dm.textContent='تعذّر: '+e.message; }
+});
+// — جلب مباشر لملف المواقيت المكتشف من صورتك —
+document.getElementById('btnQeble').addEventListener('click', async()=>{
+  const url = 'https://arabic.nojumi.org/js/qeble_openstr_main.js?v=1.0.1';
+  document.getElementById('jsUrl').value = url;
+  setText('jsMeta','جارٍ جلب '+url+' …');
+  try{
+    const r = await fetch(url);
+    const t = await r.text();
+    lastJsText = t;
+    document.getElementById('jsView').textContent = t.slice(0,120000);
+    setText('jsMeta','تم الجلب: '+url+' | HTTP '+r.status+' | الطول: '+t.length+' — الآن اضغط "إظهار كتل $.ajax فقط" وانسخ الكتلة.');
+  }catch(e){ setText('jsMeta','تعذّر الجلب: '+e.message); }
+});
+// — اكتشاف تلقائي لملف المواقيت — يتخطى المكتبات العامة
+document.getElementById('btnAutoDiscover').addEventListener('click', async()=>{
+  const dm = document.getElementById('discoverMeta');
+  dm.style.display='block';
+  dm.textContent='جارٍ اكتشاف ملف المواقيت…';
+  const LIBS = ['jquery','bootstrap','moment','persian','datepicker','leaflet','sweetalert','select2','owl','swiper','chart','popper','modernizr','polyfill','site.js','main.js','common.js','bundle','vendor'];
+  function isLib(u){ const l=u.toLowerCase(); return LIBS.some(k=>l.includes(k)); }
+  function toAbs(src){
+    if(src.startsWith('http')) return src;
+    if(src.startsWith('//')) return 'https:'+src;
+    if(src.startsWith('/')) return 'https://arabic.nojumi.org'+src;
+    return 'https://arabic.nojumi.org/'+src.replace(/^\.\//,'');
+  }
+  // 1) جلب صفحة المواقيت
+  let pageTxt='';
+  try{
+    const res = await fetch('https://arabic.nojumi.org/prayertimes');
+    pageTxt = await res.text();
+  }catch(e){ dm.textContent='تعذّر جلب صفحة المواقيت: '+e.message; return; }
+  const allSrcs = [...new Set([...pageTxt.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]))];
+  if(!allSrcs.length){ dm.textContent='لم أجد أي src في الصفحة. الصفحة تُبنى بالجافاسكربت. سأجرّب الأسماء الشائعة.'; }
+  else {
+    dm.textContent = 'وجدت في الصفحة '+allSrcs.length+' ملفاً. أتخطى المكتبات العامة (jQuery و Bootstrap و moment …) وأجرّب الباقي:\n' + allSrcs.join('\n');
+  }
+  // 2) جرّب الملفات غير المكتبات، واحداً واحداً
+  const candidates = [];
+  for(const s of allSrcs){ if(!isLib(s)) candidates.push(toAbs(s)); }
+  // أسماء شائعة كاحتياط
+  candidates.push(
+    'https://arabic.nojumi.org/JS/prayertimes.js',
+    'https://arabic.nojumi.org/JS/prayer.js',
+    'https://arabic.nojumi.org/JS/Prayertimes.js',
+    'https://arabic.nojumi.org/JS/prayertime.js',
+    'https://arabic.nojumi.org/JS/prayerTimes.js'
+  );
+  for(const url of candidates){
+    try{
+      const r = await fetch(url);
+      if(!r.ok){ dm.textContent += '\n— '+url+' : HTTP '+r.status; continue; }
+      const t = await r.text();
+      if(t.length<300 || t.includes('<!DOCTYPE') || t.includes('<html')){ dm.textContent += '\n— '+url+' : ليس JS'; continue; }
+      // إذا كان jQuery رغم الفلتر، تخطاه
+      if(t.includes('jQuery v3') || t.startsWith('/*! jQuery')){ dm.textContent += '\n— '+url+' : هذا jQuery — تخطيته'; continue; }
+      // هل فيه منطق مواقيت؟
+      const hasPrayer = /prayer|Prayer|Pray|اوقات|مواقيت|اذان|قبله|Qibla/i.test(t);
+      const hasAjax = t.includes('$.ajax') || t.includes('fetch(');
+      dm.textContent += '\n— '+url+' : طول '+t.length+' | فيه Prayer؟ '+(hasPrayer?'نعم':'لا')+' | فيه $.ajax؟ '+(hasAjax?'نعم':'لا');
+      if(hasPrayer && hasAjax){
+        document.getElementById('jsUrl').value = url;
+        lastJsText = t;
+        document.getElementById('jsView').textContent = t.slice(0,120000);
+        dm.textContent += '\n\n✓ هذا هو ملف المواقيت: '+url+'\nالآن اضغط "إظهار كتل $.ajax فقط".';
+        setText('jsMeta','تم جلب ملف المواقيت: '+url+' — اضغط "إظهار كتل $.ajax فقط".');
+        return;
+      }
+      // إذا لم يكن فيه Prayer لكنه ليس مكتبة، احفظه كاحتياط وكمّل
+      if(!hasPrayer && candidates.indexOf(url)===candidates.length-1){
+        // آخر واحد، اعرضه
+        document.getElementById('jsUrl').value = url;
+        lastJsText = t;
+        document.getElementById('jsView').textContent = t.slice(0,120000);
+        dm.textContent += '\n\nعرضت آخر ملف غير مكتبة. إذا لم يكن هو، انسخ قائمة الملفات في الأعلى وأرسلها.';
+      }
+    }catch(e){ dm.textContent += '\n— '+url+' : تعذّر'; }
+  }
+  dm.textContent += '\n\nلم أجد ملفاً فيه Prayer + $.ajax معاً. انسخ قائمة الملفات في الأعلى كاملة وأرسلها، وأنا أطلّع الاسم الصحيح.';
+});
+// — البحث عن مدينة —
+let typingTimer=null, currentSearch=null;
+document.getElementById('inpCityName').addEventListener('input',function(){
+  const q=this.value.trim(); clearTimeout(typingTimer);
+  if(!q||q.length<2){document.getElementById('searchResults').classList.remove('active');return;}
+  document.getElementById('cityLoader').style.display='block';
+  typingTimer=setTimeout(()=>doSearch(q),400);
+});
+async function doSearch(q){
+  try{
+    const ctrl=new AbortController(); currentSearch=ctrl;
+    const res=await fetch(URL_SEARCH,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify({cityName:q}),signal:ctrl.signal});
+    const text=await res.text(); const j=JSON.parse(text);
+    document.getElementById('cityLoader').style.display='none';
+    const list=document.getElementById('searchList'); list.innerHTML='';
+    if(j.d&&j.d.length>0){ list.innerHTML=j.d; document.getElementById('searchResults').classList.add('active');
+      list.querySelectorAll('.flag').forEach(el=>{ el.addEventListener('click',()=>{
+        const lat=el.getAttribute('data-lat')||el.dataset.lat; const lon=el.getAttribute('data-lon')||el.dataset.lon;
+        const name=(el.querySelector('span')?el.querySelector('span').textContent.trim():el.textContent.trim());
+        if(lat&&lon){ document.getElementById('latInput').value=parseFloat(lat).toFixed(4); document.getElementById('lngInput').value=parseFloat(lon).toFixed(4); document.getElementById('inpCityName').value=name; document.getElementById('searchResults').classList.remove('active'); setText('locMeta','المدينة: '+name+' | lat='+lat+' | lng='+lon); runPrayer(); }
+      });});
+    } else { document.getElementById('searchResults').classList.add('active'); list.innerHTML='<li>لا توجد نتائج.</li>'; }
+  }catch(e){ if(e.name!=='AbortError') document.getElementById('cityLoader').style.display='none'; }
+}
+document.addEventListener('click',function(e){ if(!e.target.closest('.search-box')) document.getElementById('searchResults').classList.remove('active'); });
+// — أوضاع المواقيت —
+document.querySelectorAll('#modeBar button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#modeBar button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+    currentMode=b.dataset.mode;
+    document.getElementById('yearBox').style.display='block';
+    document.getElementById('monthBox').style.display=(currentMode==='month'?'block':'none');
+    document.getElementById('startBox').style.display=(currentMode==='period'?'block':'none');
+    document.getElementById('endBox').style.display=(currentMode==='period'?'block':'none');
+  });
+});
+function buildMonthBar(){
+  const bar=document.getElementById('monthBar'); bar.innerHTML='';
+  const names=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  names.forEach((n,i)=>{
+    const btn=document.createElement('button'); btn.textContent=n; btn.dataset.month=i+1;
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#monthBar button').forEach(x=>x.classList.remove('active')); btn.classList.add('active');
+      // مرشّح فقط: يظهر جدول الشهر المختار إذا كان الجدول السنوي يحتوي على أقسام شهرية
+      const sections=document.querySelectorAll('#renderPrayer [data-month]');
+      if(sections.length){ sections.forEach(s=>{ s.style.display=(s.dataset.month==String(i+1)?'':'none'); }); }
+      else { setText('prayerMeta','أزرار الأشهر هي مرشّح فقط. الجدول الحالي لا يحتوي على أقسام شهرية منفصلة.'); }
+    });
+    bar.appendChild(btn);
+  });
+}
+async function runPrayer(){
+  const endpoint=document.getElementById('endpointInput').value.trim();
+  if(!endpoint){ setBadge('st2','2 — بانتظار رابط الدالة','wait'); setText('prayerMeta','الصق رابط دالة المواقيت من عارض الكود في الأعلى، ثم اضغط زر المواقيت. لا أريد أن أخمن الاسم.'); return; }
+  const b=document.getElementById('btnPrayer'); b.disabled=true; b.textContent='جارٍ الحساب…';
+  try{
+    const ok1=await step1(); if(!ok1) return;
+    setBadge('st2','2 — جارٍ…','run');
+    const year=document.getElementById('yearInput').value.trim();
+    const month=document.getElementById('monthInput').value.trim();
+    const start=document.getElementById('startDate').value.trim();
+    const end=document.getElementById('endDate').value.trim();
+    // نبني الحمولة من الوضع، بلا تخمين لأسماء بارامترات غير معروفة: نرسل الحقول الشائعة معاً، والخادم يتجاهل الزائد إن كان موجوداً، ويطلب الناقص إن كان مفقوداً فيظهر الخطأ باسمه
+    let payload={ lat:state.lat, lng:state.lng, tc:state.tc, year:year, month:month };
+    if(currentMode==='month'){ payload={lat:state.lat,lng:state.lng,tc:state.tc,year:year,month:month}; }
+    if(currentMode==='year'){ payload={lat:state.lat,lng:state.lng,tc:state.tc,year:year}; }
+    if(currentMode==='period'){ payload={lat:state.lat,lng:state.lng,tc:state.tc,startDate:start,endDate:end,syear:start.substr(0,4),smonth:start.substr(5,2),sday:start.substr(8,2),eyear:end.substr(0,4),emonth:end.substr(5,2),eday:end.substr(8,2)}; }
+    const r=await postWeb(endpoint,payload);
+    setText('debugPrayer','POST '+endpoint+'\n'+JSON.stringify(payload,null,2)+'\n\nHTTP '+r.status+'\n'+(r.text||'').slice(0,12000));
+    if(!r.ok){ setBadge('st2','2 — فشل: HTTP '+r.status,'fail'); setText('prayerMeta','الخادم رد بخطأ. انسخ الرد الخام كاملاً وأرسله، وسيظهر اسم البارامتر الناقص إن كان هناك نقص، كما حصل مع القمر.'); return; }
+    const d=r.json&&r.json.d;
+    if(d===undefined||d===null){ setBadge('st2','2 — فشل: لا يوجد result.d','fail'); return; }
+    fullPrayerHtml=d; setHTML('renderPrayer',d); setBadge('st2','2 — نجاح من الخادم','ok'); setText('prayerMeta','تم عرض result.d كما رجع من الخادم، بلا تعديل.'); buildMonthBar();
+  }catch(e){ setBadge('st2','2 — فشل: تعذّر الاتصال','fail'); setText('debugPrayer','خطأ: '+e.message); }
+  finally{ b.disabled=false; b.textContent='إعداد جدول مواقيت الصلاة'; }
+}
+document.getElementById('btnPrayer').addEventListener('click',runPrayer);
+document.getElementById('btnClearPrayer').addEventListener('click',()=>{
+  state={tc:null,zoneName:null,formatted:null,year:null,month:null,day:null,hour:null,minute:null,second:null,gmtOffset:null,lat:32,lng:44.33};
+  setBadge('st1','1 — المنطقة الزمنية: بانتظار','wait'); setBadge('st2','2 — المواقيت: بانتظار','wait');
+  setText('prayerMeta','لم يتم التشغيل بعد.'); setText('locMeta','المدينة: غير محددة.');
+  setHTML('renderPrayer','لم يتم الحساب بعد.'); setText('debugPrayer','—'); document.getElementById('monthBar').innerHTML='';
+});
+function buildExportHtml(){
+  if(!fullPrayerHtml) return '';
+  return '<html><head><meta charset="utf-8"></head><body>'+fullPrayerHtml+'</body></html>';
+}
+document.getElementById('btnWord').addEventListener('click',()=>{
+  const html=buildExportHtml(); if(!html){alert('لا يوجد جدول للتصدير.');return;}
+  const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='PrayerTimes.doc'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+});
+document.getElementById('btnPrint').addEventListener('click',()=>{window.print();});
+document.getElementById('btnPdf').addEventListener('click',async()=>{
+  const html=buildExportHtml(); if(!html){alert('لا يوجد جدول للتصدير.');return;}
+  try{ const fd=new FormData(); fd.append('data',html); fd.append('PageType','Portrait'); fd.append('fileName','PrayerTimes'); const res=await fetch(URL_PDF,{method:'POST',body:fd}); if(!res.ok){alert('تعذّر تصدير PDF.');return;} const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='PrayerTimes.pdf'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }catch(e){alert('تعذّر تصدير PDF: '+e.message);}
+});
+buildMonthBar();
+</script>
+</body>
+</html>
