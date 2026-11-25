@@ -110,7 +110,7 @@ th{background:#121c2e;color:#fff}
   </div>
   <label>مصدر المواقيت — ثابت، من الخادم فقط</label>
   <div class="meta" dir="ltr" style="text-align:left">https://arabic.nojumi.org/WebPages/PrayerTimes.aspx/GetPrayerTimesFromAPI</div>
-  <p class="small">الحمولة المثبتة من الكود الأصلي: <span dir="ltr">{ lat, lng, date: &quot;YYYY/MM/DD&quot;, navafel: false }</span>. الجدول الشهري والسنوي والفترة يُبنى من تكرار النداء على أيام الفترة، وكل يوم يرجع من الخادم بلا حساب محلي.</p>
+  <p class="small">الجسر الآن جلبة وحدة أولاً: الشهر جلبة وحدة، والسنة جلبة وحدة، والفترة جلبة وحدة، عبر الـ <span dir="ltr">API</span> المباشر الذي يكتشفه الجسر من كود الصفحة نفسها. إذا لم يجد الرابط المباشر، يرجع تلقائياً لجسر اليوم يوم المثبت: <span dir="ltr">{ lat, lng, date: &quot;YYYY/MM/DD&quot;, navafel: false }</span>. في الحالتين كل يوم يرجع من الخادم، بلا حساب محلي.</p>
   <div class="row no-print">
     <button class="primary" id="btnPrayer">إعداد جدول مواقيت الصلاة</button>
     <button class="ghost" id="btnClearPrayer">مسح النتائج</button>
@@ -274,6 +274,55 @@ function parsePrayerD(d){
   }
   return null;
 }
+// — جلبة وحدة: اكتشاف الرابط المباشر من كود الصفحة نفسها، بلا تخمين —
+async function discoverDirectApiUrl(){
+  try{
+    const res=await fetch('https://arabic.nojumi.org/prayertimes',{method:'GET',credentials:'include'});
+    const pageHtml=await res.text();
+    const srcs=[...new Set([...pageHtml.matchAll(/src=["']([^"']+\.js[^"']*)["']/g)].map(m=>m[1]))];
+    for(const s of srcs){
+      let abs=s.startsWith('http')?s:(s.startsWith('//')?'https:'+s:(s.startsWith('/')?'https://arabic.nojumi.org'+s:'https://arabic.nojumi.org/'+s));
+      try{
+        const r=await fetch(abs); if(!r.ok) continue;
+        const t=await r.text();
+        if(t.includes('jQuery v3')) continue;
+        // ابحث عن تعريف directUrl أو apiUrl
+        const m1=t.match(/(directUrl|apiUrl)\s*=\s*["']([^"']+)["']/);
+        if(m1 && /prayer/i.test(m1[2])) return m1[2];
+        // ابحث عن أي رابط فيه prayer و api في نفس السطر
+        const m2=[...t.matchAll(/https?:\/\/[^\s"'\\]+prayer[^\s"'\\]*/gi)].map(x=>x[0]);
+        for(const u of m2){ if(!/share|export|pdf/i.test(u)) return u; }
+      }catch(e){}
+    }
+  }catch(e){}
+  return null;
+}
+async function fetchRangeSingle(lat,lng,startStr,endStr){
+  const directUrl=await discoverDirectApiUrl();
+  if(!directUrl) return {ok:false,reason:'لم أجد رابط API مباشر في كود الصفحة',directUrl:null,raw:''};
+  // جرّب صيغ بارامترات الفترة الشائعة في كود الموقع، والخادم هو الذي يثبت أيها صحيحة
+  const tries=[
+    {lat:lat,lng:lng,startDate:startStr,endDate:endStr},
+    {lat:lat,lng:lng,start_date:startStr,end_date:endStr},
+    {lat:lat,lng:lng,from:startStr,to:endStr},
+    {lat:lat,lng:lng,date:startStr,endDate:endStr}
+  ];
+  let lastRaw='';
+  for(const params of tries){
+    try{
+      const qs=new URLSearchParams(params).toString();
+      const url=directUrl+(directUrl.includes('?')?'&':'?')+qs;
+      const r=await fetch(url,{method:'GET',credentials:'include'});
+      const txt=await r.text(); lastRaw=txt;
+      if(!r.ok) continue;
+      let j=null; try{ j=JSON.parse(txt); }catch(e){ continue; }
+      const arr=j && j.data && j.data.prayerTimes;
+      if(arr && arr.length>1) return {ok:true,directUrl:directUrl,params:params,days:arr,raw:txt};
+      if(arr && arr.length===1) return {ok:true,directUrl:directUrl,params:params,days:arr,raw:txt};
+    }catch(e){}
+  }
+  return {ok:false,reason:'وجدت الرابط المباشر لكن أي صيغة بارامترات لم ترجع مصفوفة prayerTimes',directUrl:directUrl,raw:lastRaw};
+}
 async function fetchOnePrayerDay(lat,lng,dateStr){
   const r=await postWeb(URL_PRAYER_API,{lat:lat,lng:lng,date:dateStr,navafel:false});
   if(!r.ok) return {ok:false,status:r.status,raw:r.text,day:null};
@@ -324,7 +373,28 @@ async function runPrayer(){
       if(isNaN(cur.getTime())||isNaN(last.getTime())||cur>last){ setBadge('st2','2 — فشل: فترة غير صالحة','fail'); return; }
       while(cur<=last){ dates.push(fmtDate(cur.getUTCFullYear(),cur.getUTCMonth()+1,cur.getUTCDate())); cur=new Date(cur.getTime()+86400000); }
     }
-    setText('prayerMeta','النمط: '+currentMode+' | عدد الأيام المطلوبة: '+dates.length+' | جارٍ جلب كل يوم من الخادم…');
+    // — أولاً: جرّب جلبة وحدة للشهر / السنة / الفترة كلها —
+    const rangeStart=dates[0]; const rangeEnd=dates[dates.length-1];
+    setText('prayerMeta','النمط: '+currentMode+' | الفترة: '+rangeStart+' إلى '+rangeEnd+' | جرّب جلبة وحدة أولاً…');
+    b.textContent='جارٍ الجلبة الوحدة…';
+    const single=await fetchRangeSingle(lat,lng,rangeStart,rangeEnd);
+    if(single.ok && single.days && single.days.length){
+      const groupedSingle={};
+      single.days.forEach(p=>{
+        const mk=(p.prayerDate||rangeStart).substr(5,2);
+        if(!groupedSingle[mk]) groupedSingle[mk]=[];
+        groupedSingle[mk].push(p);
+      });
+      const tableHtmlSingle=buildPrayerTableHtml(groupedSingle);
+      fullPrayerHtml=tableHtmlSingle; setHTML('renderPrayer',tableHtmlSingle);
+      setBadge('st2','2 — نجاح من الخادم: جلبة وحدة ('+single.days.length+' يوم)','ok');
+      setText('prayerMeta','تم عرض '+single.days.length+' يوم من جلبة وحدة، بلا حساب محلي.');
+      setText('debugPrayer','GET '+single.directUrl+'\nالبارامترات الناجحة: '+JSON.stringify(single.params,null,2)+'\nالنمط: '+currentMode+' | الفترة: '+rangeStart+' إلى '+rangeEnd+' | lat='+lat+' lng='+lng+'\n\nأول رد خام من الخادم:\n'+String(single.raw).slice(0,8000));
+      buildMonthBar();
+      return;
+    }
+    // — لم تنجح الجلبة الوحدة، ارجع لجسر اليوم يوم المثبت —
+    setText('prayerMeta','النمط: '+currentMode+' | عدد الأيام المطلوبة: '+dates.length+' | الجلبة الوحدة لم تنجح ('+(single.reason||'')+') — أرجع لجسر اليوم يوم…');
     const grouped={}; let firstRaw=''; let failCount=0; let firstFail='';
     for(let i=0;i<dates.length;i++){
       const ds=dates[i];
@@ -337,7 +407,7 @@ async function runPrayer(){
       grouped[mk].push(res.day);
     }
     const total=Object.keys(grouped).reduce((s,k)=>s+grouped[k].length,0);
-    setText('debugPrayer','POST '+URL_PRAYER_API+'\nالحمولة الأولى: '+JSON.stringify({lat:lat,lng:lng,date:dates[0],navafel:false},null,2)+'\nالنمط: '+currentMode+' | الأيام المطلوبة: '+dates.length+' | الناجحة: '+total+' | الفاشلة: '+failCount+'\nأول فشل: '+(firstFail||'—')+'\n\nأول رد خام من الخادم:\n'+String(firstRaw).slice(0,8000));
+    setText('debugPrayer','المسار: يوم يوم (احتياط بعد فشل الجلبة الوحدة)\nسبب فشل الجلبة الوحدة: '+(single.reason||'')+' | الرابط المكتشف: '+(single.directUrl||'—')+'\nPOST '+URL_PRAYER_API+'\nالحمولة الأولى: '+JSON.stringify({lat:lat,lng:lng,date:dates[0],navafel:false},null,2)+'\nالنمط: '+currentMode+' | الأيام المطلوبة: '+dates.length+' | الناجحة: '+total+' | الفاشلة: '+failCount+'\nأول فشل: '+(firstFail||'—')+'\n\nأول رد خام من الخادم (يوم يوم):\n'+String(firstRaw).slice(0,8000));
     if(total===0){ setBadge('st2','2 — فشل: لم يرجع الخادم أي يوم','fail'); setText('prayerMeta','الخادم لم يرجع أي يوم. افتح الرد الخام في الأسفل.'); return; }
     const tableHtml=buildPrayerTableHtml(grouped);
     fullPrayerHtml=tableHtml; setHTML('renderPrayer',tableHtml); setBadge('st2','2 — نجاح من الخادم ('+total+' يوم)','ok'); setText('prayerMeta','تم عرض '+total+' يوم كما رجع من الخادم، بلا تعديل وبلا حساب محلي.'+(failCount?(' — فشل '+failCount+' يوم.'):'')); buildMonthBar();
