@@ -2,191 +2,312 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>مختبر جسر القمر - النجومي</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مختبر جسر القمر — النجومي | تسلسل ثلاثي</title>
 <style>
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial;background:#eef2f7;color:#111;padding:16px}
-.wrap{max-width:900px;margin:0 auto}
-h1{font-size:22px;margin:6px 0 4px} .sub{color:#555;margin:0 0 16px;font-size:14px}
-.card{background:#fff;border:1px solid #dde3ec;border-radius:12px;padding:14px;margin:0 0 14px}
-.card h2{font-size:17px;margin:0 0 8px} .hint{color:#555;font-size:13px;margin:0 0 10px;line-height:1.7}
-label{display:block;font-size:13px;color:#333;margin:8px 0 4px} input{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;background:#fff}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px} @media(max-width:600px){.row{grid-template-columns:1fr}}
-button{border:0;border-radius:10px;padding:11px 16px;font-size:15px;font-weight:700;cursor:pointer;background:#1c6eae;color:#fff;margin-top:10px;width:100%}
-button:disabled{background:#9db4c6;cursor:not-allowed}
-pre{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto;font-size:13px;line-height:1.7;direction:ltr;text-align:left}
-.badge{display:inline-block;background:#e0f2fe;color:#075985;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700}
-.err{color:#b91c1c;font-weight:700} .ok{color:#047857;font-weight:700}
-.cand{margin:6px 0} .cand button{background:#fff;color:#1c6eae;border:1px solid #1c6eae;padding:8px 10px;font-size:13px}
-.log{font-size:13px;line-height:1.8} .log div{border-bottom:1px solid #eef2f7;padding:6px 0}
-.small{font-size:12px;color:#666;line-height:1.7}
+  *{box-sizing:border-box}
+  body{margin:0;background:#f6f5f1;color:#1a1a1a;font-family:system-ui,-apple-system,Segoe UI,Tahoma,Arial,sans-serif;line-height:1.7}
+  header{background:#121c2e;color:#fff;padding:22px 16px}
+  header h1{margin:0 0 6px;font-size:22px}
+  header p{margin:0;opacity:.85;font-size:14px}
+  main{max-width:980px;margin:0 auto;padding:16px}
+  .card{background:#fff;border:1px solid #e5e0d5;border-radius:14px;padding:16px;margin:14px 0}
+  .card h2{margin:0 0 10px;font-size:18px}
+  .card h3{margin:14px 0 8px;font-size:16px}
+  label{display:block;font-size:13px;font-weight:700;margin:10px 0 4px}
+  input[type="text"],input[type="number"],select{width:100%;padding:11px 12px;border:1px solid #d8d2c4;border-radius:10px;font-size:15px;background:#fffdf8}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:640px){.grid{grid-template-columns:1fr}}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{border:0;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:800;cursor:pointer}
+  .primary{background:#c9a227;color:#121c2e}
+  .ghost{background:#eee9dc;color:#121c2e}
+  .danger{background:#b3261e;color:#fff}
+  .check{display:flex;gap:8px;align-items:center;background:#fbf8ef;border:1px solid #e5e0d5;border-radius:10px;padding:10px 12px;font-size:14px}
+  .check input{width:18px;height:18px}
+  .step{border:1px solid #e5e0d5;border-radius:12px;padding:12px;margin:10px 0;background:#fffdf8}
+  .step b{font-size:15px}
+  .badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;background:#eee}
+  .badge.ok{background:#d9f2dd;color:#145a1f}
+  .badge.fail{background:#fde2e0;color:#8a1a14}
+  .badge.wait{background:#eee;color:#555}
+  .badge.run{background:#fff3c4;color:#6b5900}
+  pre{white-space:pre-wrap;word-break:break-word;background:#101828;color:#e8eefc;border-radius:10px;padding:12px;font-size:12.5px;max-height:320px;overflow:auto;direction:ltr;text-align:left}
+  .meta{font-size:13px;color:#555;background:#f6f5f1;border-radius:10px;padding:10px 12px}
+  .render{border:1px solid #e5e0d5;border-radius:12px;padding:12px;background:#fff;min-height:60px}
+  .note{font-size:13px;color:#5a4a1a;background:#fff8d6;border:1px solid #e8d9a0;border-radius:10px;padding:10px 12px}
+  .small{font-size:12.5px;color:#666}
+  hr{border:0;border-top:1px solid #eee;margin:14px 0}
 </style>
 </head>
 <body>
-<div class="wrap">
-<h1>🌙 مختبر جسر القمر - النجومي</h1>
-<p class="sub">نعرض ما يرجع من الخادم فقط. بلا حساب محلي وبلا رقم مخترع.</p>
+<header>
+  <h1>🌙 مختبر جسر القمر — النجومي</h1>
+  <p>ملف واحد مستقل. التسلسل الثلاثي من كود الموقع نفسه. نعرض ما يرجع من الخادم فقط. بلا حساب فلكي محلي وبلا رقم مخترع.</p>
+</header>
 
-<div class="card">
-<h2>1. اكتشاف الإعداد</h2>
-<p class="hint">يجلب صفحة <b>https://arabic.nojumi.org/events</b> كنص، ويستخرج كتلة <b>App_Config</b> فقط. لا يوجد أي طلب على <b>Events.aspx</b>.</p>
-<button id="btnConfig">اكتشاف الإعداد من صفحة events</button>
-<div id="configStatus" class="small"></div>
-<pre id="configOut">لم يتم الجلب بعد.</pre>
-</div>
+<main>
+  <div class="card">
+    <h2>المدخلات</h2>
+    <div class="grid">
+      <div>
+        <label for="lat">خط العرض lat</label>
+        <input id="lat" type="text" value="32" placeholder="مثال: 32">
+      </div>
+      <div>
+        <label for="lng">خط الطول lng</label>
+        <input id="lng" type="text" value="44.33" placeholder="مثال: 44.33">
+      </div>
+      <div>
+        <label for="startDate">تاريخ البداية — ميلادي YYYY/MM/DD</label>
+        <input id="startDate" type="text" value="2026/11/20" placeholder="ابحث عن كلمة أو سورة أو صفحة">
+      </div>
+      <div>
+        <label for="endDate">تاريخ النهاية — ميلادي YYYY/MM/DD</label>
+        <input id="endDate" type="text" value="2027/01/24" placeholder="YYYY/MM/DD">
+      </div>
+    </div>
 
-<div class="card">
-<h2>2. تحليل events.js</h2>
-<p class="hint">يجلب <b>/JS/events.js?v=6</b> كنص، ويعرض فقط الأسطر التي تحتوي على <b>App_Config</b> أو <b>apiKey</b> أو <b>ajax</b> أو <b>fetch</b>. يتجاهل تماماً <b>ScriptResource.axd</b> و <b>gtag</b> و <b>jquery</b> و <b>leaflet</b>. تنبيه: <b>get_events</b> في إطار Microsoft Ajax ليست أحداث القمر.</p>
-<button id="btnJs">تحليل ملف events.js</button>
-<div id="jsStatus" class="small"></div>
-<pre id="jsOut">لم يتم الجلب بعد.</pre>
-<div id="candidates"></div>
-</div>
+    <div class="grid">
+      <div>
+        <label for="borjFilter">مرشح البرج borjFilter — اتركه فارغاً للكل</label>
+        <input id="borjFilter" type="text" value="" placeholder="فارغ = كل الأبراج">
+      </div>
+      <div>
+        <label for="hijriAdjustment">تعديل هجري hijriAdjustment — اتركه فارغاً إن لم تعرفه</label>
+        <input id="hijriAdjustment" type="text" value="" placeholder="فارغ = افتراضي الخادم">
+      </div>
+      <div>
+        <label for="lunarMonthDisplay">عرض الشهر القمري lunarMonthDisplay — اتركه فارغاً إن لم تعرفه</label>
+        <input id="lunarMonthDisplay" type="text" value="" placeholder="فارغ = افتراضي الخادم">
+      </div>
+      <div>
+        <label for="dst">التوقيت الصيفي dst</label>
+        <select id="dst"><option value="false" selected>false — معطل</option><option value="true">true — مفعّل</option></select>
+      </div>
+    </div>
 
-<div class="card">
-<h2>3. جلب الأحداث من العنوان المكتشف فقط</h2>
-<p class="hint">هذا الزر يبقى معطّلاً حتى يُكتشف عنوان حقيقي في المرحلة 2. عند اكتشاف عنوان، اختره من القائمة أعلاه، ثم اجلب. يعرض الرد الخام كما رجع من الخادم.</p>
-<label>العنوان المكتشف</label>
-<input id="endpoint" placeholder="اختر عنواناً من المرحلة 2 أولاً" value="">
-<label>مفتاح الواجهة كما رجع من الخادم</label>
-<input id="apiKey" readonly placeholder="سيظهر بعد المرحلة 1">
-<div class="row">
-<div><label>من تاريخ</label><input id="fromDate" value="2026/11/20"></div>
-<div><label>إلى تاريخ</label><input id="toDate" value="2027/01/24"></div>
-</div>
-<div class="row">
-<div><label>خط العرض</label><input id="lat" value="32"></div>
-<div><label>خط الطول</label><input id="lng" value="44.33"></div>
-</div>
-<button id="btnFetch" disabled>جلب الأحداث من العنوان المكتشف</button>
-<div id="fetchStatus" class="small"></div>
-<pre id="fetchOut">لم يتم الجلب بعد.</pre>
-</div>
+    <div class="row" style="margin-top:14px">
+      <label class="check"><input type="checkbox" id="showShamsi"> إظهار شمسي showShamsi — في النسخة العربية الأصل false</label>
+      <label class="check"><input type="checkbox" id="showQamari" checked> إظهار قمري showQamari</label>
+      <label class="check"><input type="checkbox" id="showGregorian" checked> إظهار ميلادي showGregorian</label>
+      <label class="check"><input type="checkbox" id="solarMonthDisplay"> عرض الشهر الشمسي solarMonthDisplay</label>
+    </div>
 
-<div class="card">
-<h2>سجل المحاولات</h2>
-<div id="log" class="log"><div>لا توجد محاولات بعد.</div></div>
-</div>
+    <div class="row">
+      <button class="primary" id="btnRunAll">تشغيل التسلسل الكامل: 1 ← 2 ← 3</button>
+      <button class="ghost" id="btnStep1">الخطوة 1 فقط</button>
+      <button class="ghost" id="btnStep2">الخطوة 2 فقط</button>
+      <button class="ghost" id="btnStep3">الخطوة 3 فقط</button>
+      <button class="danger" id="btnClear">مسح النتائج</button>
+    </div>
+    <p class="small">ملاحظة: الخطوة 2 والخطوة 3 تحتاجان إلى `tc` و `hour` و `minute` و `second` من الخطوة 1. إذا شغّلت 2 أو 3 وحدها، سيطلب الملف تشغيل الخطوة 1 أولاً، أو سيستخدم القيم المعروضة إن كانت موجودة.</p>
+  </div>
 
-<p class="small">ملف مستقل واحد. بلا رياكت وبلا بناء. لا يلمس التقويم ولا الصايغ ولا المصحف. إذا لم يرجع الخادم بيانات، يعرض تعذّر جلب البيانات من الخادم.</p>
-</div>
+  <div class="card">
+    <h2>التسلسل</h2>
+    <div class="note">القاعدة: لا حساب محلي. `tc` يأتي من `TimeZoneData` فقط، والساعة تأتي من `formatted` الذي يرجعه الخادم فقط. التواريخ هي مدخلاتك كما كتبتها.</div>
+
+    <div class="step" id="box1">
+      <b>الخطوة 1 — TimeZoneData</b> <span class="badge wait" id="st1">بانتظار التشغيل</span>
+      <p class="small">الهدف: تحويل `lat` و `lng` إلى `tc` و `zoneName` و `formatted`. لا يرسل أي تاريخ.</p>
+      <div class="meta" id="meta1">لم يتم التشغيل بعد.</div>
+      <h3>الطلب المرسل</h3><pre id="req1">—</pre>
+      <h3>الرد الخام من الخادم</h3><pre id="res1">—</pre>
+      <h3>القيم المستخرجة من الرد فقط</h3><pre id="parsed1">—</pre>
+    </div>
+
+    <div class="step" id="box2">
+      <b>الخطوة 2 — CurrentBorj</b> <span class="badge wait" id="st2">بانتظار التشغيل</span>
+      <p class="small">الهدف: برج اليوم الحالي في ذلك المكان، بالتاريخ والساعة اللذين رجعا من الخطوة 1.</p>
+      <div class="meta" id="meta2">لم يتم التشغيل بعد.</div>
+      <h3>الطلب المرسل</h3><pre id="req2">—</pre>
+      <h3>الرد الخام من الخادم</h3><pre id="res2">—</pre>
+      <h3>العرض كما أرجعه الخادم — HTML</h3><div class="render" id="render2">—</div>
+    </div>
+
+    <div class="step" id="box3">
+      <b>الخطوة 3 — MoonInBorjs</b> <span class="badge wait" id="st3">بانتظار التشغيل</span>
+      <p class="small">الهدف: أحداث القمر في الأبراج للمدى الذي أدخلته، بـ `tc` والساعة من الخطوة 1. لا يرسل `lat` و `lng` هنا أبداً.</p>
+      <div class="meta" id="meta3">لم يتم التشغيل بعد.</div>
+      <h3>الطلب المرسل</h3><pre id="req3">—</pre>
+      <h3>الرد الخام من الخادم</h3><pre id="res3">—</pre>
+      <h3>العرض كما أرجعه الخادم — HTML</h3><div class="render" id="render3">—</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>كيف تقرأ النتيجة</h2>
+    <ul>
+      <li>إذا ظهرت <b>خضراء</b>، فالقيمة من الخادم.</li>
+      <li>إذا ظهرت <b>حمراء</b>، فالخادم لم يرجع بيانات أو المتصفح منع الطلب بسبب CORS. في هذه الحالة نعرض التعذّر، ولا نخترع رقماً.</li>
+      <li>الملف لا يحسب موقع القمر، ولا يحوّل التواريخ فلكياً، ولا يقدّر `tc`. كل ذلك من الخادم.</li>
+    </ul>
+    <p class="small">العناوين المستعملة كما في كود الموقع:<br>1) https://arabic.nojumi.org/Default.aspx/TimeZoneData<br>2) https://arabic.nojumi.org/webpages/Events.aspx/CurrentBorj<br>3) https://arabic.nojumi.org/webpages/Events.aspx/MoonInBorjs</p>
+  </div>
+</main>
 
 <script>
-var apiKeyVal = '';
-function now(){ return new Date().toLocaleTimeString('ar-EG'); }
-function addLog(msg){
-  var log = document.getElementById('log');
-  if(log.textContent.indexOf('لا توجد محاولات')>=0) log.innerHTML='';
-  var d=document.createElement('div'); d.textContent = now() + ' | ' + msg; log.prepend(d);
+const URL_TZ = 'https://arabic.nojumi.org/Default.aspx/TimeZoneData';
+const URL_CUR = 'https://arabic.nojumi.org/webpages/Events.aspx/CurrentBorj';
+const URL_MOON = 'https://arabic.nojumi.org/webpages/Events.aspx/MoonInBorjs';
+
+// الحالة — كلها من الخادم فقط
+let state = { tc: null, zoneName: null, formatted: null, year: null, month: null, day: null, hour: null, minute: null, second: null, gmtOffset: null };
+
+function setBadge(id, text, cls){ const el=document.getElementById(id); el.textContent=text; el.className='badge '+cls; }
+function setText(id, v){ document.getElementById(id).textContent = v; }
+function setHTML(id, v){ document.getElementById(id).innerHTML = v; }
+
+async function postWebMethod(url, payload){
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  const text = await res.text();
+  let json = null;
+  try{ json = JSON.parse(text); }catch(e){ /* الرد ليس JSON */ }
+  return { status: res.status, ok: res.ok, text, json };
 }
-function setStatus(id, html){ document.getElementById(id).innerHTML = html; }
 
-document.getElementById('btnConfig').onclick = async function(){
-  var out = document.getElementById('configOut');
-  setStatus('configStatus','جاري الجلب...');
-  addLog('المرحلة 1 | GET https://arabic.nojumi.org/events');
-  try{
-    var r = await fetch('https://arabic.nojumi.org/events');
-    var t = await r.text();
-    addLog('المرحلة 1 | الحالة: ' + r.status + ' | الطول: ' + t.length);
-    if(!r.ok){ out.textContent = 'تعذّر جلب البيانات من الخادم. الحالة: ' + r.status; setStatus('configStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>'); return; }
-    var m = t.match(/var\s+App_Config\s*=\s*\{([\s\S]*?)\};/);
-    var k = t.match(/apiKey\s*:\s*'([^']+)'/);
-    if(k) { apiKeyVal = k[1]; document.getElementById('apiKey').value = apiKeyVal; }
-    var can = t.match(/rel="canonical"[^>]*href="([^"]+)"/);
-    var show = '';
-    if(m) show += 'App_Config = {' + m[1] + '};\n\n';
-    else show += 'لم تُعثر على كتلة App_Config في الرد.\n\n';
-    if(can) show += 'canonical: ' + can[1] + '\n';
-    show += 'طول الرد الكامل: ' + t.length + '\n';
-    out.textContent = show;
-    setStatus('configStatus','<span class="ok">تم اكتشاف الإعداد من الخادم</span>');
-  }catch(e){
-    out.textContent = 'تعذّر جلب البيانات من الخادم. ' + e.message;
-    setStatus('configStatus','<span class="err">تعذّر جلب البيانات من الخادم - قد يكون حظر CORS من المتصفح</span>');
-    addLog('المرحلة 1 | خطأ: ' + e.message);
-  }
-};
+function parseFormatted(formatted){
+  // كما في كود الموقع تماماً: التاريخ أول 10 أحرف، والوقت من الحرف 11
+  // مثال: "2026-11-25 19:23:41"
+  const datePart = String(formatted).substr(0,10);
+  const timePart = String(formatted).substr(11);
+  const year = datePart.substr(0,4);
+  const month = datePart.substr(5,2);
+  const day = datePart.substr(8,2);
+  const parts = String(timePart).split(':');
+  return { datePart, timePart, year, month, day, hour: parts[0]||'', minute: parts[1]||'', second: parts[2]||'' };
+}
 
-document.getElementById('btnJs').onclick = async function(){
-  var out = document.getElementById('jsOut');
-  setStatus('jsStatus','جاري الجلب...');
-  addLog('المرحلة 2 | GET https://arabic.nojumi.org/JS/events.js?v=6');
+async function step1(){
+  setBadge('st1','جارٍ التشغيل…','run');
+  const lat = parseFloat(document.getElementById('lat').value.trim());
+  const lng = parseFloat(document.getElementById('lng').value.trim());
+  if(isNaN(lat) || isNaN(lng)){ setBadge('st1','فشل — مدخلات ناقصة','fail'); setText('meta1','أدخل lat و lng رقميين.'); return false; }
+  const payload = { lat: lat, lng: lng };
+  setText('req1', 'POST '+URL_TZ+'\n'+JSON.stringify(payload, null, 2));
+  setText('meta1','جارٍ إرسال الطلب إلى الخادم…');
   try{
-    var r = await fetch('https://arabic.nojumi.org/JS/events.js?v=6');
-    var t = await r.text();
-    addLog('المرحلة 2 | الحالة: ' + r.status + ' | الطول: ' + t.length);
-    if(!r.ok){ out.textContent='تعذّر جلب البيانات من الخادم. الحالة: '+r.status; setStatus('jsStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>'); return; }
-    var lines = t.split('\n');
-    var keys = ['App_Config','apiKey','applicationPath','ajax','fetch','XMLHttpRequest','PageMethods','WebMethod','loadingEvents'];
-    var found = [];
-    lines.forEach(function(line,i){
-      for(var j=0;j<keys.length;j++){ if(line.indexOf(keys[j])>=0){ found.push((i+1)+': '+line.trim()); break; } }
-    });
-    if(found.length===0){ out.textContent='لم تُعثر على أي سطر يحتوي على apiKey أو ajax أو fetch في events.js.\nطول الملف: '+t.length; setStatus('jsStatus','<span class="err">لا يوجد عنوان مكتشف</span>'); return; }
-    out.textContent = found.join('\n');
-    setStatus('jsStatus','<span class="ok">تم العثور على '+found.length+' سطراً مهماً من أصل '+lines.length+' سطراً</span>');
-    // استخراج عناوين مرشحة
-    var candSet = {};
-    var re1 = /https?:\/\/[^\s'"]+/g;
-    var re2 = /\/[A-Za-z0-9_\-\.\/\?\=\&\%]+(?:api|event|moon|zodiac)[A-Za-z0-9_\-\.\/\?\=\&\%]*/gi;
-    var m1; while((m1=re1.exec(t))!==null){ candSet[m1[0]]=1; }
-    var m2; while((m2=re2.exec(t))!==null){ if(m2[0].length>4) candSet[m2[0]]=1; }
-    var cands = Object.keys(candSet);
-    var box = document.getElementById('candidates');
-    if(cands.length===0){
-      box.innerHTML = '<p class="small err">لم يُستخرج أي عنوان مرشح. انسخ السطر المكتشف هنا يدوياً في حقل العنوان.</p>';
-    } else {
-      var h = '<p class="small"><b>عناوين مرشحة مكتشفة - اختر واحداً لتفعيل المرحلة 3:</b></p>';
-      cands.forEach(function(c){
-        var safe = c.replace(/"/g,'&quot;');
-        h += '<div class="cand"><button type="button" data-url="'+safe+'">استخدام: '+safe+'</button></div>';
-      });
-      box.innerHTML = h;
-      box.querySelectorAll('button').forEach(function(b){
-        b.onclick = function(){
-          document.getElementById('endpoint').value = b.getAttribute('data-url');
-          document.getElementById('btnFetch').disabled = false;
-          addLog('تم اختيار العنوان المكتشف: ' + b.getAttribute('data-url'));
-        };
-      });
-    }
+    const r = await postWebMethod(URL_TZ, payload);
+    setText('res1', 'HTTP '+r.status+'\n'+r.text.slice(0, 8000));
+    if(!r.ok){ setBadge('st1','فشل — HTTP '+r.status,'fail'); setText('meta1','الخادم لم يرجع بيانات صالحة. لم يتم اختراع أي قيمة.'); return false; }
+    const d = r.json && r.json.d;
+    if(!d){ setBadge('st1','فشل — لا يوجد result.d','fail'); setText('meta1','الرد لا يحتوي على result.d.'); return false; }
+    let parsed;
+    try{ parsed = JSON.parse(d); }catch(e){ setBadge('st1','فشل — result.d ليس JSON','fail'); setText('meta1','result.d: '+String(d).slice(0,500)); return false; }
+    if(parsed.status !== 'OK'){ setBadge('st1','فشل — status ليس OK','fail'); setText('meta1','الخادم رجع status = '+parsed.status); return false; }
+    // tc كما في كود الموقع: gmtOffset / 3600 — تحويل وحدة فقط، وليس حساباً فلكياً
+    const tc = parsed.gmtOffset / 3600;
+    const fmt = parsed.formatted || '';
+    const pt = parseFormatted(fmt);
+    state = { tc: String(tc), zoneName: parsed.zoneName||'', formatted: fmt, year: pt.year, month: pt.month, day: pt.day, hour: pt.hour, minute: pt.minute, second: pt.second, gmtOffset: parsed.gmtOffset };
+    setText('parsed1', JSON.stringify({ gmtOffset: parsed.gmtOffset, tc: state.tc, zoneName: state.zoneName, formatted: state.formatted, year: state.year, month: state.month, day: state.day, hour: state.hour, minute: state.minute, second: state.second }, null, 2));
+    setBadge('st1','نجاح — من الخادم','ok');
+    setText('meta1','تم: tc = '+state.tc+' | المنطقة = '+state.zoneName+' | التاريخ من الخادم = '+pt.datePart+' | الوقت من الخادم = '+pt.timePart);
+    return true;
   }catch(e){
-    out.textContent='تعذّر جلب البيانات من الخادم. '+e.message;
-    setStatus('jsStatus','<span class="err">تعذّر جلب البيانات من الخادم - قد يكون حظر CORS</span>');
-    addLog('المرحلة 2 | خطأ: '+e.message);
+    setBadge('st1','فشل — تعذّر الاتصال','fail');
+    setText('res1','خطأ: '+e.message+'\n\nإذا كان المتصفح منع الطلب بسبب CORS، فهذا منع من المتصفح، وليس من هذا الملف. الخادم لم يسمح بالاتصال المباشر من صفحة ملف. في التطبيق يجب أن يكون الجسر خادماً وسيطاً يتصل بالخادم، لا المتصفح مباشرة.');
+    setText('meta1','تعذّر الاتصال. لم يتم عرض أي رقم مخترع.');
+    return false;
   }
-};
+}
 
-document.getElementById('btnFetch').onclick = async function(){
-  var ep = document.getElementById('endpoint').value.trim();
-  var out = document.getElementById('fetchOut');
-  if(!ep){ setStatus('fetchStatus','<span class="err">لا يوجد عنوان مكتشف</span>'); return; }
-  var full = ep;
-  if(ep.charAt(0)==='/') full = 'https://arabic.nojumi.org' + ep;
-  var from = document.getElementById('fromDate').value;
-  var to = document.getElementById('toDate').value;
-  var lat = document.getElementById('lat').value;
-  var lng = document.getElementById('lng').value;
-  var sep = full.indexOf('?')>=0 ? '&' : '?';
-  var url = full + sep + 'apiKey=' + encodeURIComponent(apiKeyVal) + '&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to) + '&lat=' + encodeURIComponent(lat) + '&lng=' + encodeURIComponent(lng);
-  setStatus('fetchStatus','جاري الجلب من: ' + url);
-  addLog('المرحلة 3 | GET ' + url);
+async function step2(){
+  if(state.tc === null){ setBadge('st2','بانتظار الخطوة 1','wait'); setText('meta2','شغّل الخطوة 1 أولاً لكي يأتي tc والساعة من الخادم.'); return false; }
+  setBadge('st2','جارٍ التشغيل…','run');
+  const dst = document.getElementById('dst').value === 'true';
+  const payload = { year: state.year, month: state.month, day: state.day, hour: state.hour, minute: state.minute, second: state.second, dst: dst, tc: state.tc };
+  setText('req2','POST '+URL_CUR+'\n'+JSON.stringify(payload, null, 2));
   try{
-    var r = await fetch(url);
-    var t = await r.text();
-    addLog('المرحلة 3 | الحالة: ' + r.status + ' | الطول: ' + t.length);
-    if(!r.ok){ out.textContent='تعذّر جلب البيانات من الخادم. الحالة: '+r.status+'\n'+t.slice(0,2000); setStatus('fetchStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>'); return; }
-    out.textContent = t.slice(0,8000);
-    setStatus('fetchStatus','<span class="ok">رجع الخادم بيانات - الحالة: '+r.status+' - الطول: '+t.length+'</span>');
-    if(t.trim()==='' || t.indexOf('لم يتم العثور')>=0){ setStatus('fetchStatus','<span class="err">الخادم لم يرجع بيانات</span>'); }
+    const r = await postWebMethod(URL_CUR, payload);
+    setText('res2','HTTP '+r.status+'\n'+(r.text||'').slice(0, 8000));
+    if(!r.ok){ setBadge('st2','فشل — HTTP '+r.status,'fail'); setText('meta2','الخادم لم يرجع بيانات.'); return false; }
+    const d = r.json && r.json.d;
+    if(d === undefined || d === null){ setBadge('st2','فشل — لا يوجد result.d','fail'); setText('meta2','الرد لا يحتوي على result.d.'); return false; }
+    setHTML('render2', d);
+    setBadge('st2','نجاح — من الخادم','ok');
+    setText('meta2','تم عرض result.d كما رجع من الخادم، بلا تعديل.');
+    return true;
   }catch(e){
-    out.textContent='تعذّر جلب البيانات من الخادم. '+e.message;
-    setStatus('fetchStatus','<span class="err">تعذّر جلب البيانات من الخادم</span>');
-    addLog('المرحلة 3 | خطأ: '+e.message);
+    setBadge('st2','فشل — تعذّر الاتصال','fail');
+    setText('res2','خطأ: '+e.message);
+    setText('meta2','تعذّر الاتصال. لم يتم عرض أي رقم مخترع.');
+    return false;
   }
-};
+}
+
+async function step3(){
+  if(state.tc === null){ setBadge('st3','بانتظار الخطوة 1','wait'); setText('meta3','شغّل الخطوة 1 أولاً لكي يأتي tc والساعة من الخادم.'); return false; }
+  setBadge('st3','جارٍ التشغيل…','run');
+  const start = document.getElementById('startDate').value.trim();
+  const end = document.getElementById('endDate').value.trim();
+  // تقسيم كما في كود الموقع: substr فقط، بلا تحويل تقويم محلي
+  const syear = start.substr(0,4), smonth = start.substr(5,2), sday = start.substr(8,2);
+  const eyear = end.substr(0,4), emonth = end.substr(5,2), eday = end.substr(8,2);
+  if(start.length < 10 || end.length < 10){ setBadge('st3','فشل — صيغة التاريخ','fail'); setText('meta3','اكتب التاريخ بصيغة YYYY/MM/DD، مثال 2026/11/20.'); return false; }
+  const dst = document.getElementById('dst').value === 'true';
+  const borjFilter = document.getElementById('borjFilter').value.trim();
+  const showShamsi = document.getElementById('showShamsi').checked;
+  const showQamari = document.getElementById('showQamari').checked;
+  const showGregorian = document.getElementById('showGregorian').checked;
+  const solarMonthDisplay = document.getElementById('solarMonthDisplay').checked;
+  const lunarVal = document.getElementById('lunarMonthDisplay').value.trim();
+  const hijriVal = document.getElementById('hijriAdjustment').value.trim();
+  const payload = {
+    syear: syear, smonth: smonth, sday: sday,
+    eyear: eyear, emonth: emonth, eday: eday,
+    hour: state.hour, minute: state.minute, second: state.second,
+    dst: dst, tc: state.tc,
+    borjFilter: borjFilter,
+    showShamsi: showShamsi, showQamari: showQamari, showGregorian: showGregorian,
+    solarMonthDisplay: solarMonthDisplay
+  };
+  // الحقول الاختيارية: إن تركتها فارغة لا نرسل قيمة مخترعة، بل نتركها غائبة كما لو لم يختر المستخدم خياراً
+  if(lunarVal) payload.lunarMonthDisplay = lunarVal;
+  if(hijriVal) payload.hijriAdjustment = hijriVal;
+
+  setText('req3','POST '+URL_MOON+'\n'+JSON.stringify(payload, null, 2));
+  try{
+    const r = await postWebMethod(URL_MOON, payload);
+    setText('res3','HTTP '+r.status+'\n'+(r.text||'').slice(0, 12000));
+    if(!r.ok){ setBadge('st3','فشل — HTTP '+r.status,'fail'); setText('meta3','الخادم لم يرجع بيانات.'); return false; }
+    const d = r.json && r.json.d;
+    if(d === undefined || d === null){ setBadge('st3','فشل — لا يوجد result.d','fail'); setText('meta3','الرد لا يحتوي على result.d.'); return false; }
+    setHTML('render3', d);
+    setBadge('st3','نجاح — من الخادم','ok');
+    setText('meta3','تم عرض result.d كما رجع من الخادم، بلا تعديل. هذه هي بطاقات .moon-card إن رجعها الخادم.');
+    return true;
+  }catch(e){
+    setBadge('st3','فشل — تعذّر الاتصال','fail');
+    setText('res3','خطأ: '+e.message);
+    setText('meta3','تعذّر الاتصال. لم يتم عرض أي رقم مخترع.');
+    return false;
+  }
+}
+
+async function runAll(){
+  const ok1 = await step1();
+  if(!ok1) return;
+  await step2();
+  await step3();
+}
+
+document.getElementById('btnRunAll').addEventListener('click', runAll);
+document.getElementById('btnStep1').addEventListener('click', step1);
+document.getElementById('btnStep2').addEventListener('click', step2);
+document.getElementById('btnStep3').addEventListener('click', step3);
+document.getElementById('btnClear').addEventListener('click', ()=>{
+  state = { tc:null, zoneName:null, formatted:null, year:null, month:null, day:null, hour:null, minute:null, second:null, gmtOffset:null };
+  ['st1','st2','st3'].forEach((id,i)=> setBadge(id,'بانتظار التشغيل','wait'));
+  ['meta1','meta2','meta3'].forEach(id=> setText(id,'لم يتم التشغيل بعد.'));
+  ['req1','req2','req3','res1','res2','res3','parsed1'].forEach(id=> setText(id,'—'));
+  setHTML('render2','—'); setHTML('render3','—');
+});
 </script>
 </body>
 </html>
