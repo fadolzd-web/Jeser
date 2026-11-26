@@ -3,148 +3,325 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مختبر الرد الخام - MoonInBorjs</title>
+<title>التقويم الشامل — الأبراج شهر وسنة بجلبة وحدة</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0a1f14;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;padding:12px 12px 40px}
-h1{font-size:19px;color:#fde68a;margin:4px 0 2px}
-.sub{color:#9ca3af;font-size:12px;line-height:1.7;margin-bottom:10px}
-.card{background:rgba(0,0,0,.28);border:1px solid rgba(212,175,55,.22);border-radius:14px;padding:12px;margin-bottom:10px}
-.card h2{font-size:14px;color:#fde68a;margin:0 0 8px}
-label{font-size:12px;color:#e8d9a3;display:block;margin:8px 0 4px}
-input{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(212,175,55,.35);background:#0f2418;color:#fff;font-size:14px;direction:ltr;text-align:left}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.btn{display:block;width:100%;padding:13px;border-radius:12px;border:1px solid #d4af37;background:linear-gradient(135deg,#d4af37,#8a6d1b);color:#0a1f14;font-weight:900;font-size:14px;margin:8px 0;cursor:pointer}
-.btn.sec{background:#14532d;color:#e8d9a3;border-color:rgba(212,175,55,.4)}
-.status{background:rgba(0,0,0,.35);border:1px solid rgba(212,175,55,.18);border-radius:10px;padding:10px;font-size:12px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
-pre{background:#000;border:1px solid rgba(212,175,55,.2);border-radius:10px;padding:10px;font-size:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word;color:#e5e7eb;max-height:420px;overflow:auto;direction:ltr;text-align:left}
-.small{font-size:11px;color:#9ca3af;line-height:1.7}
-.kv{font-size:12px;line-height:1.8}
-.kv b{color:#fde68a}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f6f5f1;color:#1a1a1a;margin:0;padding:0}
+header{background:#101828;color:#fff;padding:18px 16px}
+header h1{margin:0;font-size:20px}
+header p{margin:6px 0 0;color:#cbd5e1;font-size:13px}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:#fff;border:1px solid #e5e0d5;border-radius:14px;padding:14px;margin:12px 0}
+h2{margin:0 0 10px;font-size:17px}
+label{display:block;font-size:13px;color:#444;margin:0 0 4px}
+input,select{width:100%;padding:10px;border:1px solid #ddd;border-radius:10px;font-size:15px;background:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{border:0;border-radius:10px;padding:11px 16px;font-size:15px;cursor:pointer;background:#101828;color:#fff}
+button.ghost{background:#eee;color:#222}
+button.scorpio{background:#c9a227;color:#111}
+button:disabled{opacity:.6;cursor:wait}
+.badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12.5px;background:#eee}
+.badge.wait{background:#eee;color:#555}
+.badge.run{background:#fff3cd;color:#6b5900}
+.badge.ok{background:#d1fae5;color:#065f46}
+.badge.fail{background:#fee2e2;color:#991b1b}
+.meta{font-size:13px;color:#555;background:#f6f5f1;border-radius:10px;padding:10px 12px}
+.note{font-size:13px;color:#5a4a1a;background:#fff8d6;border:1px solid #e8d9a0;border-radius:10px;padding:10px 12px}
+.small{font-size:12.5px;color:#666}
+pre{white-space:pre-wrap;word-break:break-word;background:#101828;color:#e8eefc;border-radius:10px;padding:12px;font-size:12.5px;max-height:320px;overflow:auto;direction:ltr;text-align:left}
+.render{border:1px solid #e5e0d5;border-radius:12px;padding:12px;background:#fff;min-height:60px}
+.moon-card{border:1px solid #e5e0d5;border-radius:12px;padding:12px;margin:10px 0;background:#fffdf8}
+.moon-card.is-scorpio{background:#fff8d6;border-color:#c9a227}
+.moon-card.hidden{display:none}
+.search-results ul{list-style:none;margin:0;padding:0}
+.search-results ul li{padding:10px 12px;border-bottom:1px solid #eee;cursor:pointer}
+.search-results ul li:hover{background:#fbf8ef}
+.check{display:flex;gap:6px;align-items:center;font-size:13px}
+.check input{width:auto}
+.modebar{display:flex;gap:8px}
+.modebar button{flex:1}
+.modebar button.active{outline:2px solid #c9a227}
+@media print{header,.no-print{display:none!important}main{max-width:100%}.card{border:0}}
 </style>
 </head>
 <body>
-<h1>🌙 مختبر الرد الخام - MoonInBorjs</h1>
-<div class="sub">بلا محلّل وبلا رسم وبلا حساب محلي. يعرض ما يرجع من الخادم فقط. إذا لم يرجع الخادم بيانات، يعرض تعذّر الجلب.</div>
+<header>
+<h1>التقويم الشامل — الأبراج شهر وسنة بجلبة وحدة</h1>
+<p>جسر القمر إلى النجومي. نعرض ما يرجع من الخادم فقط. بلا حساب فلكي محلي وبلا أرقام مخترعة.</p>
+</header>
+<main>
 
-<div class="card">
-<h2>الإعدادات</h2>
-<div class="row">
-<div><label>خط العرض lat</label><input id="lat" value="32.00"></div>
-<div><label>خط الطول lng</label><input id="lng" value="44.33"></div>
+<section class="card">
+<h2>1 — المكان</h2>
+<label for="inpCityName">اسم المدينة</label>
+<div class="row no-print">
+<input id="inpCityName" type="text" placeholder="ابحث عن مدينة" style="flex:1">
+<button id="btnSearchCity" type="button">بحث</button>
 </div>
-<div class="row">
-<div><label>تاريخ الابتداء</label><input id="startDate" value="2026/11/01"></div>
-<div><label>تاريخ الانتهاء</label><input id="endDate" value="2026/11/30"></div>
+<div class="search-results" id="searchResults"><ul id="searchList"></ul></div>
+<div class="small" id="cityLoader" style="display:none">جارٍ البحث…</div>
+<div class="grid" style="margin-top:10px">
+<div><label for="latInput">خط العرض lat</label><input id="latInput" type="text" value="32"></div>
+<div><label for="lngInput">خط الطول lng</label><input id="lngInput" type="text" value="44.33"></div>
 </div>
-<div class="small">الافتراضي: النجف الأشرف. الشهر الحالي: تشرين الثاني 2026.</div>
-<button class="btn" id="btnRun">جلب الرد الخام من MoonInBorjs</button>
-<button class="btn sec" id="btnClear">مسح النتائج</button>
+<div class="meta" id="locMeta" style="margin-top:10px">المدينة: غير محددة.</div>
+</section>
+
+<section class="card">
+<h2>2 — النمط: شهر أو سنة</h2>
+<div class="modebar no-print" id="modeBar">
+<button type="button" data-mode="month" class="active">شهر واحد</button>
+<button type="button" data-mode="year">سنة كاملة</button>
 </div>
-
-<div class="card"><h2>الحالة</h2><div class="status" id="status">جاهز. اضغط زر الجلب.</div></div>
-
-<div class="card"><h2>الطلب المرسل - TimeZoneData</h2><pre id="req1">لم يرسل بعد.</pre></div>
-<div class="card"><h2>الرد الخام - TimeZoneData</h2><pre id="raw1">لم يرجع بعد.</pre></div>
-<div class="card"><h2>الطلب المرسل - MoonInBorjs</h2><pre id="req2">لم يرسل بعد.</pre></div>
-<div class="card"><h2>الرد الخام - MoonInBorjs - كما هو من الخادم</h2>
-<div class="kv" id="meta2"></div>
-<pre id="raw2">لم يرجع بعد.</pre>
+<div class="grid" style="margin-top:10px">
+<div><label for="yearInput">السنة</label><input id="yearInput" type="text" value="2026"></div>
+<div id="monthBox"><label for="monthInput">الشهر (1 - 12)</label><input id="monthInput" type="text" value="11"></div>
 </div>
+<div class="meta" id="rangeMeta" style="margin-top:10px">المدى: 2026/11/01 إلى 2026/11/30</div>
+<p class="small">الشهر أو السنة يُحوَّلان إلى تاريخ بداية ونهاية فقط، ثم تُرسل جلبة وحدة إلى الخادم.</p>
+</section>
 
-<div class="card"><h2>عدّاد خام - بلا تفسير</h2><div class="status" id="counts">لم يحسب بعد. هذا العدّاد يعدّ ظهور الكلمات في الرد الخام فقط، لا يفسّر البرج.</div></div>
+<section class="card">
+<h2>3 — خيارات العرض</h2>
+<div class="grid">
+<div><label for="borjFilter">مرشح البرج — اتركه فارغاً للكل</label><input id="borjFilter" type="text" value="" placeholder="فارغ = كل الأبراج"></div>
+<div><label for="dstSel">التوقيت الصيفي</label><select id="dstSel"><option value="false" selected>معطل</option><option value="true">مفعّل</option></select></div>
+<div><label for="lunarMonthDisplay">عرض الشهر القمري</label><select id="lunarMonthDisplay"><option value="0" selected>اسم الشهر</option><option value="1">رقم الشهر</option></select></div>
+<div><label for="hijriAdjustment">تعديل هجري — اتركه فارغاً إن لم تعرفه</label><input id="hijriAdjustment" type="text" value="" placeholder="فارغ = 0"></div>
+</div>
+<div class="row" style="margin-top:10px">
+<label class="check"><input type="checkbox" id="showShamsi"> إظهار شمسي</label>
+<label class="check"><input type="checkbox" id="showQamari"> إظهار قمري</label>
+<label class="check"><input type="checkbox" id="showGregorian" checked> إظهار ميلادي</label>
+<label class="check"><input type="checkbox" id="solarMonthDisplay"> عرض الشهر الشمسي</label>
+</div>
+</section>
 
-<div class="small">ملاحظة: إذا فتحت الملف من المتصفح وظهر خطأ CORS، هذا حجب من المتصفح وليس فشل الجسر. داخل تطبيق التقويم، الجلب يتم عبر CapacitorHttp ولهذا يعمل.</div>
+<section class="card">
+<h2>4 — الجسر: جلبة وحدة</h2>
+<p><span class="badge wait" id="st1">1 — المنطقة الزمنية: بانتظار</span> <span class="badge wait" id="st2">2 — الأبراج: بانتظار</span></p>
+<div class="meta" id="bridgeMeta">لم يتم التشغيل بعد. عند التشغيل، يمشي الجسر: المنطقة الزمنية ← الأبراج للمدى كله بجلبة وحدة.</div>
+<div class="note" style="margin-top:10px">القاعدة: لا حساب محلي. فرق التوقيت والساعة يأتيان من الخادم فقط.</div>
+<div class="row no-print" style="margin-top:12px">
+<button id="btnFetch" type="button">جلب الأبراج — جلبة وحدة</button>
+<button id="btnClear" type="button" class="ghost">مسح</button>
+</div>
+</section>
 
+<section class="card">
+<h2>5 — جدول القمر في الأبراج</h2>
+<div class="row no-print">
+<button class="scorpio" id="btnScorpio" type="button">القمر في العقرب فقط — <span id="scorpioCount">0</span></button>
+<button class="ghost" id="btnShowAll" type="button">كل الأيام</button>
+<button class="ghost" id="btnWord" type="button">تصدير Word</button>
+<button class="ghost" id="btnPdf" type="button">تصدير PDF</button>
+<button class="ghost" id="btnPrint" type="button">طباعة</button>
+</div>
+<p class="small no-print">زر العقرب مرشّح فقط. لا يحسب شيئاً جديداً، بل يظهر البطاقات التي رجعت من الخادم وفيها برج العقرب.</p>
+<div class="render" id="renderMoon">لم يتم الجلب بعد.</div>
+<details style="margin-top:10px"><summary class="small">الطلب المرسل والرد الخام — للتحقق</summary><pre id="debugMoon">—</pre></details>
+</section>
+
+</main>
 <script>
-var TZ_URL='https://arabic.nojumi.org/Default.aspx/TimeZoneData';
-var LIST_URL='https://arabic.nojumi.org/webpages/Events.aspx/MoonInBorjs';
-function setStatus(t){document.getElementById('status').textContent=t;}
-function setPre(id,t){document.getElementById(id).textContent=String(t).slice(0,20000);}
-function normDate(s){
-  try{
-    var t=String(s||'').trim().replace(/\s*[\/\-]\s*/g,'/');
-    var m=t.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-    if(m) return m[1]+'/'+String(m[2]).padStart(2,'0')+'/'+String(m[3]).padStart(2,'0');
-  }catch(e){}
-  return String(s||'');
+const URL_TZ='https://arabic.nojumi.org/Default.aspx/TimeZoneData';
+const URL_MOON='https://arabic.nojumi.org/webpages/Events.aspx/MoonInBorjs';
+const URL_SEARCH='https://arabic.nojumi.org/webpages/Events.aspx/SearchCity';
+const URL_PDF='https://arabic.nojumi.org/WebPages/ExportHandler.ashx';
+let state={tc:null,zoneName:null,formatted:null,year:null,month:null,day:null,hour:null,minute:null,second:null,gmtOffset:null,lat:32,lng:44.33};
+let currentMode='month';
+let scorpioOnly=false;
+function setBadge(id,t,cls){const el=document.getElementById(id);el.textContent=t;el.className='badge '+cls;}
+function setText(id,v){document.getElementById(id).textContent=v;}
+function setHTML(id,v){document.getElementById(id).innerHTML=v;}
+function pad2(n){return String(n).padStart(2,'0');}
+async function postWeb(url,payload){
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify(payload)});
+  const text=await res.text(); let json=null; try{json=JSON.parse(text);}catch(e){}
+  return {status:res.status,ok:res.ok,text,json};
 }
 function parseFormatted(f){
-  var s=String(f||'');
-  var datePart=s.substr(0,10); var timePart=s.substr(11);
-  return {datePart:datePart, timePart:timePart, year:datePart.substr(0,4), month:datePart.substr(5,2), day:datePart.substr(8,2), hour:String(timePart).split(':')[0]||'', minute:String(timePart).split(':')[1]||'', second:String(timePart).split(':')[2]||''};
+  const datePart=String(f).substr(0,10); const timePart=String(f).substr(11);
+  return {datePart,timePart,year:datePart.substr(0,4),month:datePart.substr(5,2),day:datePart.substr(8,2),hour:String(timePart).split(':')[0]||'',minute:String(timePart).split(':')[1]||'',second:String(timePart).split(':')[2]||''};
 }
-async function postOne(url,payload){
-  try{
-    if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.CapacitorHttp){
-      var r=await window.Capacitor.Plugins.CapacitorHttp.post({url:url, headers:{'Content-Type':'application/json; charset=utf-8'}, data:payload});
-      var d=r&&r.data!=null?(typeof r.data==='string'?r.data:JSON.stringify(r.data)):'';
-      return {ok:(r.status>=200&&r.status<300), status:r.status, body:d, via:'CapacitorHttp'};
-    }
-  }catch(e){ return {ok:false, status:0, body:'Capacitor خطأ: '+e.message, via:'CapacitorHttp'}; }
-  try{
-    var res=await fetch(url,{method:'POST', headers:{'Content-Type':'application/json; charset=utf-8'}, body:JSON.stringify(payload)});
-    var txt=await res.text();
-    return {ok:res.ok, status:res.status, body:txt, via:'fetch'};
-  }catch(e){ return {ok:false, status:0, body:'fetch خطأ: '+e.message, via:'fetch'}; }
-}
-document.getElementById('btnClear').onclick=function(){
-  setStatus('جاهز.');
-  setPre('req1','لم يرسل بعد.');
-  setPre('raw1','لم يرجع بعد.');
-  setPre('req2','لم يرسل بعد.');
-  setPre('raw2','لم يرجع بعد.');
-  document.getElementById('meta2').innerHTML='';
-  document.getElementById('counts').textContent='لم يحسب بعد.';
-};
-document.getElementById('btnRun').onclick=async function(){
-  var lat=parseFloat(document.getElementById('lat').value);
-  var lng=parseFloat(document.getElementById('lng').value);
-  var start=document.getElementById('startDate').value.trim();
-  var end=document.getElementById('endDate').value.trim();
-  setStatus('جارٍ الجلب... لا تغلق الصفحة.');
-  document.getElementById('counts').textContent='لم يحسب بعد.';
-  document.getElementById('meta2').innerHTML='';
-  // 1 - TimeZoneData
-  var pTZ={lat:lat, lng:lng};
-  setPre('req1', JSON.stringify({url:TZ_URL, payload:pTZ}, null, 2));
-  var r1=await postOne(TZ_URL, pTZ);
-  setPre('raw1', 'via: '+r1.via+' | status: '+r1.status+' | ok: '+r1.ok+'\n\n'+r1.body);
-  if(!r1.ok){ setStatus('❌ تعذّر الجلب من مركز البحوث - TimeZoneData.'); return; }
-  var j1=null; try{ j1=JSON.parse(r1.body); }catch(e){ j1=null; }
-  if(!j1 || j1.d===undefined){ setStatus('❌ الخادم رجع رداً بلا حقل d - TimeZoneData.'); return; }
-  var p1=null; try{ p1=JSON.parse(j1.d); }catch(e){ p1=null; }
-  if(!p1 || p1.status!=='OK'){ setStatus('❌ الخادم رجع status غير OK - TimeZoneData.'); return; }
-  var tc=p1.gmtOffset/3600;
-  var pt=parseFormatted(p1.formatted||'');
-  // 2 - MoonInBorjs - نفس حمولة Step32 بالضبط
-  var sParts=normDate(start).split('/');
-  var eParts=normDate(end).split('/');
-  var pList={syear:sParts[0], smonth:sParts[1], sday:sParts[2], eyear:eParts[0], emonth:eParts[1], eday:eParts[2], hour:pt.hour, minute:pt.minute, second:pt.second, dst:false, tc:String(tc), borjFilter:'', showShamsi:false, showQamari:true, showGregorian:true, solarMonthDisplay:false, lunarMonthDisplay:'0', hijriAdjustment:'0'};
-  setPre('req2', JSON.stringify({url:LIST_URL, payload:pList, note:'نفس حمولة Step32 - njP_fetchBorjMap'}, null, 2));
-  var r3=await postOne(LIST_URL, pList);
-  if(!r3.ok){ setPre('raw2','via: '+r3.via+' | status: '+r3.status+' | ok: '+r3.ok+'\n\n'+r3.body); setStatus('❌ تعذّر الجلب من مركز البحوث - MoonInBorjs.'); return; }
-  var j3=null; try{ j3=JSON.parse(r3.body); }catch(e){ j3=null; }
-  var d3=(j3 && j3.d!==undefined) ? String(j3.d) : '';
-  setPre('raw2', 'via: '+r3.via+' | status: '+r3.status+' | ok: '+r3.ok+' | طول الرد الخام d: '+d3.length+' حرف\n\n'+d3);
-  document.getElementById('meta2').innerHTML='<b>طول الرد الخام d:</b> '+d3.length+' حرف<br><b>TimeZoneData formatted:</b> '+(p1.formatted||'')+'<br><b>tc:</b> '+tc+'<br><b>hour/minute/second المرسلة:</b> '+pt.hour+':'+pt.minute+':'+pt.second;
-  // عدّاد خام فقط
-  try{
-    var names=['الحمل','الثور','الجوزاء','السرطان','الأسد','العذراء','الميزان','العقرب','القوس','الجدي','الدلو','الحوت'];
-    var lines=names.map(function(nm){
-      var c=(d3.match(new RegExp(nm,'g'))||[]).length;
-      return nm+': '+c+' مرة';
-    }).join(' | ');
-    var dateMatches=(d3.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/g)||[]);
-    var moonCard=(d3.match(/moon-card/g)||[]).length;
-    var trCount=(d3.match(/<tr/gi)||[]).length;
-    var tdCount=(d3.match(/<td/gi)||[]).length;
-    document.getElementById('counts').textContent='moon-card: '+moonCard+' | <tr: '+trCount+' | <td: '+tdCount+' | تواريخ YYYY/MM/DD: '+dateMatches.length+' | أول 5 تواريخ: '+dateMatches.slice(0,5).join(' ، ')+'\n'+lines;
-  }catch(e){
-    document.getElementById('counts').textContent='تعذّر العدّ: '+e.message;
+function buildRange(){
+  const year=parseInt(document.getElementById('yearInput').value.trim(),10);
+  const month=parseInt(document.getElementById('monthInput').value.trim(),10);
+  if(!year){return null;}
+  if(currentMode==='month'){
+    if(!month||month<1||month>12){return null;}
+    const dim=new Date(Date.UTC(year,month,0)).getUTCDate();
+    const s=year+'/'+pad2(month)+'/01';
+    const e=year+'/'+pad2(month)+'/'+pad2(dim);
+    return {start:s,end:e};
   }
-  setStatus('✅ وصل الرد الخام. انسخ الرد الخام من الأسفل وابعته، حتى نعرف إذا الخادم بيرجع مدخل واحد أو قايمة كاملة.');
-};
+  return {start:year+'/01/01',end:year+'/12/31'};
+}
+function refreshRangeMeta(){
+  const r=buildRange();
+  if(!r){setText('rangeMeta','المدى: سنة أو شهر غير صالح.');return;}
+  setText('rangeMeta','المدى: '+r.start+' إلى '+r.end+' | جلبة وحدة واحدة.');
+}
+document.getElementById('yearInput').addEventListener('input',refreshRangeMeta);
+document.getElementById('monthInput').addEventListener('input',refreshRangeMeta);
+document.querySelectorAll('#modeBar button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#modeBar button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    currentMode=b.dataset.mode;
+    document.getElementById('monthBox').style.display=(currentMode==='month'?'':'none');
+    refreshRangeMeta();
+  });
+});
+async function step1(){
+  setBadge('st1','1 — المنطقة الزمنية: جارٍ…','run');
+  const lat=parseFloat(document.getElementById('latInput').value.trim());
+  const lng=parseFloat(document.getElementById('lngInput').value.trim());
+  if(isNaN(lat)||isNaN(lng)){setBadge('st1','1 — فشل: إحداثيات ناقصة','fail');return false;}
+  state.lat=lat; state.lng=lng;
+  try{
+    const r=await postWeb(URL_TZ,{lat:lat,lng:lng});
+    if(!r.ok){setBadge('st1','1 — فشل: HTTP '+r.status,'fail');setText('bridgeMeta','الخادم لم يرجع بيانات المنطقة الزمنية. لم يتم عرض أي رقم مخترع.');return false;}
+    const d=r.json&&r.json.d; if(!d){setBadge('st1','1 — فشل: لا يوجد result.d','fail');return false;}
+    let p; try{p=JSON.parse(d);}catch(e){setBadge('st1','1 — فشل: result.d ليس JSON','fail');return false;}
+    if(p.status!=='OK'){setBadge('st1','1 — فشل: status ليس OK','fail');return false;}
+    const tc=p.gmtOffset/3600; const pt=parseFormatted(p.formatted||'');
+    state={...state,tc:String(tc),zoneName:p.zoneName||'',formatted:p.formatted||'',year:pt.year,month:pt.month,day:pt.day,hour:pt.hour,minute:pt.minute,second:pt.second,gmtOffset:p.gmtOffset};
+    setBadge('st1','1 — نجاح من الخادم','ok');
+    setText('locMeta','المنطقة: '+(state.zoneName||'—')+' | فرق التوقيت tc = '+state.tc+' | التاريخ من الخادم = '+pt.datePart+' | الوقت من الخادم = '+pt.timePart+' | خط العرض = '+lat+' | خط الطول = '+lng);
+    return true;
+  }catch(e){setBadge('st1','1 — فشل: تعذّر الاتصال','fail');setText('bridgeMeta','تعذّر الاتصال. '+e.message);return false;}
+}
+function isScorpioCard(card){
+  const t=card.textContent||'';
+  return t.includes('العقرب')||t.includes('Scorpio')||t.includes('عقرب');
+}
+function applyScorpioFilter(){
+  const cards=[...document.querySelectorAll('#renderMoon .moon-card')];
+  let count=0;
+  cards.forEach(c=>{
+    const isS=isScorpioCard(c);
+    if(isS){c.classList.add('is-scorpio');count++;}
+    else{c.classList.remove('is-scorpio');}
+    if(scorpioOnly&&!isS){c.classList.add('hidden');}
+    else{c.classList.remove('hidden');}
+  });
+  document.getElementById('scorpioCount').textContent=String(count);
+}
+async function runMoon(){
+  const b=document.getElementById('btnFetch'); b.disabled=true; b.textContent='جارٍ الجلب من الخادم…';
+  try{
+    const ok1=await step1(); if(!ok1){return;}
+    setBadge('st2','2 — جارٍ…','run');
+    const range=buildRange();
+    if(!range){setBadge('st2','2 — فشل: سنة أو شهر غير صالح','fail');return;}
+    const start=range.start; const end=range.end;
+    const dst=document.getElementById('dstSel').value==='true';
+    const borjFilter=document.getElementById('borjFilter').value.trim();
+    const showShamsi=document.getElementById('showShamsi').checked;
+    const showQamari=document.getElementById('showQamari').checked;
+    const showGregorian=document.getElementById('showGregorian').checked;
+    const solarMonthDisplay=document.getElementById('solarMonthDisplay').checked;
+    const lunarVal=document.getElementById('lunarMonthDisplay').value.trim();
+    const hijriVal=document.getElementById('hijriAdjustment').value.trim();
+    const payload={
+      syear:start.substr(0,4),smonth:start.substr(5,2),sday:start.substr(8,2),
+      eyear:end.substr(0,4),emonth:end.substr(5,2),eday:end.substr(8,2),
+      hour:state.hour,minute:state.minute,second:state.second,
+      dst:dst,tc:state.tc,
+      borjFilter:borjFilter,
+      showShamsi:showShamsi,showQamari:showQamari,showGregorian:showGregorian,
+      solarMonthDisplay:solarMonthDisplay,
+      lunarMonthDisplay:lunarVal||'0',
+      hijriAdjustment:hijriVal||'0'
+    };
+    setText('bridgeMeta','النمط: '+(currentMode==='month'?'شهر':'سنة')+' | المدى: '+start+' إلى '+end+' | جلبة وحدة واحدة إلى MoonInBorjs.');
+    const r=await postWeb(URL_MOON,payload);
+    setText('debugMoon','POST '+URL_MOON+'\n'+JSON.stringify(payload,null,2)+'\n\nHTTP '+r.status+'\n'+(r.text||'').slice(0,12000));
+    if(!r.ok){setBadge('st2','2 — فشل: HTTP '+r.status,'fail');return;}
+    const d=r.json&&r.json.d;
+    if(d===undefined||d===null){setBadge('st2','2 — فشل: لا يوجد result.d','fail');return;}
+    setHTML('renderMoon',d);
+    scorpioOnly=false; applyScorpioFilter();
+    const cards=document.querySelectorAll('#renderMoon .moon-card').length;
+    setBadge('st2','2 — نجاح من الخادم: جلبة وحدة ('+cards+' بطاقة)','ok');
+    setText('bridgeMeta','تم عرض '+cards+' بطاقة من جلبة وحدة، بلا حساب محلي. المدى: '+start+' إلى '+end+'.');
+  }catch(e){setBadge('st2','2 — فشل: تعذّر الاتصال','fail');setText('debugMoon','خطأ: '+e.message);}
+  finally{b.disabled=false;b.textContent='جلب الأبراج — جلبة وحدة';}
+}
+document.getElementById('btnFetch').addEventListener('click',runMoon);
+document.getElementById('btnClear').addEventListener('click',()=>{
+  state={tc:null,zoneName:null,formatted:null,year:null,month:null,day:null,hour:null,minute:null,second:null,gmtOffset:null,lat:32,lng:44.33};
+  scorpioOnly=false; applyScorpioFilter();
+  setBadge('st1','1 — المنطقة الزمنية: بانتظار','wait'); setBadge('st2','2 — الأبراج: بانتظار','wait');
+  setText('bridgeMeta','لم يتم التشغيل بعد.'); setText('locMeta','المدينة: غير محددة.');
+  setHTML('renderMoon','لم يتم الجلب بعد.'); setText('debugMoon','—'); document.getElementById('scorpioCount').textContent='0';
+});
+document.getElementById('btnScorpio').addEventListener('click',()=>{scorpioOnly=true;applyScorpioFilter();});
+document.getElementById('btnShowAll').addEventListener('click',()=>{scorpioOnly=false;applyScorpioFilter();});
+function buildExportHtml(){
+  const cards=[...document.querySelectorAll('#renderMoon .moon-card')];
+  if(!cards.length) return '';
+  const rows=cards.map(card=>{
+    const day=card.querySelector('.day-name')?card.querySelector('.day-name').textContent.trim():'';
+    const date=card.querySelector('.date-text')?card.querySelector('.date-text').textContent.trim():'';
+    const borj=card.querySelector('.borj-text')?card.querySelector('.borj-text').textContent.trim():'';
+    const txt=(!day&&!date&&!borj)?card.textContent.trim().slice(0,200):'';
+    const isS=isScorpioCard(card)?'نعم':'لا';
+    return '<tr><td>'+day+'</td><td>'+(date||txt)+'</td><td>'+borj+'</td><td>'+isS+'</td></tr>';
+  }).join('');
+  return '<html><head><meta charset="utf-8"></head><body><table border="1"><thead><tr><th>اليوم</th><th>التاريخ</th><th>البرج</th><th>عقرب؟</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>';
+}
+document.getElementById('btnWord').addEventListener('click',()=>{
+  const html=buildExportHtml(); if(!html){alert('لا يوجد جدول للتصدير.');return;}
+  const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='Moon-in-Zodiac.doc'; a.click();
+});
+document.getElementById('btnPrint').addEventListener('click',()=>{window.print();});
+document.getElementById('btnPdf').addEventListener('click',async()=>{
+  const html=buildExportHtml(); if(!html){alert('لا يوجد جدول للتصدير.');return;}
+  try{
+    const fd=new FormData(); fd.append('data',html); fd.append('PageType','Portrait'); fd.append('fileName','Moon-in-Zodiac');
+    const res=await fetch(URL_PDF,{method:'POST',body:fd});
+    if(!res.ok){alert('تعذّر تصدير PDF.');return;}
+    const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='Moon-in-Zodiac.pdf'; a.click();
+  }catch(e){alert('تعذّر تصدير PDF: '+e.message);}
+});
+async function doSearch(){
+  const q=document.getElementById('inpCityName').value.trim();
+  if(!q||q.length<2){return;}
+  document.getElementById('cityLoader').style.display='block';
+  try{
+    const res=await fetch(URL_SEARCH,{method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},body:JSON.stringify({cityName:q})});
+    const text=await res.text(); const j=JSON.parse(text);
+    document.getElementById('cityLoader').style.display='none';
+    const list=document.getElementById('searchList'); list.innerHTML='';
+    if(j.d&&j.d.length>0){
+      list.innerHTML=j.d;
+      list.querySelectorAll('.flag').forEach(el=>{
+        el.addEventListener('click',()=>{
+          const lat=el.getAttribute('data-lat')||el.dataset.lat;
+          const lon=el.getAttribute('data-lon')||el.dataset.lon;
+          const name=(el.querySelector('span')?el.querySelector('span').textContent.trim():el.textContent.trim());
+          if(lat&&lon){
+            document.getElementById('latInput').value=parseFloat(lat).toFixed(4);
+            document.getElementById('lngInput').value=parseFloat(lon).toFixed(4);
+            document.getElementById('inpCityName').value=name;
+            document.getElementById('searchList').innerHTML='';
+            setText('locMeta','المدينة: '+name+' | lat='+lat+' | lng='+lon);
+            runMoon();
+          }
+        });
+      });
+    } else {
+      list.innerHTML='<li>لا توجد نتائج.</li>';
+    }
+  }catch(e){document.getElementById('cityLoader').style.display='none';}
+}
+document.getElementById('btnSearchCity').addEventListener('click',doSearch);
+document.addEventListener('click',function(e){if(!e.target.closest('.search-results')&&!e.target.closest('#inpCityName')&&!e.target.closest('#btnSearchCity')){document.getElementById('searchList').innerHTML='';}});
+refreshRangeMeta();
 </script>
 </body>
 </html>
