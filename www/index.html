@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>التقويم الشامل — الأبراج شهر وسنة فقط</title>
+<title>التقويم الشامل — الأبراج شهر وسنة فقط — بلا برج اليوم</title>
 <style>
 *{box-sizing:border-box}
 body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#f6f5f1;color:#1a1a1a;margin:0;padding:0}
@@ -48,8 +48,8 @@ pre{white-space:pre-wrap;word-break:break-word;background:#101828;color:#e8eefc;
 </head>
 <body>
 <header>
-<h1>التقويم الشامل — الأبراج شهر وسنة فقط</h1>
-<p>جسر القمر إلى النجومي. نعرض ما يرجع من الخادم فقط. بلا حساب فلكي محلي وبلا أرقام مخترعة.</p><p style="background:#d1fae5;color:#065f46;padding:8px 10px;border-radius:8px;margin:8px 0 0;font-size:13px">نسخة جديدة — شهر وسنة فقط — إذا ما شفت هالسطر، أنت فاتح الملف القديم.</p>
+<h1>التقويم الشامل — الأبراج شهر وسنة فقط — بلا برج اليوم</h1>
+<p>جسر القمر إلى النجومي. نعرض ما يرجع من الخادم فقط. بلا حساب فلكي محلي وبلا أرقام مخترعة.</p><p style="background:#d1fae5;color:#065f46;padding:8px 10px;border-radius:8px;margin:8px 0 0;font-size:13px">نسخة جديدة — شهر وسنة فقط — بلا جلبة يوم — بلا برج اليوم — إذا ما شفت هالسطر، أنت فاتح الملف القديم.</p>
 </header>
 <main>
 
@@ -228,8 +228,7 @@ async function runMoon(){
     if(!range){setBadge('st2','2 — فشل: سنة أو شهر غير صالح','fail');return;}
     const start=range.start; const end=range.end;
     const dst=(state.dst!==undefined&&state.dst!==null)?state.dst:(document.getElementById('dstSel').value==='true');
-    const borjFilterRaw=document.getElementById('borjFilter').value.trim();
-    const borjFilter=borjFilterRaw===''?'0':borjFilterRaw; // فارغ = 0 = الكل — "" ليست صالحة لـ Int32
+    const borjFilter=document.getElementById('borjFilter').value.trim();
     const showShamsi=false; // النسخة العربية: currentCulture !== 'fa' → showShamsi = false كما في moonInborooj
     const showQamari=document.getElementById('showQamari').checked;
     const showGregorian=document.getElementById('showGregorian').checked;
@@ -257,7 +256,7 @@ async function runMoon(){
     scorpioOnly=false; applyScorpioFilter();
     const cards=document.querySelectorAll('#renderMoon .moon-card').length;
     setBadge('st2','2 — نجاح من الخادم: جلبة وحدة ('+cards+' بطاقة)','ok');
-    setText('bridgeMeta','تم عرض '+cards+' نتيجة من جلبة وحدة، بلا حساب محلي. المدى: '+start+' إلى '+end+'.');
+    setText('bridgeMeta','تم عرض '+cards+' بطاقة من جلبة وحدة، بلا حساب محلي. المدى: '+start+' إلى '+end+'.');
   }catch(e){setBadge('st2','2 — فشل: تعذّر الاتصال','fail');setText('debugMoon','خطأ: '+e.message);}
   finally{b.disabled=false;b.textContent='جلب الأبراج — جلبة وحدة';}
 }
