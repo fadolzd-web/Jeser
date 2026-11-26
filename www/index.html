@@ -1,152 +1,263 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>مكتشف واجهة نجومي</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>عارض المصدر الكامل</title>
 <style>
-body{font-family:system-ui,Arial,sans-serif;margin:0;background:#f6f4ef;color:#1a1a1a}
-header{background:#1f3a2d;color:#fff;padding:16px}
-header h1{margin:0;font-size:20px}
-header p{margin:6px 0 0;opacity:.9;font-size:14px}
-main{padding:14px;max-width:900px;margin:auto}
-.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px;margin-bottom:12px}
-h2{margin:0 0 8px;font-size:17px}
-label{display:block;margin:10px 0 4px;font-weight:700;font-size:14px}
-input,textarea{width:100%;box-sizing:border-box;padding:10px;border:1px solid #bbb;border-radius:8px;font-family:inherit;font-size:14px}
-textarea{min-height:140px;direction:ltr;text-align:left}
-button{background:#1f3a2d;color:#fff;border:0;border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;margin-top:10px}
-button.secondary{background:#fff;color:#1f3a2d;border:1px solid #1f3a2d}
-pre{background:#111;color:#e8e8e8;padding:10px;border-radius:8px;overflow:auto;white-space:pre-wrap;word-break:break-word;font-size:12px;direction:ltr;text-align:left;max-height:320px}
-.muted{color:#666;font-size:13px}
-.ok{color:#0a6b2f}.fail{color:#a00}
-.script-item{border:1px solid #eee;border-radius:8px;padding:8px;margin:6px 0}
-.line{border-bottom:1px solid #eee;padding:6px 0;font-size:13px;direction:ltr;text-align:left;word-break:break-word}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f6f4;color:#1a1a1a;font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.7}
+header{background:#0a4a2a;color:#fff;padding:18px 16px}
+header h1{margin:0;font-size:22px}
+header p{margin:6px 0 0;opacity:.92;font-size:14px}
+main{max-width:980px;margin:0 auto;padding:16px}
+.card{background:#fff;border:1px solid #dfe5df;border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 6px;font-size:18px}
+.card p{margin:0 0 12px;color:#4a4a4a;font-size:14px}
+label{display:block;font-weight:700;margin:12px 0 6px}
+input[type="text"],input[type="url"]{width:100%;padding:12px;border:1px solid #c8d0c8;border-radius:10px;font-size:15px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+button{background:#0a4a2a;color:#fff;border:0;border-radius:10px;padding:11px 18px;font-size:15px;cursor:pointer}
+button.secondary{background:#eef2ee;color:#0a4a2a;border:1px solid #c8d0c8}
+button.small{padding:7px 12px;font-size:13px}
+.status{margin-top:10px;font-size:14px;color:#0a4a2a;font-weight:700;white-space:pre-wrap}
+.status.error{color:#9b1c1c}
+.check{display:flex;gap:8px;align-items:center;font-size:14px}
+.check input{width:18px;height:18px}
+.result{border:1px solid #e2e2e2;border-radius:10px;padding:10px;margin-top:10px}
+.result .meta{font-weight:700;color:#0a4a2a}
+.result pre{margin:8px 0 0;background:#111;color:#f5f5f5;border-radius:8px;padding:10px;overflow-x:auto;direction:ltr;text-align:left;white-space:pre;font-size:13px;line-height:1.6}
+.context{margin-top:14px;border:1px solid #dfe5df;border-radius:10px;padding:12px;background:#fbfbfb}
+.context h3{margin:0 0 8px;font-size:16px}
+.context pre{background:#111;color:#f5f5f5;border-radius:8px;padding:12px;overflow-x:auto;direction:ltr;text-align:left;white-space:pre;font-size:13px;line-height:1.6}
+.wide{overflow-x:auto;background:#111;border-radius:10px;padding:0}
+.wide pre{margin:0;padding:14px;color:#f5f5f5;direction:ltr;text-align:left;white-space:pre;font-size:13px;line-height:1.6;min-width:900px}
+.chunks{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.note{font-size:13px;color:#555}
+mark{background:#ffe58a;color:#111;padding:0 2px}
 </style>
 </head>
 <body>
 <header>
-<h1>مكتشف واجهة نجومي</h1>
-<p>البحث عن عنوان الجلب الحقيقي من صفحة الأحداث، دون تخمين.</p>
+<h1>عارض المصدر الكامل</h1>
+<p>يجلب مصدر أي صفحة أو ملف، ويبحث فيه مباشرة. لا حاجة إلى النسخ واللصق، ولا إلى عرض المصدر من المتصفح.</p>
 </header>
 <main>
 <section class="card">
-<h2>١ — جلب مباشر من الصفحة</h2>
-<p class="muted">يجلب مصدر الصفحة ويستخرج ملفات الجافاسكربت. إذا لم يرجع الخادم بيانات، تظهر رسالة فشل الجلب.</p>
-<label for="pageUrl">عنوان الصفحة</label>
-<input id="pageUrl" type="text" value="https://arabic.nojumi.org/events">
-<button id="btnFetchPage">جلب مصدر الصفحة</button>
-<div id="pageStatus" class="muted">لم يتم الجلب بعد.</div>
-<div id="scripts"></div>
-<pre id="pageRaw">—</pre>
+<h2>١. جلب المصدر</h2>
+<p>ضع رابط الصفحة أو ملف الجافا سكربت، ثم اضغط جلب المصدر. يظهر المصدر كاملا دون قص.</p>
+<label for="urlInput">عنوان الصفحة</label>
+<input id="urlInput" type="url" value="https://arabic.nojumi.org/events" placeholder="ابحث عن كلمة أو سورة أو صفحة">
+<div class="row">
+<button id="fetchBtn">جلب المصدر</button>
+<button id="copyFullBtn" class="secondary">نسخ المصدر كاملا</button>
+</div>
+<div id="fetchStatus" class="status"></div>
 </section>
 
 <section class="card">
-<h2>٢ — البحث في نص ملصوق</h2>
-<p class="muted">الصق هنا مصدر الصفحة أو ملف الجافاسكربت المنسوخ من المتصفح، ثم ابحث عن عبارات الجلب.</p>
-<label for="pasteText">النص الملصوق</label>
-<textarea id="pasteText" placeholder="الصق مصدر الصفحة أو ملف الجافاسكربت هنا"></textarea>
-<label for="terms">عبارات البحث، مفصولة بفاصلة</label>
-<input id="terms" type="text" value="fetch, /api/, Moon, Events, borj, prayertimes, axios">
-<button id="btnSearchPaste">بحث في النص الملصوق</button>
-<div id="pasteResult"></div>
+<h2>٢. البحث في المصدر المجتلب</h2>
+<p>اكتب عبارة البحث، ثم اضغط بحث. تظهر كل الأسطر المطابقة مع رقم السطر.</p>
+<label for="searchInput">عبارة البحث</label>
+<input id="searchInput" type="text" placeholder="مثال: MoonInBorjs أو ddlBorj" value="MoonInBorjs">
+<label class="check"><input id="caseCheck" type="checkbox"> مطابقة حالة الأحرف</label>
+<div class="row">
+<button id="searchBtn">بحث في المصدر</button>
+<button id="copyResultsBtn" class="secondary">نسخ النتائج</button>
+</div>
+<div id="searchStatus" class="status"></div>
+<div id="results"></div>
+<div id="contextBox" class="context" hidden>
+<h3 id="contextTitle">السياق</h3>
+<pre id="contextPre"></pre>
+</div>
 </section>
 
 <section class="card">
-<h2>٣ — عدّاد النتائج في الرد الخام</h2>
-<p class="muted">الصق قيمة الحقل d من رد الخادم، لمعرفة عدد النتائج الحقيقي.</p>
-<label for="rawD">قيمة الحقل d</label>
-<textarea id="rawD" placeholder="الصق قيمة الحقل d هنا"></textarea>
-<button id="btnCount">عدّ النتائج</button>
-<div id="countResult" class="muted">لم يتم العدّ بعد.</div>
+<h2>٣. المصدر الكامل</h2>
+<p>المصدر الكامل في إطار عريض. مرر أفقيا لقراءة الأسطر الطويلة. النسخ متاح على أجزاء لتسهيل النسخ على الهاتف.</p>
+<div class="wide"><pre id="fullPre">لم يتم جلب أي مصدر بعد.</pre></div>
+<div id="chunks" class="chunks"></div>
+<p class="note">يعرض هذا العارض ما يعود من الخادم فقط. عند تعذر الجلب، تظهر رسالة تعذر الجلب دون عرض أي أرقام مختلقة.</p>
 </section>
 </main>
 <script>
-function setText(id,t){document.getElementById(id).textContent=t;}
-function setHTML(id,h){document.getElementById(id).innerHTML=h;}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-async function fetchText(url){
-  const r=await fetch(url,{method:'GET'});
-  if(!r.ok){throw new Error('HTTP '+r.status);}
-  return await r.text();
+var fullText = "";
+var lines = [];
+var lastResults = [];
+var urlInput = document.getElementById("urlInput");
+var fetchBtn = document.getElementById("fetchBtn");
+var fetchStatus = document.getElementById("fetchStatus");
+var searchInput = document.getElementById("searchInput");
+var searchBtn = document.getElementById("searchBtn");
+var searchStatus = document.getElementById("searchStatus");
+var resultsBox = document.getElementById("results");
+var contextBox = document.getElementById("contextBox");
+var contextTitle = document.getElementById("contextTitle");
+var contextPre = document.getElementById("contextPre");
+var fullPre = document.getElementById("fullPre");
+var chunksBox = document.getElementById("chunks");
+var caseCheck = document.getElementById("caseCheck");
+var copyFullBtn = document.getElementById("copyFullBtn");
+var copyResultsBtn = document.getElementById("copyResultsBtn");
+
+function setFetchStatus(text, isError) {
+  fetchStatus.textContent = text;
+  fetchStatus.className = isError ? "status error" : "status";
 }
-function extractScripts(html,base){
-  const out=[];
-  const re=/<script[^>]+src=["']([^"']+)["']/gi;
-  let m;
-  while((m=re.exec(html))!==null){
-    let u=m[1];
-    try{u=new URL(u,base).href;}catch(e){}
-    if(out.indexOf(u)===-1){out.push(u);}
-  }
-  return out;
+function setSearchStatus(text, isError) {
+  searchStatus.textContent = text;
+  searchStatus.className = isError ? "status error" : "status";
 }
-function searchLines(text,terms){
-  const lines=text.split('\n');
-  const hits=[];
-  lines.forEach(function(line,i){
-    const low=line.toLowerCase();
-    for(let k=0;k<terms.length;k++){
-      const term=terms[k].trim();
-      if(term && low.indexOf(term.toLowerCase())!==-1){
-        hits.push({n:i+1,line:line.trim()});
-        break;
-      }
-    }
-  });
-  return hits;
-}
-function renderHits(hits,elId){
-  if(!hits.length){setHTML(elId,'<p class="fail">لا توجد نتائج مطابقة.</p>');return;}
-  let h='<p class="ok">عدد النتائج: '+hits.length+'</p>';
-  hits.slice(0,200).forEach(function(x){
-    h+='<div class="line"><b>'+x.n+'</b> — '+esc(x.line.slice(0,600))+'</div>';
-  });
-  setHTML(elId,h);
-}
-document.getElementById('btnFetchPage').addEventListener('click',function(){
-  const url=document.getElementById('pageUrl').value.trim();
-  if(!url){setText('pageStatus','فشل: العنوان فارغ.');return;}
-  setText('pageStatus','جارٍ الجلب من الخادم…');
-  fetchText(url).then(function(t){
-    setText('pageStatus','تم الجلب. طول النص: '+t.length+' حرف.');
-    setText('pageRaw',t.slice(0,12000));
-    const scripts=extractScripts(t,url);
-    let h='<h3>ملفات الجافاسكربت: '+scripts.length+'</h3>';
-    if(!scripts.length){h+='<p class="fail">لا توجد ملفات جافاسكربت في المصدر.</p>';}
-    scripts.forEach(function(s,i){
-      h+='<div class="script-item"><div style="direction:ltr;text-align:left;word-break:break-all">'+esc(s)+'</div><button class="secondary" data-url="'+esc(s)+'" data-idx="'+i+'">جلب هذا الملف والبحث فيه</button><div id="jsres'+i+'"></div></div>';
-    });
-    setHTML('scripts',h);
-    const btns=document.querySelectorAll('#scripts button[data-url]');
-    btns.forEach(function(b){
-      b.addEventListener('click',function(){
-        const u=b.getAttribute('data-url');
-        const idx=b.getAttribute('data-idx');
-        setText('jsres'+idx,'جارٍ جلب ملف الجافاسكربت…');
-        fetchText(u).then(function(jt){
-          const terms=document.getElementById('terms').value.split(',');
-          const hits=searchLines(jt,terms);
-          let hh='<p class="ok">طول الملف: '+jt.length+' حرف. عدد النتائج: '+hits.length+'</p>';
-          hits.slice(0,200).forEach(function(x){hh+='<div class="line"><b>'+x.n+'</b> — '+esc(x.line.slice(0,600))+'</div>';});
-          setHTML('jsres'+idx,hh);
-        }).catch(function(e){setText('jsres'+idx,'فشل الجلب: '+e.message);});
+function buildChunks() {
+  chunksBox.innerHTML = "";
+  if (!fullText) { return; }
+  var size = 8000;
+  var count = Math.ceil(fullText.length / size);
+  for (var i = 0; i < count; i++) {
+    (function(index) {
+      var btn = document.createElement("button");
+      btn.className = "small secondary";
+      btn.type = "button";
+      var start = index * size + 1;
+      var end = Math.min((index + 1) * size, fullText.length);
+      btn.textContent = "نسخ الجزء " + (index + 1) + " (" + start + " - " + end + ")";
+      btn.addEventListener("click", function() {
+        var part = fullText.slice(index * size, (index + 1) * size);
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(part).then(function() {
+            setFetchStatus("تم نسخ الجزء " + (index + 1) + ".");
+          }, function() {
+            setFetchStatus("تعذر النسخ. حدد النص يدويا.", true);
+          });
+        } else {
+          setFetchStatus("النسخ غير متاح في هذا المتصفح.", true);
+        }
       });
+      chunksBox.appendChild(btn);
+    })(i);
+  }
+}
+function showContext(lineNo) {
+  var start = Math.max(0, lineNo - 11);
+  var end = Math.min(lines.length, lineNo + 25);
+  var out = "";
+  for (var i = start; i < end; i++) {
+    var num = i + 1;
+    var marker = (num === lineNo) ? ">>> " : "    ";
+    out += marker + num + ": " + lines[i] + "\n";
+  }
+  contextTitle.textContent = "السياق حول السطر " + lineNo;
+  contextPre.textContent = out;
+  contextBox.hidden = false;
+  contextBox.scrollIntoView({behavior: "smooth", block: "start"});
+}
+fetchBtn.addEventListener("click", function() {
+  var url = urlInput.value.trim();
+  if (!url) {
+    setFetchStatus("ضع عنوانا أولا.", true);
+    return;
+  }
+  setFetchStatus("جارٍ الجلب...");
+  resultsBox.innerHTML = "";
+  contextBox.hidden = true;
+  fetch(url).then(function(res) {
+    if (!res.ok) {
+      throw new Error("استجابة الخادم: " + res.status);
+    }
+    return res.text();
+  }).then(function(text) {
+    fullText = text;
+    lines = text.split("\n");
+    fullPre.textContent = text;
+    buildChunks();
+    setFetchStatus("تم الجلب. الطول: " + text.length + " حرف. عدد الأسطر: " + lines.length + ".");
+    setSearchStatus("المصدر جاهز. اكتب عبارة البحث ثم اضغط بحث.");
+  }).catch(function(err) {
+    fullText = "";
+    lines = [];
+    fullPre.textContent = "تعذر الجلب.";
+    chunksBox.innerHTML = "";
+    setFetchStatus("تعذر الجلب: " + err.message, true);
+  });
+});
+searchBtn.addEventListener("click", function() {
+  var q = searchInput.value;
+  if (!fullText) {
+    setSearchStatus("اجلب المصدر أولا.", true);
+    return;
+  }
+  if (!q) {
+    setSearchStatus("اكتب عبارة البحث أولا.", true);
+    return;
+  }
+  var sensitive = caseCheck.checked;
+  var needle = sensitive ? q : q.toLowerCase();
+  lastResults = [];
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var hay = sensitive ? line : line.toLowerCase();
+    if (hay.indexOf(needle) !== -1) {
+      lastResults.push({no: i + 1, text: line});
+    }
+  }
+  resultsBox.innerHTML = "";
+  if (lastResults.length === 0) {
+    setSearchStatus("لا توجد نتائج لعبارة: " + q);
+    return;
+  }
+  setSearchStatus("عدد النتائج: " + lastResults.length + " نتيجة.");
+  lastResults.forEach(function(r) {
+    var div = document.createElement("div");
+    div.className = "result";
+    var meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = "السطر " + r.no;
+    var pre = document.createElement("pre");
+    pre.textContent = r.text;
+    var btn = document.createElement("button");
+    btn.className = "small secondary";
+    btn.type = "button";
+    btn.textContent = "عرض ١٠ أسطر قبل و ٢٥ سطرا بعد";
+    btn.addEventListener("click", function() {
+      showContext(r.no);
     });
-  }).catch(function(e){setText('pageStatus','فشل الجلب: '+e.message);setText('pageRaw','—');});
+    div.appendChild(meta);
+    div.appendChild(pre);
+    div.appendChild(btn);
+    resultsBox.appendChild(div);
+  });
 });
-document.getElementById('btnSearchPaste').addEventListener('click',function(){
-  const t=document.getElementById('pasteText').value;
-  if(!t.trim()){setHTML('pasteResult','<p class="fail">فشل: النص الملصوق فارغ.</p>');return;}
-  const terms=document.getElementById('terms').value.split(',');
-  const hits=searchLines(t,terms);
-  renderHits(hits,'pasteResult');
+copyFullBtn.addEventListener("click", function() {
+  if (!fullText) {
+    setFetchStatus("اجلب المصدر أولا.", true);
+    return;
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(fullText).then(function() {
+      setFetchStatus("تم نسخ المصدر كاملا.");
+    }, function() {
+      setFetchStatus("تعذر النسخ. استخدم أزرار الأجزاء.", true);
+    });
+  } else {
+    setFetchStatus("النسخ غير متاح في هذا المتصفح.", true);
+  }
 });
-document.getElementById('btnCount').addEventListener('click',function(){
-  const t=document.getElementById('rawD').value;
-  if(!t.trim()){setText('countResult','فشل: النص فارغ.');return;}
-  const c=(t.match(/moon-card/g)||[]).length;
-  setText('countResult','طول النص: '+t.length+' حرف. عدد moon-card في الرد الخام: '+c+'.');
+copyResultsBtn.addEventListener("click", function() {
+  if (lastResults.length === 0) {
+    setSearchStatus("لا توجد نتائج للنسخ.", true);
+    return;
+  }
+  var out = lastResults.map(function(r) { return r.no + ": " + r.text; }).join("\n");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(out).then(function() {
+      setSearchStatus("تم نسخ النتائج.");
+    }, function() {
+      setSearchStatus("تعذر النسخ.", true);
+    });
+  } else {
+    setSearchStatus("النسخ غير متاح في هذا المتصفح.", true);
+  }
 });
 </script>
 </body>
